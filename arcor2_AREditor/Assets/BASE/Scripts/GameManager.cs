@@ -85,7 +85,7 @@ namespace Base {
         public bool ProjectChanged = false, ProjectRunning = false;
 
         public const string ApiVersion = "0.6.0";
-        public readonly string EditorVersion = "0.4.0";
+        public readonly string EditorVersion = "0.4.1-alpha.1";
 
         public List<IO.Swagger.Model.ListProjectsResponseData> Projects = new List<IO.Swagger.Model.ListProjectsResponseData>();
         public List<IO.Swagger.Model.IdDesc> Scenes = new List<IO.Swagger.Model.IdDesc>();
@@ -93,6 +93,8 @@ namespace Base {
         public TMPro.TMP_Text VersionInfo, MessageBox, EditorInfo, ConnectionInfo, ServerVersion;
 
         public Image GizmoOverlay;
+
+        public GameObject Table, Factory;
 
         public bool SceneInteractable {
             get => !MenuManager.Instance.IsAnyMenuOpened();
