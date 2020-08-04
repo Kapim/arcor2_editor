@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.Playables;
 using Base;
+using System.Runtime.CompilerServices;
+using IO.Swagger.Model;
 
 public class MainScreen : Base.Singleton<MainScreen>
 {
@@ -14,7 +16,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     public InputDialog InputDialog;
 
     [SerializeField]
-    private SceneOptionMenu SceneOptionMenu;
+    public SceneOptionMenu SceneOptionMenu;
 
     [SerializeField]
     private ProjectOptionMenu ProjectOptionMenu;
@@ -23,7 +25,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     private PackageOptionMenu PackageOptionMenu;
 
     [SerializeField]
-    private CanvasGroup projectsList, scenesList, packageList;
+    public CanvasGroup ProjectsList, ScenesList, PackageList;
 
     [SerializeField]
     private CanvasGroup CanvasGroup;
@@ -31,9 +33,10 @@ public class MainScreen : Base.Singleton<MainScreen>
     [SerializeField]
     private GameObject ButtonsPortrait, ButtonsLandscape;
 
-    private List<SceneTile> sceneTiles = new List<SceneTile>();
-    private List<ProjectTile> projectTiles = new List<ProjectTile>();
-    private List<PackageTile> packageTiles = new List<PackageTile>();
+    
+    private List<SceneTile> SceneTiles = new List<SceneTile>();
+    private List<ProjectTile> ProjectTiles = new List<ProjectTile>();
+    private List<PackageTile> PackageTiles = new List<PackageTile>();
 
     //filters
     private bool starredOnly = false;
@@ -70,6 +73,22 @@ public class MainScreen : Base.Singleton<MainScreen>
         SwitchToScenes();
     }
 
+    public bool IsActive() {
+        return CanvasGroup.alpha == 1 && CanvasGroup.blocksRaycasts == true;
+    }
+    public bool IsInactive() {
+        return CanvasGroup.alpha == 0 && CanvasGroup.blocksRaycasts == false;
+    }
+
+    public SceneTile GetSceneTile(string sceneName) {
+        foreach (SceneTile sceneTile in MainScreen.Instance.SceneTiles) {
+            if (sceneTile.GetLabel() == sceneName) {
+                return sceneTile;
+            }
+        }
+        throw new ItemNotFoundException("Scene tile not found");
+    }
+
     public void SwitchToProjects() {
         foreach (TMPro.TMP_Text btn in ScenesBtns) {
             btn.color = new Color(0.687f, 0.687f, 0.687f);
@@ -80,9 +99,9 @@ public class MainScreen : Base.Singleton<MainScreen>
         foreach (TMPro.TMP_Text btn in ProjectsBtns) {
             btn.color = new Color(0, 0, 0);
         }
-        projectsList.gameObject.SetActive(true);
-        scenesList.gameObject.SetActive(false);
-        packageList.gameObject.SetActive(false);
+        ProjectsList.gameObject.SetActive(true);
+        ScenesList.gameObject.SetActive(false);
+        PackageList.gameObject.SetActive(false);
         FilterProjectsBySceneId(null);
         FilterLists();
     }
@@ -98,9 +117,9 @@ public class MainScreen : Base.Singleton<MainScreen>
             btn.color = new Color(0.687f, 0.687f, 0.687f);
         }
         
-        projectsList.gameObject.SetActive(false);
-        packageList.gameObject.SetActive(false);
-        scenesList.gameObject.SetActive(true);
+        ProjectsList.gameObject.SetActive(false);
+        PackageList.gameObject.SetActive(false);
+        ScenesList.gameObject.SetActive(true);
         FilterScenesById(null);
         FilterLists();
     }
@@ -115,26 +134,26 @@ public class MainScreen : Base.Singleton<MainScreen>
         foreach (TMPro.TMP_Text btn in ProjectsBtns) {
             btn.color = new Color(0.687f, 0.687f, 0.687f);
         }
-        projectsList.gameObject.SetActive(false);
-        scenesList.gameObject.SetActive(false);
-        packageList.gameObject.SetActive(true);
+        ProjectsList.gameObject.SetActive(false);
+        ScenesList.gameObject.SetActive(false);
+        PackageList.gameObject.SetActive(true);
         FilterLists();
     }
 
     public void HighlightTile(string tileId) {
-        foreach (SceneTile s in sceneTiles) {
+        foreach (SceneTile s in SceneTiles) {
             if (s.SceneId == tileId) {
                 s.Highlight();
                 return;
             }            
         }
-        foreach (ProjectTile p in projectTiles) {
+        foreach (ProjectTile p in ProjectTiles) {
             if (p.ProjectId == tileId) {
                 p.Highlight();
                 return;
             }            
         }
-        foreach (PackageTile p in packageTiles) {
+        foreach (PackageTile p in PackageTiles) {
             if (p.PackageId == tileId) {
                 p.Highlight();
                 return;
@@ -143,13 +162,13 @@ public class MainScreen : Base.Singleton<MainScreen>
     }
 
     public void FilterLists() {
-        foreach (SceneTile tile in sceneTiles) {
+        foreach (SceneTile tile in SceneTiles) {
             FilterTile(tile);
         }
-        foreach (ProjectTile tile in projectTiles) {
+        foreach (ProjectTile tile in ProjectTiles) {
             FilterTile(tile);
         }
-        foreach (PackageTile tile in packageTiles) {
+        foreach (PackageTile tile in PackageTiles) {
             FilterTile(tile);
         }
     }
@@ -162,7 +181,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     }
 
     public void FilterProjectsBySceneId(string sceneId) {
-        foreach (ProjectTile tile in projectTiles) {
+        foreach (ProjectTile tile in ProjectTiles) {
             if (sceneId == null) {
                 tile.gameObject.SetActive(true);
                 return;
@@ -175,7 +194,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     }
 
     public void FilterScenesById(string sceneId) {
-        foreach (SceneTile tile in sceneTiles) {
+        foreach (SceneTile tile in SceneTiles) {
             if (sceneId == null) {
                 tile.gameObject.SetActive(true);
                 return;
@@ -212,7 +231,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     }
 
     public void UpdateScenes(object sender, EventArgs eventArgs) {
-        sceneTiles.Clear();
+        SceneTiles.Clear();
         foreach (Transform t in ScenesDynamicContent.transform) {
             Destroy(t.gameObject);
         }
@@ -225,7 +244,7 @@ public class MainScreen : Base.Singleton<MainScreen>
                           starred,
                           scene.Id,
                           scene.Modified.ToString());
-            sceneTiles.Add(tile);
+            SceneTiles.Add(tile);
         }
         Button button = Instantiate(TileNewPrefab, ScenesDynamicContent.transform).GetComponent<Button>();
         // TODO new scene
@@ -248,7 +267,7 @@ public class MainScreen : Base.Singleton<MainScreen>
     }
 
     public void UpdatePackages(object sender, EventArgs eventArgs) {
-        packageTiles.Clear();
+        PackageTiles.Clear();
         foreach (Transform t in PackagesDynamicContent.transform) {
             Destroy(t.gameObject);
         }
@@ -268,13 +287,13 @@ public class MainScreen : Base.Singleton<MainScreen>
                           package.Id,
                           projectName,
                           package.PackageMeta.Built.ToString());
-            packageTiles.Add(tile);
+            PackageTiles.Add(tile);
         }
         
     }
 
     public void UpdateProjects(object sender, EventArgs eventArgs) {
-        projectTiles.Clear();
+        ProjectTiles.Clear();
         foreach (Transform t in ProjectsDynamicContent.transform) {
             Destroy(t.gameObject);
         }
@@ -291,7 +310,7 @@ public class MainScreen : Base.Singleton<MainScreen>
                               project.SceneId,
                               sceneName,
                               project.Modified.ToString());
-                projectTiles.Add(tile);
+                ProjectTiles.Add(tile);
             } catch (ItemNotFoundException ex) {
                 Debug.LogError(ex);
                 Notifications.Instance.SaveLogs("Failed to load scene name.");

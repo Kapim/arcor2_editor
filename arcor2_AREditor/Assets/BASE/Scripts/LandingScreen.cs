@@ -6,7 +6,7 @@ using System;
 using Base;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class LandingScreen : MonoBehaviour
+public class LandingScreen : Singleton<LandingScreen>
 {
     public TMPro.TMP_InputField Domain, Port;
     public Toggle KeepConnected;
@@ -32,12 +32,19 @@ public class LandingScreen : MonoBehaviour
         }
     }
 
+    public bool IsActive() {
+        return CanvasGroup.alpha == 1 && CanvasGroup.blocksRaycasts == true;
+    }
+
+    public bool IsInactive() {
+        return CanvasGroup.alpha == 0 && CanvasGroup.blocksRaycasts == false;
+    }
+
     public void ConnectToServer() {
         string domain = Domain.text;
         int port = int.Parse(Port.text);
         PlayerPrefs.SetString("arserver_domain", domain);
         PlayerPrefs.SetInt("arserver_port", port);
-        PlayerPrefs.SetInt("arserver_keep_connected", KeepConnected.isOn ? 1 : 0);
         PlayerPrefs.Save();
         Base.GameManager.Instance.ConnectToSever(domain, port);
     }
@@ -54,5 +61,9 @@ public class LandingScreen : MonoBehaviour
 
     public void SaveLogs() {
         Notifications.Instance.SaveLogs();
+    }
+
+    public void SetKeepMeConnected(bool value) {
+        PlayerPrefsHelper.SaveBool("arserver_keep_connected", value);
     }
 }

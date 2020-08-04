@@ -26,6 +26,10 @@ public class Tile : MonoBehaviour
         return Label.text;
     }
 
+    public Button GetOptionButton() {
+        return OptionButton;
+    }
+
     public void AddListener(UnityAction callback) {
         if (callback != null)
             MainButton.onClick.AddListener(callback);

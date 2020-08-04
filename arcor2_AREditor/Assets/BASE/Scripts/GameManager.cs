@@ -275,6 +275,9 @@ namespace Base {
             WebsocketManager.Instance.OnConnectedEvent += OnConnected;
             WebsocketManager.Instance.OnDisconnectEvent += OnDisconnected;
             WebsocketManager.Instance.OnShowMainScreen += OnShowMainScreen;
+            if (Application.isEditor || Debug.isDebugBuild) {
+                TrilleonAutomation.AutomationMaster.Initialize();
+            }
         }
 
         private async void OnShowMainScreen(object sender, ShowMainScreenEventArgs args) {

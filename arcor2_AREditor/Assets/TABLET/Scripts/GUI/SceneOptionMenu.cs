@@ -11,7 +11,7 @@ public class SceneOptionMenu : TileOptionMenu {
     [SerializeField]
     private InputDialog inputDialog;
     [SerializeField]
-    private ConfirmationDialog confirmationDialog;
+    public ConfirmationDialog confirmationDialog;
 
     protected override void Start() {
         base.Start();
