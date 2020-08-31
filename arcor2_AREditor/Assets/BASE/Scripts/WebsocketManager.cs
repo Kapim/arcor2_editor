@@ -1593,7 +1593,7 @@ namespace Base {
         public async Task UpdateActionPointOrientationUsingRobot(string id, string robotId, string endEffector, string orientationId) {
             int r_id = Interlocked.Increment(ref requestID);
             IO.Swagger.Model.RobotArg robotArg = new IO.Swagger.Model.RobotArg(robotId: robotId, endEffector: endEffector);
-            IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequestArgs args = new IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequestArgs(actionPointId: id, robot: robotArg, orientationId: orientationId);
+            IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequestArgs args = new IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequestArgs(robot: robotArg, orientationId: orientationId);
             IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequest request = new IO.Swagger.Model.UpdateActionPointOrientationUsingRobotRequest(r_id, "UpdateActionPointOrientationUsingRobot", args);
             SendDataToServer(request.ToJson(), r_id, true);
             IO.Swagger.Model.UpdateActionPointOrientationUsingRobotResponse response = await WaitForResult<IO.Swagger.Model.UpdateActionPointOrientationUsingRobotResponse>(r_id);
@@ -1603,6 +1603,23 @@ namespace Base {
         }
 
         /// <summary>
+        /// Asks server to compute calibration based on captured image
+        /// </summary>
+        /// <param name="image">base64 encoded string</param>
+        /// <param name="cameraParameters">Intristic parameters of camera</param>
+        /// <returns></returns>
+        public async Task Calibrate(string image, CameraParameters cameraParameters) {
+            int r_id = Interlocked.Increment(ref requestID);
+            IO.Swagger.Model.CalibrationRequestArgs args = new IO.Swagger.Model.CalibrationRequestArgs(cameraParameters: cameraParameters, image: image);
+            IO.Swagger.Model.CalibrationRequest request = new IO.Swagger.Model.CalibrationRequest(r_id, "Calibration", args);
+            SendDataToServer(request.ToJson(), r_id, true);
+            IO.Swagger.Model.CalibrationResponse response = await WaitForResult<IO.Swagger.Model.CalibrationResponse>(r_id);
+
+            if (response == null || !response.Result)
+                throw new RequestFailedException(response == null ? "Request timed out" : response.Messages[0]);
+        }
+
+       /* /// <summary>
         /// Asks server to add action point joints
         /// </summary>
         /// <param name="id">UUID of action point</param>
@@ -1618,7 +1635,7 @@ namespace Base {
 
             if (response == null || !response.Result)
                 throw new RequestFailedException(response == null ? "Request timed out" : response.Messages[0]);
-        }
+        }*/
 
         /// <summary>
         /// Asks server to update action point joints using robot.
@@ -1629,7 +1646,7 @@ namespace Base {
         /// <returns></returns>
         public async Task UpdateActionPointJoints(string robotId, string jointsId) {
             int r_id = Interlocked.Increment(ref requestID);
-            IO.Swagger.Model.UpdateActionPointJointsRequestArgs args = new IO.Swagger.Model.UpdateActionPointJointsRequestArgs(robotId: robotId, jointsId: jointsId);
+            IO.Swagger.Model.UpdateActionPointJointsRequestArgs args = new IO.Swagger.Model.UpdateActionPointJointsRequestArgs(jointsId: jointsId);
             IO.Swagger.Model.UpdateActionPointJointsRequest request = new IO.Swagger.Model.UpdateActionPointJointsRequest(r_id, "UpdateActionPointJoints", args);
             SendDataToServer(request.ToJson(), r_id, true);
             IO.Swagger.Model.UpdateActionPointJointsResponse response = await WaitForResult<IO.Swagger.Model.UpdateActionPointJointsResponse>(r_id);
