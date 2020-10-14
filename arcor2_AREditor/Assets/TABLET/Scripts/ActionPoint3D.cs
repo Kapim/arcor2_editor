@@ -12,13 +12,13 @@ public class ActionPoint3D : Base.ActionPoint {
     public TextMeshPro ActionPointName;
     private Material sphereMaterial;
 
-    private bool manipulationStarted = false;
+    public bool manipulationStarted = false;
     private TransformGizmo tfGizmo;
 
     private float interval = 0.1f;
     private float nextUpdate = 0;
 
-    private bool updatePosition = false;
+    public bool updatePosition = false;
     [SerializeField]
     private OutlineOnClick outlineOnClick;
 
@@ -31,7 +31,12 @@ public class ActionPoint3D : Base.ActionPoint {
 
     protected override void Update() {
         if (manipulationStarted) {
-            if (tfGizmo.mainTargetRoot != null && GameObject.ReferenceEquals(tfGizmo.mainTargetRoot.gameObject, Sphere)) {
+            if (updatePosition) {
+                updatePosition = false;
+                UpdatePose();
+            }
+            
+            /*if (tfGizmo.mainTargetRoot != null && GameObject.ReferenceEquals(tfGizmo.mainTargetRoot.gameObject, Sphere)) {
                 if (!tfGizmo.isTransforming && updatePosition) {
                     updatePosition = false;
                     UpdatePose();
@@ -43,7 +48,7 @@ public class ActionPoint3D : Base.ActionPoint {
 
             } else {
                 manipulationStarted = false;
-            }
+            }*/
         }
             
         //TODO shouldn't this be called first?

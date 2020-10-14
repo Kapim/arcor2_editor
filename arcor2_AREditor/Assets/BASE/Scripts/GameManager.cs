@@ -379,7 +379,11 @@ namespace Base {
             /// <summary>
             /// Indicates that all interaction is disabled
             /// </summary>
-            InteractionDisabled
+            InteractionDisabled,
+            /// <summary>
+            /// Indicates that some action point is transformed atm
+            /// </summary>
+            TransformingAP
         }
 
         /// <summary>
@@ -465,7 +469,7 @@ namespace Base {
         /// and invoke corresponding event
         /// </summary>
         /// <param name="newState">New state</param>
-        private void SetEditorState(EditorStateEnum newState) {
+        public void SetEditorState(EditorStateEnum newState) {
             editorState = newState;
             OnEditorStateChanged?.Invoke(this, new EditorStateEventArgs(newState));
             switch (newState) {
