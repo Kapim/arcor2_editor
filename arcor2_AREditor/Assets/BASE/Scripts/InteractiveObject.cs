@@ -18,11 +18,16 @@ public abstract class InteractiveObject : Clickable {
     public virtual float GetDistance(Vector3 origin) {
         float minDist = float.MaxValue;
         foreach (Collider collider in Colliders) {
-            Vector3 point = collider.ClosestPointOnBounds(origin);
-           
-            minDist = Math.Min(Vector3.Distance(origin, point), minDist);
+            try {
+                Vector3 point = collider.ClosestPointOnBounds(origin);
+
+                minDist = Math.Min(Vector3.Distance(origin, point), minDist);
+            } catch (UnassignedReferenceException ex) {
+
+            }            
 
         }
+        
         return minDist;
     }
 

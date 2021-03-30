@@ -268,6 +268,13 @@ public class ActionPoint3D : Base.ActionPoint {
 
     public async override void Remove() {
         try {
+            foreach (Base.Action action in Actions.Values) {                
+                action.Remove();
+            }
+            foreach (Base.ActionPoint ap in ProjectManager.Instance.GetAllActionPoints()) {
+                if (ap.Parent != null && ap.Parent.GetId() == GetId())
+                    ap.Remove();
+            }
             await WebsocketManager.Instance.RemoveActionPoint(Data.Id);
         } catch (RequestFailedException e) {
             Notifications.Instance.ShowNotification("Failed to remove action point", e.Message);

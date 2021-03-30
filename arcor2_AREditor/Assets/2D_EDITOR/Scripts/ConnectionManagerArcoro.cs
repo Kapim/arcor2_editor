@@ -22,6 +22,7 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
 
     public Connection CreateConnection(GameObject o1, GameObject o2) {
         Connection c = Instantiate(ConnectionPrefab).GetComponent<Connection>();
+        
         c.transform.SetParent(transform);
         // Set correct targets. Output has to be always at 0 index, because we are connecting output to input.
         // Output has direction to the east, while input has direction to the west.

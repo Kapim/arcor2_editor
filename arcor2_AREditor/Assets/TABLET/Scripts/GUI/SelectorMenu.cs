@@ -43,13 +43,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     private void OnLoadProjectScene(object sender, EventArgs e) {
-        ShowRobots(RobotsToggle.Toggled, false);
-        ShowActionObjects(ObjectsToggle.Toggled, false);
-        ShowActionPoints(PointsToggle.Toggled, false);
-        ShowActions(ActionsToggle.Toggled, false);
-        ShowIO(IOToggle.Toggled, false);
-        ShowOthers(OthersToggle.Toggled, false);
-        ForceUpdateMenus();
+        UpdateFilters();
     }
 
 
@@ -476,4 +470,13 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ShowOthers(show, true);
     }
 
+    internal void UpdateFilters() {
+        ShowRobots(RobotsToggle.Toggled, false);
+        ShowActionObjects(ObjectsToggle.Toggled, false);
+        ShowActionPoints(PointsToggle.Toggled, false);
+        ShowActions(ActionsToggle.Toggled, false);
+        ShowIO(IOToggle.Toggled, false);
+        ShowOthers(OthersToggle.Toggled, false);
+        ForceUpdateMenus();
+    }
 }

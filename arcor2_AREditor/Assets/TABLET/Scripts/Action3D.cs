@@ -158,6 +158,8 @@ public class Action3D : Base.Action {
     }
 
     public override void Remove() {
+        Input.Remove();
+        Output.Remove();
         WebsocketManager.Instance.RemoveAction(Data.Id, false);
     }
 

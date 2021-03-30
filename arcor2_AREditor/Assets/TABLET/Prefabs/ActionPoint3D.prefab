@@ -306,7 +306,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.6, y: 0.6}
+  m_Size: {x: 0.5, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -505,7 +505,6 @@ MonoBehaviour:
   ActionsSpawn: {fileID: 1416551817558692293}
   ConnectionToParent: {fileID: 0}
   orientations: {fileID: 1503747242841873625}
-  OrientationsVisible: 0
   ActionsCollapsed: 0
   Sphere: {fileID: 7822383090967264636}
   Visual: {fileID: 4940753687191564067}

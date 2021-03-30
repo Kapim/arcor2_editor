@@ -1205,6 +1205,7 @@ namespace Base {
                 SelectorMenu.Instance.ForceUpdateMenus();
                 updateProject = true;
                 SelectorMenu.Instance.SetSelectedObject(action, true);
+                LeftMenu.Instance.MoveClick();
             } catch (RequestFailedException ex) {
                 Debug.LogError(ex);
             }            

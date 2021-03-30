@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5806945198084741765}
   - component: {fileID: 5806945198096296325}
   - component: {fileID: 5806945198095790967}
+  - component: {fileID: 665063037600708594}
   m_Layer: 0
   m_Name: ConnectionPrefab
   m_TagString: Untagged
@@ -82,7 +83,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.05
+        value: 0.037884522
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -91,7 +92,7 @@ LineRenderer:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0.05
+        value: 0.037884522
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -164,3 +165,19 @@ MonoBehaviour:
     weight: 0.1
   resolution: 20
   _line: {fileID: 5806945198096296325}
+--- !u!114 &665063037600708594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5806945198085100239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e73a907a2be23c24fa6f4aac0eff29d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  Colliders: []
+  LogicItemId: 
+  Name: connection
