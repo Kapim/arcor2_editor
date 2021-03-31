@@ -343,6 +343,7 @@ MonoBehaviour:
   ActionOutput: {fileID: 21300000, guid: d8b73322ecdd1bc49a2d8c8496061af1, type: 3}
   Action: {fileID: 21300000, guid: 898f649ad97e7ad4a83665483790ca16, type: 3}
   Others: {fileID: 21300000, guid: da28346b19bb5664d9fd89c4ac0a58c4, type: 3}
+  Connection: {fileID: 21300000, guid: e88c3ade7884cbd43a0b4ac36f91de37, type: 3}
 --- !u!114 &2773184679950104427
 MonoBehaviour:
   m_ObjectHideFlags: 0

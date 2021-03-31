@@ -436,6 +436,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         SelectorMenu.Instance.SwitchToNoPose();
         SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(), true);
         ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
+        SelectorMenu.Instance.UpdateFilters();
     }
 
     public void CubeClick() {
@@ -443,6 +444,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyBox("Cube"), true);
+        SelectorMenu.Instance.UpdateFilters();
     }
 
     #endregion

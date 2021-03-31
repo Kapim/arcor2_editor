@@ -297,7 +297,7 @@ namespace Base {
 
             }
             if (ap != null && SelectAPNameWhenCreated.Equals(ap.GetName())) {
-                SelectorMenu.Instance.ForceUpdateMenus();
+                SelectorMenu.Instance.UpdateFilters();
                 SelectorMenu.Instance.SetSelectedObject(ap, true);
                 SelectAPNameWhenCreated = "";
                 //// FOR EXPERIMENT!!
@@ -305,6 +305,7 @@ namespace Base {
                 IRobot robot = SceneManager.Instance.GetRobots()[0];
                 await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), robot.GetId(),
                   "default", "default");
+                LeftMenu.Instance.MoveClick();
                 //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "def");
             }
             updateProject = true;
@@ -388,6 +389,13 @@ namespace Base {
             return true;
         }
 
+        internal void EnableAllConnections(bool show) {
+            foreach (Connection c in ConnectionManagerArcoro.Instance.Connections) {
+                if (c != null && c.GetComponent<ConnectionLine>() != null)
+                    c.GetComponent<ConnectionLine>().Enable(show);
+            }
+        }
+
 
         /// <summary>
         /// Destroys current project
@@ -464,6 +472,8 @@ namespace Base {
         private void OnLogicItemAdded(object sender, LogicItemChangedEventArgs args) {
             LogicItem logicItem = new LogicItem(args.Data);
             LogicItems.Add(args.Data.Id, logicItem);
+
+            SelectorMenu.Instance.UpdateFilters();
         }
 
         /// <summary>
@@ -1201,8 +1211,9 @@ namespace Base {
                 action.ActionUpdateBaseData(DataHelper.ActionToBareAction(projectAction));
                 // updates parameters of the action
                 action.ActionUpdate(projectAction);
-                
-                SelectorMenu.Instance.ForceUpdateMenus();
+
+
+                SelectorMenu.Instance.UpdateFilters();
                 updateProject = true;
                 SelectorMenu.Instance.SetSelectedObject(action, true);
                 LeftMenu.Instance.MoveClick();

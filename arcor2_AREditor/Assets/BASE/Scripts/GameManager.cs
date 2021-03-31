@@ -533,7 +533,9 @@ namespace Base {
             // "disable" non-relevant elements to simplify process for the user
             switch (requestType) {
                 case EditorStateEnum.SelectingActionObject:
-                    SceneManager.Instance.EnableAllActionObjects(true, true);
+                    ProjectManager.Instance.EnableAllConnections(false);
+                    SceneManager.Instance.EnableAllActionObjects(true, false);
+                    SceneManager.Instance.EnableAllRobots(true);
                     ProjectManager.Instance.EnableAllActionPoints(false);
                     ProjectManager.Instance.EnableAllActions(false);
                     ProjectManager.Instance.EnableAllActionOutputs(false);
@@ -543,40 +545,48 @@ namespace Base {
                     EnableServiceInteractiveObjects(false);
                     break;
                 case EditorStateEnum.SelectingActionOutput:
+                    ProjectManager.Instance.EnableAllConnections(false);
                     ProjectManager.Instance.EnableAllActionPoints(false);
                     ProjectManager.Instance.EnableAllActionInputs(false);
                     ProjectManager.Instance.EnableAllActions(false);
-                    SceneManager.Instance.EnableAllActionObjects(false);
+                    SceneManager.Instance.EnableAllActionObjects(false, false);
+                    SceneManager.Instance.EnableAllRobots(false);
                     ProjectManager.Instance.EnableAllOrientations(false);
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     EnableServiceInteractiveObjects(false);
                     ProjectManager.Instance.EnableAllActionOutputs(true);
                     break;
                 case EditorStateEnum.SelectingActionInput:
+                    ProjectManager.Instance.EnableAllConnections(false);
                     ProjectManager.Instance.EnableAllActionPoints(false);
                     ProjectManager.Instance.EnableAllActionOutputs(false);
                     ProjectManager.Instance.EnableAllActions(false);
-                    SceneManager.Instance.EnableAllActionObjects(false);
+                    SceneManager.Instance.EnableAllActionObjects(false, false);
+                    SceneManager.Instance.EnableAllRobots(false);
                     ProjectManager.Instance.EnableAllOrientations(false);
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     EnableServiceInteractiveObjects(false);
                     ProjectManager.Instance.EnableAllActionInputs(true);
                     break;
                 case EditorStateEnum.SelectingActionPointParent:
+                    ProjectManager.Instance.EnableAllConnections(false);
                     ProjectManager.Instance.EnableAllActions(false);
                     ProjectManager.Instance.EnableAllOrientations(false);
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     ProjectManager.Instance.EnableAllActionOutputs(false);
                     ProjectManager.Instance.EnableAllActionInputs(false);
-                    SceneManager.Instance.EnableAllActionObjects(true, true);
+                    SceneManager.Instance.EnableAllActionObjects(false, false);
+                    SceneManager.Instance.EnableAllRobots(false);
                     ProjectManager.Instance.EnableAllActionPoints(true);
                     EnableServiceInteractiveObjects(false);
                     break;
                 case EditorStateEnum.SelectingAction:
+                    ProjectManager.Instance.EnableAllConnections(false);
                     ProjectManager.Instance.EnableAllActionPoints(false);
                     ProjectManager.Instance.EnableAllActionInputs(false);
                     ProjectManager.Instance.EnableAllActions(true);
-                    SceneManager.Instance.EnableAllActionObjects(false);
+                    SceneManager.Instance.EnableAllActionObjects(false, false);
+                    SceneManager.Instance.EnableAllRobots(false);
                     ProjectManager.Instance.EnableAllOrientations(false);
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     EnableServiceInteractiveObjects(false);

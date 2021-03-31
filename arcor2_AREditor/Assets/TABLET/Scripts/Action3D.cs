@@ -90,7 +90,7 @@ public class Action3D : Base.Action {
         if (type == Click.MOUSE_RIGHT_BUTTON || type == Click.TOUCH) {
             OpenMenu();
         }*/
-        Output.Show();
+        //Output.Show();
         Output.OnClick(Click.MOUSE_LEFT_BUTTON);
     }
 

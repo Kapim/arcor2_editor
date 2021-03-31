@@ -10,19 +10,22 @@ public class OnClickCollider : Clickable {
 
     public override void OnClick(Click type) {
         foreach (Clickable clickable in Target?.GetComponents<Clickable>()) {
-            clickable.OnClick(type);
+            if (clickable != this)
+                clickable.OnClick(type);
         }
     }
 
     public override void OnHoverStart() {
         foreach (Clickable clickable in Target?.GetComponents<Clickable>()) {
-            clickable.OnHoverStart();
+            if (clickable != this)
+                clickable.OnHoverStart();
         }
     }
 
     public override void OnHoverEnd() {
         foreach (Clickable clickable in Target?.GetComponents<Clickable>()) {
-            clickable.OnHoverEnd();
+            if (clickable != this)
+                clickable.OnHoverEnd();
         }
     }
 

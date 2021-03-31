@@ -40,6 +40,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ProjectManager.Instance.OnLoadProject += OnLoadProjectScene;
         SceneManager.Instance.OnLoadScene += OnLoadProjectScene;
         GameManager.Instance.OnRunPackage += OnLoadProjectScene;
+        ShowIO(false, false);
     }
 
     private void OnLoadProjectScene(object sender, EventArgs e) {
@@ -408,7 +409,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void ShowRobots(bool show, bool updateMenus) {
-        ProjectManager.Instance.EnableAllRobotsEE(show);
+        ProjectManager.Instance.EnableAllRobotsEE(false);
         SceneManager.Instance.EnableAllRobots(show);
         if (updateMenus)
             ForceUpdateMenus();
@@ -446,6 +447,12 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             ForceUpdateMenus();
     }
 
+    public void ShowConnections(bool show, bool updateMenus) {
+        ProjectManager.Instance.EnableAllConnections(show);
+        if (updateMenus)
+            ForceUpdateMenus();
+    }
+
     public void ShowRobots(bool show) {
         ShowRobots(show, true);
     }
@@ -462,6 +469,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ShowIO(show, true);
     }
 
+    public void ShowConnections(bool show) {
+        ShowConnections(show, true);
+    }
+
     public void ShowActions(bool show) {
         ShowActions(show, true);
     }
@@ -470,12 +481,14 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ShowOthers(show, true);
     }
 
+
     internal void UpdateFilters() {
         ShowRobots(RobotsToggle.Toggled, false);
         ShowActionObjects(ObjectsToggle.Toggled, false);
         ShowActionPoints(PointsToggle.Toggled, false);
         ShowActions(ActionsToggle.Toggled, false);
-        ShowIO(IOToggle.Toggled, false);
+        ShowIO(false, false);
+        ShowConnections(IOToggle.Toggled, false);
         ShowOthers(OthersToggle.Toggled, false);
         ForceUpdateMenus();
     }

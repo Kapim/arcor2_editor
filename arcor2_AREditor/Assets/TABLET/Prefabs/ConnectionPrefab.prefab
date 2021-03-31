@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 5806945198096296325}
   - component: {fileID: 5806945198095790967}
   - component: {fileID: 665063037600708594}
+  - component: {fileID: 7522651762674020684}
+  - component: {fileID: 3233066136122509002}
+  - component: {fileID: 7397735029035130149}
   m_Layer: 0
   m_Name: ConnectionPrefab
   m_TagString: Untagged
@@ -178,6 +181,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Enabled: 1
-  Colliders: []
+  Colliders:
+  - {fileID: 7522651762674020684}
   LogicItemId: 
   Name: connection
+--- !u!64 &7522651762674020684
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5806945198085100239}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!114 &3233066136122509002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5806945198085100239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 2100000, guid: 1ef88d2e88b167344b7db905a28877ad,
+    type: 2}
+  OutlineHoverMaterial: {fileID: 2100000, guid: 30b6c12768aff6b449821421d3bccff4,
+    type: 2}
+  Renderers:
+  - {fileID: 5806945198096296325}
+  HoverOnly: 0
+--- !u!114 &7397735029035130149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5806945198085100239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b0ea4ca6bb8264ca3aabbcc53b2254, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  Target: {fileID: 0}

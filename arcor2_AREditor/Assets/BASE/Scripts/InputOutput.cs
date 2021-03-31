@@ -21,25 +21,17 @@ namespace Base {
 
         public object ifValue;
 
-        private void Start() {
-            if (logicItemIds.Count == 0) {
-                Hide();
-            } else {
-                Show();
-            }
-        }
+        
 
 
         public void AddLogicItem(string logicItemId) {
             Debug.Assert(logicItemId != null);
             logicItemIds.Add(logicItemId);
-            Show();
         }
 
         public void RemoveLogicItem(string logicItemId) {
             Debug.Assert(logicItemIds.Contains(logicItemId));
             logicItemIds.Remove(logicItemId);
-            Hide();
         }
 
         public List<LogicItem> GetLogicItems() {

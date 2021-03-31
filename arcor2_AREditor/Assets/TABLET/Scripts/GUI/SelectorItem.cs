@@ -16,7 +16,7 @@ public class SelectorItem : MonoBehaviour
     public float Score;
     private long lastUpdate;
     private bool selected;
-    public Sprite ActionPoint, ActionObject, Robot, RobotEE, Orientation, ActionInput, ActionOutput, Action, Others;
+    public Sprite ActionPoint, ActionObject, Robot, RobotEE, Orientation, ActionInput, ActionOutput, Action, Others, Connection;
 
     private void Awake() {
         Button = GetComponent<Button>();
@@ -47,6 +47,8 @@ public class SelectorItem : MonoBehaviour
             Icon.sprite = RobotEE;
         } else if (interactiveObject.GetType() == typeof(APOrientation)) {
             Icon.sprite = Orientation;
+        } else if (interactiveObject.GetType() == typeof(ConnectionLine)) {
+            Icon.sprite = Connection;
         } else {
             Icon.sprite = Others;
         }
