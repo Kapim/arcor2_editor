@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using IO.Swagger.Model;
 using System.Globalization;
+using Newtonsoft.Json;
 
 public class VelocityDialog : Dialog
 {
@@ -39,14 +40,20 @@ public class VelocityDialog : Dialog
 
 
     public override async void Confirm() {
-        List<ActionParameter> parameters = new List<ActionParameter> {
-            new ActionParameter(name: "velocity", type: "double", value: TransformWheel.GetValue().ToString("#.0", CultureInfo.GetCultureInfo("en-US"))),
-        };
-        foreach (KeyValuePair<string, Base.Parameter> param in action.Parameters) {
+        //List<ActionParameter> parameters = new List<ActionParameter>();
+        /*foreach (KeyValuePair<string, Base.Parameter> param in action.Parameters) {
             if (param.Value.Name == "velocity")
-                continue;
-            parameters.Add(new ActionParameter(name: param.Value.Name, type: param.Value.Type, value: param.Value.Value));
-        }
+                parameters.Add(new ActionParameter(name: "velocity", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue())));
+            else
+                parameters.Add(new ActionParameter(name: param.Value.Name, type: param.Value.Type, value: param.Value.Value));
+        }*/
+        NamedOrientation o = action.ActionPoint.GetFirstOrientation();
+        List<ActionParameter> parameters = new List<ActionParameter> {
+            new ActionParameter(name: "pose", type: "pose", value: "\"" + o.Id + "\""),
+            new ActionParameter(name: "move_type", type: "string_enum", value: "\"JOINTS\""),
+            new ActionParameter(name: "velocity", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue())),
+            new ActionParameter(name: "acceleration", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue()))
+        };
 
         Debug.Assert(ProjectManager.Instance.AllowEdit);
         try {

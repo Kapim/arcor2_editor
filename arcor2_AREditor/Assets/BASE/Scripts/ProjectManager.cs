@@ -303,8 +303,9 @@ namespace Base {
                 //// FOR EXPERIMENT!!
                 ///
                 IRobot robot = SceneManager.Instance.GetRobots()[0];
-                await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), robot.GetId(),
-                  "default", "default");
+                /*await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), robot.GetId(),
+                  "default", "default");*/
+                await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "default");
                 LeftMenu.Instance.MoveClick();
                 //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "def");
             }

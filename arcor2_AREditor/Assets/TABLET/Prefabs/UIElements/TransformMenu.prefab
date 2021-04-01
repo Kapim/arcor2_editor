@@ -306,6 +306,8 @@ MonoBehaviour:
   - {fileID: 2307180883262197989}
   NextArrowBtn: {fileID: 1745775811903247058}
   PreviousArrowBtn: {fileID: 7243736512002179370}
+  StepuUpButton: {fileID: 5066039515238940108}
+  StepDownButton: {fileID: 2628195491864368733}
 --- !u!225 &4595658156852722566
 CanvasGroup:
   m_ObjectHideFlags: 0

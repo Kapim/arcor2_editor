@@ -481,7 +481,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
-        string name = ProjectManager.Instance.GetFreeActionName("MoveTo");
+        string name = ProjectManager.Instance.GetFreeActionName("Pick");
         NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
@@ -502,7 +502,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
-        string name = ProjectManager.Instance.GetFreeActionName("MoveTo");
+        string name = ProjectManager.Instance.GetFreeActionName("Release");
         NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "place_pose", type: "pose", value: "\"" + o.Id + "\""),

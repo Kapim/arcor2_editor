@@ -2390,6 +2390,18 @@ namespace Base {
             }
         }
 
+        public async Task StepRobotEef(StepRobotEefRequestArgs.AxisEnum axis, string endEffectorId, bool safe, string robotId, decimal speed, decimal step,
+            StepRobotEefRequestArgs.WhatEnum what, StepRobotEefRequestArgs.ModeEnum mode = StepRobotEefRequestArgs.ModeEnum.World) {
+            int r_id = Interlocked.Increment(ref requestID);
+            IO.Swagger.Model.StepRobotEefRequestArgs args = new StepRobotEefRequestArgs(axis: axis, endEffectorId: endEffectorId, mode: mode, robotId: robotId, safe: safe, speed: speed, step: step, what: what);
+            IO.Swagger.Model.StepRobotEefRequest request = new IO.Swagger.Model.StepRobotEefRequest(r_id, "StepRobotEef", args: args);
+            SendDataToServer(request.ToJson(), r_id, true);
+            IO.Swagger.Model.StepRobotEefResponse response = await WaitForResult<IO.Swagger.Model.StepRobotEefResponse>(r_id);
+            if (response == null || !response.Result) {
+                throw new RequestFailedException(response == null ? new List<string>() { "Failed to step robot" } : response.Messages);
+            }
+        }
+
     }
 
 
