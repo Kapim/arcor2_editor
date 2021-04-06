@@ -44,7 +44,7 @@ public class ActionPoint3D : Base.ActionPoint {
                 manipulationStarted = false;
             }
         }
-        if (GetName() == "dabap" && Visual.activeSelf)
+        if ((GetName() == "dabap" || GetName() == "dabap2") && Visual.activeSelf)
             Visual.SetActive(false);
             
         //TODO shouldn't this be called first?
@@ -221,7 +221,7 @@ public class ActionPoint3D : Base.ActionPoint {
         sphereMaterial = Sphere.GetComponent<Renderer>().material;
         ActionPointName.text = apData.Name;
         SetRotation(GetRotation());
-        if (GetName() == "dabap")
+        if (GetName() == "dabap" || GetName() == "dabap2")
             Visual.SetActive(false);
     }
 

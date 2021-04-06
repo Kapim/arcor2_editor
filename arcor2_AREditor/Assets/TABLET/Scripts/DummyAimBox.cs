@@ -17,7 +17,7 @@ public class DummyAimBox : DummyBox, IActionPointParent {
     private void Start() {
     }
 
-    private void OnActionPointAddedToScene(object sender, Base.ActionPointEventArgs args) {
+    protected virtual void OnActionPointAddedToScene(object sender, Base.ActionPointEventArgs args) {
         if (args.ActionPoint.Data.Name == "dabap") {
             ActionPoint = args.ActionPoint;
             transform.SetParent(ActionPoint.transform);
@@ -36,7 +36,7 @@ public class DummyAimBox : DummyBox, IActionPointParent {
 
 
 
-    public async void AimFinished() {
+    public virtual async void AimFinished() {
         if (!Reseted)
             return;
         SetVisibility(true);
@@ -54,7 +54,7 @@ public class DummyAimBox : DummyBox, IActionPointParent {
         Reseted = false;
     }
 
-    public void SetVisibility(bool visible) {
+    public virtual void SetVisibility(bool visible) {
         Visible = visible;
         PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/visible", visible);
 
@@ -68,7 +68,7 @@ public class DummyAimBox : DummyBox, IActionPointParent {
             if (gameObject != null)
                 Destroy(gameObject);
             for (int i = 0; i < 4; ++i)
-                PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/PointAimed/" + i, false);
+                PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/PointAimed/" + i, false);
             SelectorMenu.Instance.ForceUpdateMenus();
         } catch (RequestFailedException e) {
             Notifications.Instance.ShowNotification("Failed to remove BlueBox", e.Message);

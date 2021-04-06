@@ -299,7 +299,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             clickedButton.GetComponent<Image>().enabled = true;
             SelectorMenu.Instance.gameObject.SetActive(false);
             //selectedObject.StartManipulation();
-            TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox));
+            TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
         }
 
     }
@@ -434,7 +434,17 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SwitchToNoPose();
-        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(), true);
+        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(true), true);
+        ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
+        SelectorMenu.Instance.UpdateFilters();
+    }
+
+    public void TesterClick() {
+        SelectorMenu.Instance.gameObject.SetActive(true);
+        MeshPicker.SetActive(false);
+        SetActiveSubmenu(LeftMenuSelection.None);
+        SelectorMenu.Instance.SwitchToNoPose();
+        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(false), true);
         ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
         SelectorMenu.Instance.UpdateFilters();
     }

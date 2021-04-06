@@ -76,7 +76,7 @@ namespace Base {
 
         public GameObject ActionPointSphere;
 
-        public GameObject DummyBoxPrefab, DummyBoxVisual, DummyAimBoxPrefab;
+        public GameObject DummyBoxPrefab, DummyBoxVisual, DummyAimBoxPrefab, DummyAimBoxTesterPrefab;
 
         public bool ProjectChanged {
             get => projectChanged;
@@ -378,15 +378,17 @@ namespace Base {
             }
 
 
-            bool boxInScene = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/inScene", false);
+            bool blueBoxInScene = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/inScene", false);
+            bool testerInScene = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/inScene", false);
             
-            if (boxInScene) {
-                DummyAimBox box = AddDummyAimBox(false);
+            if (blueBoxInScene) {
+                DummyAimBox box = AddDummyAimBox(true, false);
                 box.Visible = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/visible", false);
                 
-               
-                
-                
+            }
+            if (testerInScene) {
+                DummyAimBox box = AddDummyAimBox(false, false);
+                box.Visible = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/visible", false);
             }
             HideAPOrientations();
             projectChanged = project.Modified == DateTime.MinValue;
@@ -643,23 +645,43 @@ namespace Base {
             return box;
         }
 
-        public DummyAimBox AddDummyAimBox(bool init = true) {
-            DummyAimBox box = Instantiate(DummyAimBoxPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
-            try {
-                box.ActionPoint = GetactionpointByName("dabap");
-                box.transform.SetParent(box.ActionPoint.transform);
-                box.transform.localPosition = Vector3.zero;
-                box.transform.rotation = GameManager.Instance.Scene.transform.rotation;
-            } catch (KeyNotFoundException ex) {
-                _ = Base.GameManager.Instance.AddActionPoint("dabap", "", new IO.Swagger.Model.Position(-0.25m, 0.59m, 0));
-            } 
-                
-            if (init) {
-                PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/inScene", true);
-                PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/visible", false);
+        public DummyAimBox AddDummyAimBox(bool blueBox, bool init = true) {
+            if (blueBox) {
+                DummyAimBox box = Instantiate(DummyAimBoxPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
+                try {
+                    box.ActionPoint = GetactionpointByName("dabap");
+                    box.transform.SetParent(box.ActionPoint.transform);
+                    box.transform.localPosition = Vector3.zero;
+                    box.transform.rotation = GameManager.Instance.Scene.transform.rotation;
+                } catch (KeyNotFoundException ex) {
+                    _ = Base.GameManager.Instance.AddActionPoint("dabap", "", new IO.Swagger.Model.Position(-0.25m, 0.59m, 0));
+                }
+
+                if (init) {
+                    PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/inScene", true);
+                    PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/visible", false);
+                }
+                SelectorMenu.Instance.ForceUpdateMenus();
+                return box;
+            } else {
+                DummyAimBox box = Instantiate(DummyAimBoxTesterPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
+                try {
+                    box.ActionPoint = GetactionpointByName("dabap2");
+                    box.transform.SetParent(box.ActionPoint.transform);
+                    box.transform.localPosition = Vector3.zero;
+                    box.transform.rotation = GameManager.Instance.Scene.transform.rotation;
+                } catch (KeyNotFoundException ex) {
+                    _ = Base.GameManager.Instance.AddActionPoint("dabap2", "", new IO.Swagger.Model.Position(-0.25m, 0.59m, 0));
+                }
+
+                if (init) {
+                    PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/inScene", true);
+                    PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/visible", false);
+                }
+                SelectorMenu.Instance.ForceUpdateMenus();
+                return box;
             }
-            SelectorMenu.Instance.ForceUpdateMenus();
-            return box;
+
         }
 
         /// <summary>

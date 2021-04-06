@@ -298,7 +298,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         //ClearMenu(selectorItemsAlphabetMenu);
         List<string> idsToRemove = selectorItems.Keys.ToList();
         foreach (InteractiveObject io in GameManager.Instance.GetAllInteractiveObjects()) {
-            if (!io.Enabled || io.GetName() == "dabap" || io.GetName() == "default")
+            if (!io.Enabled || io.GetName() == "dabap" || io.GetName() == "dabap2" || io.GetName() == "default")
                 continue;
             if (selectorItems.TryGetValue(io.GetId(), out SelectorItem item)) {
                 item.transform.SetParent(ContentAlphabet.transform);

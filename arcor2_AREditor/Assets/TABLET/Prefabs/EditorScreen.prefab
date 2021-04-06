@@ -17469,6 +17469,21 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 202607586399094849, guid: 944feb2edd3faa947b264eda901c8dab,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2552091387944622631}
+    - target: {fileID: 202607586399094849, guid: 944feb2edd3faa947b264eda901c8dab,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TesterClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 202607586399094849, guid: 944feb2edd3faa947b264eda901c8dab,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 615569689399430467, guid: 944feb2edd3faa947b264eda901c8dab,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -17802,7 +17817,7 @@ PrefabInstance:
     - target: {fileID: 5023149704527114042, guid: 944feb2edd3faa947b264eda901c8dab,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: BlueBoxClick
+      value: CubeClick
       objectReference: {fileID: 0}
     - target: {fileID: 5023149704527114042, guid: 944feb2edd3faa947b264eda901c8dab,
         type: 3}

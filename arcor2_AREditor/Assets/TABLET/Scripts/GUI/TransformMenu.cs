@@ -25,13 +25,19 @@ public class TransformMenu : Singleton<TransformMenu> {
     public CanvasGroup CanvasGroup;
 
     private bool handHolding = false, DummyAimBox = false;
+
+    public bool Tester {
+        get;
+        private set;
+    }
+
     private string robotId;
 
     private RobotEE endEffector;
 
     public GameObject DummyBoxing;
 
-    public List<Image> Arrows, Dots, DotsBackgrounds;
+    public List<Image> Arrows, ArrowsTester, Dots, DotsBackgrounds;
     private List<GameObject> dummyPoints = new List<GameObject>();
     private int currentArrowIndex;
     public Button NextArrowBtn, PreviousArrowBtn, StepuUpButton, StepDownButton;
@@ -341,7 +347,7 @@ public class TransformMenu : Singleton<TransformMenu> {
             UpdateRotate(0);
     }
 
-    public void Show(InteractiveObject interactiveObject, bool dummyAimBox = false) {
+    public void Show(InteractiveObject interactiveObject, bool dummyAimBox = false, bool tester = false) {
         foreach (IRobot robot in SceneManager.Instance.GetRobots()) {
             robotId = robot.GetId();
         }
@@ -354,6 +360,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         offsetPosition = Vector3.zero;
         ResetTransformWheel();
         DummyAimBox = dummyAimBox;
+        Tester = tester;
         SwitchToTranslate();
         if (DummyAimBox) {
             InteractiveObject = ((DummyAimBox) interactiveObject).ActionPoint;
@@ -373,7 +380,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         } else if (DummyAimBox) {
             model = GetPointModel();
             for (int i = 0; i < 4; ++i) {
-                bool aimed = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/PointAimed/" + i, false);
+                bool aimed = PlayerPrefsHelper.LoadBool(Base.ProjectManager.Instance.ProjectMeta.Id + (Tester ? "/BlueBox" : "/Tester") + "/PointAimed/" + i, false);
                 if (aimed)
                     Dots[i].color = Color.green;
                 else
@@ -409,9 +416,13 @@ public class TransformMenu : Singleton<TransformMenu> {
     private void SetArrowVisible(int index) {
         for (int i = 0; i < 4; ++i) {
             Arrows[i].gameObject.SetActive(false);
+            ArrowsTester[i].gameObject.SetActive(false);
             DotsBackgrounds[i].color = Color.clear;
-        }            
-        Arrows[index].gameObject.SetActive(true);
+        }
+        if (Tester)
+            ArrowsTester[index].gameObject.SetActive(true);
+        else
+            Arrows[index].gameObject.SetActive(true);
         DotsBackgrounds[index].color = Color.white;
         NextArrowBtn.interactable = index != 3;
         PreviousArrowBtn.interactable = index != 0;
@@ -469,7 +480,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     public async void SubmitPosition() {
         if (DummyAimBox) {
             Dots[currentArrowIndex].color = Color.green;
-            PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/PointAimed/" + currentArrowIndex, true);
+            PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + (Tester ? "/BlueBox" : "/Tester") + "/PointAimed/" + currentArrowIndex, true);
             if (dummyPoints[currentArrowIndex] != null) {
                 GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
                 Destroy(dummyPoints[currentArrowIndex]);
@@ -487,9 +498,15 @@ public class TransformMenu : Singleton<TransformMenu> {
                 }
             }
             if (done) {
-                DummyAimBox dummyAimBox = FindObjectOfType<DummyAimBox>();
-                if (dummyAimBox != null)
-                    dummyAimBox.AimFinished();
+                if (Tester) {
+                    DummyAimBoxTester dummyAimBox = FindObjectOfType<DummyAimBoxTester>();
+                    if (dummyAimBox != null)
+                        dummyAimBox.AimFinished();
+                } else {
+                    DummyAimBox dummyAimBox = FindObjectOfType<DummyAimBox>();
+                    if (dummyAimBox != null)
+                        dummyAimBox.AimFinished();
+                }
             }
         } else if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
             try {
@@ -525,14 +542,22 @@ public class TransformMenu : Singleton<TransformMenu> {
         if (manually && DummyAimBox) {
             for (int i = 0; i < 4; ++i) {
                 Dots[i].color = Color.red;
-                PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/PointAimed/" + i, false);
+                PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + (Tester ? "/BlueBox" : "/Tester") + "/PointAimed/" + i, false);
                 if (dummyPoints[i] != null) {
                     Destroy(dummyPoints[i]);
                 }
-                DummyAimBox dummyAimBox = FindObjectOfType<DummyAimBox>();
-                if (dummyAimBox != null) {
-                    dummyAimBox.SetVisibility(false);
-                    dummyAimBox.Reseted = true;
+                if (Tester) {
+                    DummyAimBoxTester dummyAimBox = FindObjectOfType<DummyAimBoxTester>();
+                    if (dummyAimBox != null) {
+                        dummyAimBox.SetVisibility(false);
+                        dummyAimBox.Reseted = true;
+                    }
+                } else {
+                    DummyAimBox dummyAimBox = FindObjectOfType<DummyAimBox>();
+                    if (dummyAimBox != null) {
+                        dummyAimBox.SetVisibility(false);
+                        dummyAimBox.Reseted = true;
+                    }
                 }
             }
         }
