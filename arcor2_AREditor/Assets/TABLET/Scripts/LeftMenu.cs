@@ -183,7 +183,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (selectedObject is null)
             return;
         if (selectedObject.GetType() == typeof(ActionPoint3D)) {
-            ProjectManager.Instance.SelectAPNameWhenCreated = "copy_of_" + selectedObject.GetName();
+            ProjectManager.Instance.SelectAPNameWhenCreated = selectedObject.GetName() + "_copy";
             WebsocketManager.Instance.CopyActionPoint(selectedObject.GetId(), null);
         } else if (selectedObject.GetType() == typeof(Action3D)) {
             Action3D action = (Action3D) selectedObject;
@@ -467,6 +467,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             new ActionParameter(name: "acceleration", type: "double", value: "50.0")
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
+        ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/move", ProjectManager.Instance.GetFreeActionName("MoveTo"), robot.GetActionMetadata("move").GetFlows(name));
         SelectorMenu.Instance.gameObject.SetActive(true);
         ActionPicker.SetActive(false);
@@ -488,6 +489,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             new ActionParameter(name: "vertical_offset", type: "double", value: "0.05")
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
+
+        ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/pick", ProjectManager.Instance.GetFreeActionName("Pick"), robot.GetActionMetadata("pick").GetFlows(name));
         SelectorMenu.Instance.gameObject.SetActive(true);
         ActionPicker.SetActive(false);
@@ -509,6 +512,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             new ActionParameter(name: "vertical_offset", type: "double", value: "0.05")
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
+
+        ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/place", ProjectManager.Instance.GetFreeActionName("Place"), robot.GetActionMetadata("place").GetFlows(name));
         SelectorMenu.Instance.gameObject.SetActive(true);
         ActionPicker.SetActive(false);

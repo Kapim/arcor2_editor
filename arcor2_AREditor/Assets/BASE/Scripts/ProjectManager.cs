@@ -96,6 +96,10 @@ namespace Base {
             get;
             internal set;
         }
+        public string ActionToSelect {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Invoked when some of the action point weas updated. Contains action point description
@@ -296,16 +300,19 @@ namespace Base {
                 }
 
             }
-            if (ap != null && SelectAPNameWhenCreated.Equals(ap.GetName())) {
+            if (ap != null && SelectAPNameWhenCreated.Contains(ap.GetName())) {
                 SelectorMenu.Instance.UpdateFilters();
                 SelectorMenu.Instance.SetSelectedObject(ap, true);
                 SelectAPNameWhenCreated = "";
                 //// FOR EXPERIMENT!!
                 ///
-                IRobot robot = SceneManager.Instance.GetRobots()[0];
                 /*await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), robot.GetId(),
                   "default", "default");*/
-                await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "default");
+                try {
+                    await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "default");
+
+                } catch (RequestFailedException) {
+                }
                 LeftMenu.Instance.MoveClick();
                 //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "def");
             }
@@ -1216,8 +1223,10 @@ namespace Base {
 
                 SelectorMenu.Instance.UpdateFilters();
                 updateProject = true;
-                SelectorMenu.Instance.SetSelectedObject(action, true);
-                LeftMenu.Instance.MoveClick();
+                if (ActionToSelect == action.GetName()) {
+                    SelectorMenu.Instance.SetSelectedObject(action, true);
+                    ActionToSelect = "";
+                }
             } catch (RequestFailedException ex) {
                 Debug.LogError(ex);
             }            

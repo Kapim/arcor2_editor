@@ -13,6 +13,7 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
     private GameObject virtualPointer;
     [SerializeField]
     private Material EnabledMaterial, DisabledMaterial;
+    public GameObject SegmentColliderPrefab;
 
     private void Start() {
         virtualPointer = VirtualConnectionOnTouch.Instance.VirtualPointer;

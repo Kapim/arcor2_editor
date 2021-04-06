@@ -2,14 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(OnClickCollider))]
+[RequireComponent(typeof(OutlineOnClick))]
 public class ConnectionLine : InteractiveObject {
     public string LogicItemId = "", Name = "connection";
+
+    public OnClickCollider OnClickCollider;
+    public OutlineOnClick OutlineOnClick;
+    private LineRenderer lineRenderer;
+    private MeshCollider meshCollider;
+    public Connection Connection;
     public void InitConnection(string logicItemId, string name, Connection connection) {
         LogicItemId = logicItemId;
         Name = name;
+        Connection = connection;
+
     }
 
-    private void Update() {
+    private void Awake() {
+
+        OnClickCollider = GetComponent<OnClickCollider>();
+        OutlineOnClick = GetComponent<OutlineOnClick>();
+        OnClickCollider.Target = gameObject;
+        lineRenderer = gameObject.GetComponent<LineRenderer>();
+        meshCollider = gameObject.GetComponent<MeshCollider>();
+        lineRenderer.rayTracingMode = UnityEngine.Experimental.Rendering.RayTracingMode.DynamicGeometry;
+    }
+
+    private void FixedUpdate() {
         /*
                 for (int j = 0; j < lineRenderer.GetPositions().Count; j++) {
                     Vector2 distanceBetweenPoints = bezierPoints[j - 1] - bezierPoints[j];
@@ -48,10 +68,24 @@ public class ConnectionLine : InteractiveObject {
             leftPoint.x += halfWidth;
             colliderPoints2.Add(rightPoint);
             colliderPoints2.Add(leftPoint));*/
-    
 
+
+
+       /* Mesh mesh = new Mesh();
+        //lineRenderer.useWorldSpace = false;
+        //lineRenderer.SetPosition(0, transform.InverseTransformPoint(Connection.target[0].position));
+        lineRenderer.BakeMesh(mesh, true);
+        for (int i = 0; i < mesh.vertexCount; ++i) {
+            mesh.vertices[i] = Base.GameManager.Instance.Scene.transform.TransformPoint(mesh.vertices[i]);
+        }
+        meshCollider.sharedMesh = mesh;*/
+        //meshCollider.convex = true;
+    }
+
+    private void Start() {
         
     }
+
 
     public override string GetId() {
         return LogicItemId;
@@ -74,11 +108,12 @@ public class ConnectionLine : InteractiveObject {
     }
 
     public override void OnHoverEnd() {
-        
+        OutlineOnClick.UnHighlight();
     }
 
     public override void OnHoverStart() {
         
+        OutlineOnClick.Highlight();
     }
 
     public override void OpenMenu() {
@@ -99,5 +134,10 @@ public class ConnectionLine : InteractiveObject {
 
     public override void StartManipulation() {
         throw new System.NotImplementedException();
+    }
+
+    public override void Enable(bool enable) {
+        base.Enable(enable);
+        gameObject.SetActive(enable);
     }
 }

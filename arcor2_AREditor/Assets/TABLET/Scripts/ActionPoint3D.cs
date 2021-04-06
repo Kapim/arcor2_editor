@@ -230,12 +230,16 @@ public class ActionPoint3D : Base.ActionPoint {
         if (enable) {
             Visual.SetActive(true);
             sphereMaterial.color = new Color(0.51f, 0.51f, 0.89f);
+            if (ConnectionToParent != null)
+                ConnectionToParent.gameObject.SetActive(true);
         } else {
             if (GameManager.Instance.GreyVsHide) {
                 sphereMaterial.color = Color.gray;
             }
             else {
                 Visual.SetActive(false);
+                if (ConnectionToParent != null)
+                    ConnectionToParent.gameObject.SetActive(false);
             }
         }
     }

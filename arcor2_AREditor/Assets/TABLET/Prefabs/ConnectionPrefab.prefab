@@ -185,6 +185,9 @@ MonoBehaviour:
   - {fileID: 7522651762674020684}
   LogicItemId: 
   Name: connection
+  OnClickCollider: {fileID: 0}
+  OutlineOnClick: {fileID: 0}
+  Connection: {fileID: 0}
 --- !u!64 &7522651762674020684
 MeshCollider:
   m_ObjectHideFlags: 0
