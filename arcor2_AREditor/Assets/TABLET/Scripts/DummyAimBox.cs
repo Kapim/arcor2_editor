@@ -95,4 +95,8 @@ public class DummyAimBox : DummyBox, IActionPointParent {
     public void OnDestroy() {
         Base.ProjectManager.Instance.OnActionPointAddedToScene -= OnActionPointAddedToScene;
     }
+
+    public override string GetId() {
+        return ActionPoint.GetId();
+    }
 }

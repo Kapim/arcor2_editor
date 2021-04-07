@@ -13,6 +13,15 @@ public class DummyBox : InteractiveObject {
 
     protected virtual void Awake() {
         id = Guid.NewGuid().ToString();
+        GameManager.Instance.OnCloseProject += OnCloseProject;
+    }
+
+    private void OnCloseProject(object sender, EventArgs e) {
+        try {
+            Destroy(gameObject);
+        } catch (MissingReferenceException) {
+
+        }
     }
 
     protected virtual void Update() {

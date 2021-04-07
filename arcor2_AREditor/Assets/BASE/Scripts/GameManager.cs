@@ -575,7 +575,7 @@ namespace Base {
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     ProjectManager.Instance.EnableAllActionOutputs(false);
                     ProjectManager.Instance.EnableAllActionInputs(false);
-                    SceneManager.Instance.EnableAllActionObjects(false, false);
+                    SceneManager.Instance.EnableAllActionObjects(true, false);
                     SceneManager.Instance.EnableAllRobots(false);
                     ProjectManager.Instance.EnableAllActionPoints(true);
                     EnableServiceInteractiveObjects(false);

@@ -441,6 +441,11 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     public void Hide() {
+        for (int i = 0; i < 4; ++i) {
+            if (dummyPoints[i] != null) {
+                Destroy(dummyPoints[i]);
+            }
+        }
         InteractiveObject = null;
         GameManager.Instance.Gizmo.SetActive(false);
         GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
@@ -485,6 +490,7 @@ public class TransformMenu : Singleton<TransformMenu> {
                 GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
                 Destroy(dummyPoints[currentArrowIndex]);
             }
+            model.transform.SetParent(GameManager.Instance.Scene.transform, true);
             dummyPoints[currentArrowIndex] = model;
             model = GetPointModel();
 
