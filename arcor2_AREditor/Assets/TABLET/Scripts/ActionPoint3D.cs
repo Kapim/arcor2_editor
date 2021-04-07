@@ -126,6 +126,7 @@ public class ActionPoint3D : Base.ActionPoint {
             foreach (Action3D action in Actions.Values) {
                 action.transform.localPosition = new Vector3(0, 0, 0);
                 action.transform.localScale = new Vector3(0, 0, 0);
+                action.Enable(false);
             }
             
         } else {
@@ -134,7 +135,9 @@ public class ActionPoint3D : Base.ActionPoint {
                 action.transform.localPosition = new Vector3(0, 0.02f + i * 0.011f, 0);
                 ++i;
                 action.transform.localScale = new Vector3(1, 1, 1);
+                action.UpdateConnections();                
             }
+            SelectorMenu.Instance.UpdateFilters();
         }        
     }
     
@@ -201,12 +204,21 @@ public class ActionPoint3D : Base.ActionPoint {
         ActionPointName.gameObject.SetActive(true);
         if (Locked)
             Lock.SetActive(true);
+        if (SelectorMenu.Instance.ManuallySelected) {
+            ActionsCollapsed = false;
+            UpdatePositionsOfPucks();
+        }
     }
 
     public override void OnHoverEnd() {
         HighlightAP(false);
         ActionPointName.gameObject.SetActive(false);
         Lock.SetActive(false);
+
+        if (SelectorMenu.Instance.ManuallySelected) {
+            ActionsCollapsed = true;
+            UpdatePositionsOfPucks();
+        }
     }
 
 

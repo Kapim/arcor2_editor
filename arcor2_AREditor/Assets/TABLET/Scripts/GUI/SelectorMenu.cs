@@ -18,7 +18,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private Dictionary<string, SelectorItem> selectorItems = new Dictionary<string, SelectorItem>();
 
-    private bool manuallySelected;
+    public bool ManuallySelected;
 
     private long iteration = 0;
 
@@ -76,7 +76,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         selectorItemsAimMenu.Clear();
         selectorItems.Clear();
         selectorItemsNoPoseMenu.Clear();
-        manuallySelected = false;
+        ManuallySelected = false;
     }
 
     private class SelectorItemComparer : IComparer<SelectorItem> {
@@ -176,7 +176,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     selectorItemsAimMenu.RemoveAt(i);
                     continue;
                 }
-                if (!(selectorItemsAimMenu[i].IsSelected() && manuallySelected) && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
+                if (!(selectorItemsAimMenu[i].IsSelected() && ManuallySelected) && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
                     selectorItemsAimMenu[i].transform.SetParent(ContentAlphabet.transform);
                     selectorItemsAimMenu.RemoveAt(i);
                 }
@@ -206,7 +206,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             }
             selectorItemsAimMenu.Sort(new SelectorItemComparer());
             while (selectorItemsAimMenu.Count > 6) {
-                if (selectorItemsAimMenu.Last().IsSelected() && manuallySelected) {
+                if (selectorItemsAimMenu.Last().IsSelected() && ManuallySelected) {
                     SelectorItem item = selectorItemsAimMenu.Last();
                     selectorItemsAimMenu.RemoveAt(selectorItemsAimMenu.Count - 1);
                     selectorItemsAimMenu.Insert(selectorItemsAimMenu.Count - 2, item);
@@ -216,7 +216,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 selectorItemsAimMenu.RemoveAt(selectorItemsAimMenu.Count - 1);
             }
         }
-        if (!manuallySelected) {
+        if (!ManuallySelected) {
             bool selected = false;
             if (ContentAim.activeSelf) {
                 if (selectorItemsAimMenu.Count > 0) {
@@ -246,7 +246,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private void RemoveItem(int index, List<SelectorItem> selectorItems) {
         if (selectorItems[index].IsSelected()) {
-            manuallySelected = false;
+            ManuallySelected = false;
             selectorItems[index].SetSelected(false, true);
         }
         Destroy(selectorItems[index].gameObject);
@@ -264,22 +264,22 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             GameManager.Instance.ObjectSelected(selectorItem.InteractiveObject);
         } else {
             if (manually) {
-                if (selectorItem.IsSelected() && manuallySelected) {
+                if (selectorItem.IsSelected() && ManuallySelected) {
                     selectorItem.SetSelected(false, manually);
-                    manuallySelected = false;
+                    ManuallySelected = false;
                     return;
                 }
             }
             DeselectObject(manually);
-            selectorItem.SetSelected(true, manually);
             if (manually)
-                manuallySelected = true;
+                ManuallySelected = true;
+            selectorItem.SetSelected(true, manually);
         }        
     }
 
     public void DeselectObject(bool manually = true) {
         if (manually)
-            manuallySelected = false;
+            ManuallySelected = false;
         foreach (SelectorItem item in selectorItems.Values.ToList()) {
             item.SetSelected(false, manually);
         }
@@ -316,8 +316,8 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             if (selectorItems.TryGetValue(id, out SelectorItem item)) {
                 if (item.IsSelected()) {
                     item.SetSelected(false, true);
-                    if (manuallySelected) {
-                        manuallySelected = false;
+                    if (ManuallySelected) {
+                        ManuallySelected = false;
                     }
                 }                
                 Destroy(item.gameObject);
@@ -354,7 +354,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ContentAim.SetActive(true);
         ContentNoPose.SetActive(false);
         ContainerAlphabet.SetActive(false);
-        if (manuallySelected) {
+        if (ManuallySelected) {
             InteractiveObject selectedItem = GetSelectedObject();
             foreach (SelectorItem item in selectorItemsAimMenu) {
                 if (item.InteractiveObject.GetId() == selectedItem.GetId()) {
@@ -362,7 +362,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     return;
                 }
             }
-            manuallySelected = false;
+            ManuallySelected = false;
             DeselectObject(true);
         }
         

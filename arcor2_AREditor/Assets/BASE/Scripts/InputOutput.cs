@@ -5,9 +5,7 @@ using System;
 using System.Threading.Tasks;
 using IO.Swagger.Model;
 using Newtonsoft.Json;
-using static Base.Clickable;
 using UnityEngine.Events;
-using RosSharp.RosBridgeClient.MessageTypes.Nav;
 
 namespace Base {
     [RequireComponent(typeof(OutlineOnClick))]
@@ -21,7 +19,7 @@ namespace Base {
 
         public object ifValue;
 
-        
+        public Connection LineToConnection;
 
 
         public void AddLogicItem(string logicItemId) {
@@ -436,6 +434,23 @@ namespace Base {
 
         public bool ConnectionExists() {
             return logicItemIds.Count > 0;
+        }
+
+        public Action3D GetConnectedTo() {
+            Debug.Assert(ConnectionExists());
+            if (ProjectManager.Instance.LogicItems.TryGetValue(logicItemIds[0], out LogicItem logicItem)) {
+                return (Action3D) ConnectionManagerArcoro.Instance.GetActionConnectedTo(logicItem.GetConnection(), gameObject);
+            }
+            throw new ItemNotFoundException("Not connected to any action");
+        }
+
+        public Connection GetConnection() {
+            Debug.Assert(ConnectionExists());
+            if (ProjectManager.Instance.LogicItems.TryGetValue(logicItemIds[0], out LogicItem logicItem)) {
+                return logicItem.GetConnection();
+            } else {
+                throw new ItemNotFoundException("Not connected to any action");
+            }
         }
     }
 

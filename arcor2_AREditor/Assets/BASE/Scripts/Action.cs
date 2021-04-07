@@ -17,7 +17,7 @@ namespace Base {
         // Dictionary of all action parameters for this Action
         private Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
         
-        public InputOutput Input;
+        public PuckInput Input;
         public PuckOutput Output;
 
         public GameObject InputArrow, OutputArrow;
@@ -28,6 +28,8 @@ namespace Base {
         public IO.Swagger.Model.Action Data = null;
 
         public TextMeshPro NameText;
+
+        public RectTransform Center;
 
         
         public virtual void Init(IO.Swagger.Model.Action projectAction, ActionMetadata metadata, ActionPoint ap, IActionProvider actionProvider) {
@@ -154,6 +156,23 @@ namespace Base {
         public override bool Movable() {
             return false;
         }
+
+    public static Vector3 ClosestPointOnCircle(Vector3 actionPosition, Vector3 otherActionPosition) {
+        float vX = otherActionPosition.x - actionPosition.x;
+        float vY = otherActionPosition.z - actionPosition.z;
+        float magV = Mathf.Sqrt(vX * vX + vY * vY);
+        float aX = actionPosition.x + vX / magV * 0.03f;
+        if (float.IsNaN(aX))
+            aX = actionPosition.x + 0.03f;
+        float aZ = actionPosition.z + vY / magV * 0.03f;
+        if (float.IsNaN(aZ))
+            aZ = actionPosition.z + 0.03f;
+        return new Vector3(aX, actionPosition.y, aZ);
+    }
+
+    public Vector3 ClosestPointOnCircle(Vector3 otherActionPosition) {
+        return ClosestPointOnCircle(transform.position, otherActionPosition);
+    }
     }
 
 }

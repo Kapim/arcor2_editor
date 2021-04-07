@@ -2880,6 +2880,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConnectionPrefab: {fileID: 5806945198085100239, guid: 31f6d6356966c2e4bb045504a3741145,
     type: 3}
+  ConnectionWidePrefab: {fileID: 2303981452596860744, guid: 8238d76b9cb0f5d45bbd52d4f4600b83,
+    type: 3}
+  ConnectionNarrowPrefab: {fileID: 9103242387224649026, guid: f8ef269df5c2ecd48bb5c71a04f675fd,
+    type: 3}
   Connections: []
   EnabledMaterial: {fileID: 2100000, guid: 605dbb58d4667314aa4913ada0902c4a, type: 2}
   DisabledMaterial: {fileID: 2100000, guid: 18cb087e2086c504f951f7984f9ba971, type: 2}
@@ -3962,12 +3966,12 @@ PrefabInstance:
     - target: {fileID: 224685037686054822, guid: 4d8c6c9fba0e46f489b21fd7d92d739d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -146117860
+      value: -146830940
       objectReference: {fileID: 0}
     - target: {fileID: 224685037686054822, guid: 4d8c6c9fba0e46f489b21fd7d92d739d,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -21917142
+      value: -21868632
       objectReference: {fileID: 0}
     - target: {fileID: 224818740107539070, guid: 4d8c6c9fba0e46f489b21fd7d92d739d,
         type: 3}
@@ -39148,7 +39152,7 @@ PrefabInstance:
     - target: {fileID: 224841020572500472, guid: d39ad26c554f1a04d870956f7fac6fd8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 13143794
+      value: 13212314
       objectReference: {fileID: 0}
     - target: {fileID: 224880000733725854, guid: d39ad26c554f1a04d870956f7fac6fd8,
         type: 3}

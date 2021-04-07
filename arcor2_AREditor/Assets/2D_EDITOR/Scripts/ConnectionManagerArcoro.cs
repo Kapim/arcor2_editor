@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
 
-    public GameObject ConnectionPrefab;
+    public GameObject ConnectionPrefab, ConnectionWidePrefab, ConnectionNarrowPrefab;
+    public Material DefaultMat, SelectedMat;
     public List<Connection> Connections = new List<Connection>();
     private Connection virtualConnectionToMouse;
     private GameObject virtualPointer;
@@ -22,7 +23,7 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
 
 
     public Connection CreateConnection(GameObject o1, GameObject o2) {
-        Connection c = Instantiate(ConnectionPrefab).GetComponent<Connection>();
+        Connection c = Instantiate(ConnectionNarrowPrefab).GetComponent<Connection>();
         
         c.transform.SetParent(transform);
         // Set correct targets. Output has to be always at 0 index, because we are connecting output to input.

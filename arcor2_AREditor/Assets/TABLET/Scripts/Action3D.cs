@@ -18,9 +18,10 @@ public class Action3D : Base.Action {
     [SerializeField]
     protected OutlineOnClick outlineOnClick;
 
+
+
     private void Start() {
         GameManager.Instance.OnStopPackage += OnProjectStop;
-        
     }
 
     private void OnEnable() {
@@ -117,11 +118,42 @@ public class Action3D : Base.Action {
         }
         outlineOnClick.Highlight();
         NameText.gameObject.SetActive(true);
+        if (Input.ConnectionExists()) {
+            //Input.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0038f;
+            Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+            Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+            Input.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0038f;
+            Input.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+        }
+
+        if (Output.ConnectionExists()) {
+            Output.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0038f;
+            Output.LineToConnection.GetComponent<LineRenderer>().endWidth = 0.0038f;
+            Output.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0038f;
+            Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+            Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+            Output.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
+        }
     }
 
     public override void OnHoverEnd() {
         outlineOnClick.UnHighlight();
         NameText.gameObject.SetActive(false);
+        if (Input.ConnectionExists()) {
+            Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+            Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+            Input.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0008f;
+            Input.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+        }
+
+        if (Output.ConnectionExists()) {
+            Output.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0008f;
+            Output.LineToConnection.GetComponent<LineRenderer>().endWidth = 0.0008f;
+            Output.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0008f;
+            Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+            Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+            Output.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
+        }
     }
 
     public override void Enable(bool enable) {
@@ -149,6 +181,15 @@ public class Action3D : Base.Action {
         ActionPoint.HighlightAP(true);
     }
 
+    public void UpdateConnections() {
+        if (Input.ConnectionExists()) {
+            Input.transform.position = ClosestPointOnCircle(Input.GetConnectedTo().transform.position);
+        }
+        if (Output.ConnectionExists()) {
+            Output.transform.position = ClosestPointOnCircle(Output.GetConnectedTo().transform.position);
+        }
+    }
+
     public override bool HasMenu() {
         return true;
     }
@@ -167,9 +208,9 @@ public class Action3D : Base.Action {
         return true;
     }
 
-    public override void Rename(string newName) {
+    public async override void Rename(string newName) {
         try {
-            WebsocketManager.Instance.RenameAction(GetId(), newName);
+            await WebsocketManager.Instance.RenameAction(GetId(), newName);
             Notifications.Instance.ShowToastMessage("Action renamed");
         } catch (RequestFailedException e) {
             Notifications.Instance.ShowNotification("Failed to rename action", e.Message);

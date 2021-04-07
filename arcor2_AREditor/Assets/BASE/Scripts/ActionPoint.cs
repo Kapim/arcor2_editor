@@ -74,7 +74,8 @@ namespace Base {
             Debug.Assert(apData != null);
             SetParent(parent);
             Data = apData;
-            ActionsCollapsed = PlayerPrefsHelper.LoadBool("/AP/" + Data.Id + "/actionsCollapsed", false);
+            //ActionsCollapsed = PlayerPrefsHelper.LoadBool("/AP/" + Data.Id + "/actionsCollapsed", false);
+            ActionsCollapsed = true;
             transform.localPosition = GetScenePosition();
             SetSize(size);
             ActivateForGizmo((ControlBoxManager.Instance.UseGizmoMove && ProjectManager.Instance.AllowEdit && !MenuManager.Instance.IsAnyMenuOpened) ? "GizmoRuntime" : "Default");
