@@ -139,5 +139,10 @@ public class ConnectionLine : InteractiveObject {
     public override void Enable(bool enable) {
         base.Enable(enable);
         gameObject.SetActive(enable);
+
+        if (enable)
+            SelectorMenu.Instance.CreateSelectorItem(this);
+        else
+            SelectorMenu.Instance.DestroySelectorItem(this);
     }
 }

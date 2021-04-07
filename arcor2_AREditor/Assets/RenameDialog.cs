@@ -41,7 +41,6 @@ public class RenameDialog : Dialog
 
         try {
             selectedObject.Rename(name);
-            SelectorMenu.Instance.ForceUpdateMenus();
             Close();
         } catch (RequestFailedException e) {
             //notification already shown, nothing else to do

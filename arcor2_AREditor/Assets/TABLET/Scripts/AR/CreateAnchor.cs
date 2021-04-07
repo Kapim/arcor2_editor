@@ -12,12 +12,12 @@ public class CreateAnchor : InteractiveObject {
 
     private void OnEnable() {
         Enabled = true;
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     private void OnDisable() {
         Enabled = false;
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.DestroySelectorItem(this);
     }
 
     public override void OnHoverStart() {

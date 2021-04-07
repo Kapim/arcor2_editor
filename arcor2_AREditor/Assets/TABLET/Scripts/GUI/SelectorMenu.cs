@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 using static Base.GameManager;
 using TMPro;
+using UnityEngine.Events;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class SelectorMenu : Singleton<SelectorMenu> {
@@ -15,10 +17,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     public GameObject ContentAim, ContentAlphabet, ContentNoPose, ContainerAlphabet;
     private List<SelectorItem> selectorItemsAimMenu = new List<SelectorItem>();
     private List<SelectorItem> selectorItemsNoPoseMenu = new List<SelectorItem>();
+    public event AREditorEventArgs.InteractiveObjectEventHandler OnObjectSelectedChangedEvent;
 
     private Dictionary<string, SelectorItem> selectorItems = new Dictionary<string, SelectorItem>();
 
-    public bool ManuallySelected;
+    private bool manuallySelected;
 
     private long iteration = 0;
 
@@ -26,8 +29,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private bool requestingObject = false;
 
-    public ToggleIconButton RobotsToggle, ObjectsToggle, PointsToggle, ActionsToggle, IOToggle, OthersToggle;
 
+
+    public ToggleIconButton RobotsToggle, ObjectsToggle, PointsToggle, ActionsToggle, IOToggle, OthersToggle;
+    private InteractiveObject lastSelectedObject = null;
 
     private void Start() {
         GameManager.Instance.OnCloseProject += OnCloseProjectScene;
@@ -40,13 +45,20 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ProjectManager.Instance.OnLoadProject += OnLoadProjectScene;
         SceneManager.Instance.OnLoadScene += OnLoadProjectScene;
         GameManager.Instance.OnRunPackage += OnLoadProjectScene;
-        ShowIO(false, false);
     }
 
     private void OnLoadProjectScene(object sender, EventArgs e) {
-        UpdateFilters();
+        _ = UpdateFilters();
     }
 
+    public async Task UpdateFilters() {
+        await ShowRobots(RobotsToggle.Toggled, false);
+        ShowActionObjects(ObjectsToggle.Toggled, false);
+        ShowActionPoints(PointsToggle.Toggled, false);
+        ShowActions(ActionsToggle.Toggled, false);
+        ShowIO(IOToggle.Toggled, false);
+        ShowOthers(OthersToggle.Toggled, false);
+    }
 
     private void OnEditorStateChanged(object sender, EditorStateEventArgs args) {
         editorState = args.Data;
@@ -76,7 +88,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         selectorItemsAimMenu.Clear();
         selectorItems.Clear();
         selectorItemsNoPoseMenu.Clear();
-        ManuallySelected = false;
+        manuallySelected = false;
     }
 
     private class SelectorItemComparer : IComparer<SelectorItem> {
@@ -103,24 +115,42 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             CanvasGroup.blocksRaycasts = true;
             CanvasGroup.alpha = 1;
         }
-        
-    }
 
+    }
+    /*
     public void ForceUpdateMenus() {
         UpdateAlphabetMenu();
         if (ContentNoPose.activeSelf)
             UpdateNoPoseMenu();
-    }
+    }*/
 
     private void OnProjectChanged(object sender, System.EventArgs e) {
-        UpdateAlphabetMenu();
+        //UpdateAlphabetMenu();
         UpdateNoPoseMenu();
     }
 
     private void OnSceneChanged(object sender, System.EventArgs e) {
-        UpdateAlphabetMenu();
+        //UpdateAlphabetMenu();
         UpdateNoPoseMenu();
-        Debug.LogError("Scene changed");
+    }
+
+    private void SelectedObjectChanged(InteractiveObject interactiveObject, bool force = false) {
+        if (force || interactiveObject != lastSelectedObject) {
+            if (manuallySelected && interactiveObject is ActionPoint3D) {
+                if (ProjectManager.Instance.SelectedAP != null) {
+                    ProjectManager.Instance.SelectedAP.ActionsCollapsed = true;
+                    ProjectManager.Instance.SelectedAP.UpdatePositionsOfPucks();
+                }
+                ProjectManager.Instance.SelectedAP = (ActionPoint3D) interactiveObject;
+                ProjectManager.Instance.SelectedAP.ActionsCollapsed = false;
+                ProjectManager.Instance.SelectedAP.UpdatePositionsOfPucks();
+            }
+            
+
+            OnObjectSelectedChangedEvent?.Invoke(this, new InteractiveObjectEventArgs(interactiveObject));
+            Debug.LogWarning(interactiveObject?.GetName());
+            lastSelectedObject = interactiveObject;
+        }
     }
 
     private SelectorItem GetSelectorItem(InteractiveObject io) {
@@ -149,7 +179,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public void UpdateAimMenu(Vector3? aimingPoint) {
         List<Tuple<float, InteractiveObject>> items = new List<Tuple<float, InteractiveObject>>();
-        
+
         if (aimingPoint.HasValue) {
             foreach (SelectorItem item in selectorItems.Values) {
                 try {
@@ -158,25 +188,19 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     float dist = item.InteractiveObject.GetDistance(aimingPoint.Value);
                     if (dist > 0.2) // add objects max 20cm away from point of impact
                         continue;
-                    if (item.InteractiveObject.GetType() == typeof(DummyAimBox)) {
-                        if (!((DummyAimBox) item.InteractiveObject).Visible)
-                            continue;
-                    }
                     items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
                 } catch (MissingReferenceException ex) {
                     Debug.LogError(ex);
                 }
             }
             items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+        } else {
+            SelectedObjectChanged(null);
         }
         if (ContentAim.activeSelf) {
             int count = 0;
             for (int i = selectorItemsAimMenu.Count - 1; i >= 0; --i) {
-                if (selectorItemsAimMenu[i] == null) {
-                    selectorItemsAimMenu.RemoveAt(i);
-                    continue;
-                }
-                if (!(selectorItemsAimMenu[i].IsSelected() && ManuallySelected) && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
+                if (!(selectorItemsAimMenu[i].IsSelected() && manuallySelected) && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
                     selectorItemsAimMenu[i].transform.SetParent(ContentAlphabet.transform);
                     selectorItemsAimMenu.RemoveAt(i);
                 }
@@ -197,7 +221,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                         newItems.Add(selectorItem);
                     } else {
                         if (selectorItem.transform.parent != ContentAim.transform)
-                          selectorItem.transform.SetParent(ContentAim.transform);
+                            selectorItem.transform.SetParent(ContentAim.transform);
                     }
                     selectorItem.UpdateScore(item.Item1, iteration);
                 }
@@ -206,17 +230,17 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             }
             selectorItemsAimMenu.Sort(new SelectorItemComparer());
             while (selectorItemsAimMenu.Count > 6) {
-                if (selectorItemsAimMenu.Last().IsSelected() && ManuallySelected) {
+                if (selectorItemsAimMenu.Last().IsSelected() && manuallySelected) {
                     SelectorItem item = selectorItemsAimMenu.Last();
                     selectorItemsAimMenu.RemoveAt(selectorItemsAimMenu.Count - 1);
                     selectorItemsAimMenu.Insert(selectorItemsAimMenu.Count - 2, item);
                 }
-                    
+
                 selectorItemsAimMenu.Last().transform.SetParent(ContentAlphabet.transform);
                 selectorItemsAimMenu.RemoveAt(selectorItemsAimMenu.Count - 1);
             }
         }
-        if (!ManuallySelected) {
+        if (!manuallySelected) {
             bool selected = false;
             if (ContentAim.activeSelf) {
                 if (selectorItemsAimMenu.Count > 0) {
@@ -224,7 +248,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     selected = true;
                 }
             } else if (ContentAlphabet.activeSelf && items.Count > 0) {
-                
+
                 foreach (Tuple<float, InteractiveObject> item in items) {
                     if (item.Item2.Enabled) {
                         SetSelectedObject(items.First().Item2, false);
@@ -232,7 +256,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                         break;
                     }
                 }
-                
+
             }
             if (items.Count == 0 || !selected) {
                 DeselectObject(false);
@@ -242,11 +266,9 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ++iteration;
     }
 
-
-
     private void RemoveItem(int index, List<SelectorItem> selectorItems) {
         if (selectorItems[index].IsSelected()) {
-            ManuallySelected = false;
+            manuallySelected = false;
             selectorItems[index].SetSelected(false, true);
         }
         Destroy(selectorItems[index].gameObject);
@@ -255,7 +277,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public void SetSelectedObject(InteractiveObject interactiveObject, bool manually = false) {
         if (selectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem item)) {
-            SetSelectedObject(item, manually);            
+            SetSelectedObject(item, manually);
         }
     }
 
@@ -264,80 +286,112 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             GameManager.Instance.ObjectSelected(selectorItem.InteractiveObject);
         } else {
             if (manually) {
-                if (selectorItem.IsSelected() && ManuallySelected) {
+                if (selectorItem.IsSelected() && manuallySelected) {
                     selectorItem.SetSelected(false, manually);
-                    ManuallySelected = false;
+                    manuallySelected = false;
+                    SelectedObjectChanged(null);
                     return;
                 }
             }
             DeselectObject(manually);
-            if (manually)
-                ManuallySelected = true;
             selectorItem.SetSelected(true, manually);
-        }        
+            if (manually)
+                manuallySelected = true;
+            SelectedObjectChanged(selectorItem.InteractiveObject, manuallySelected);
+        }
     }
 
     public void DeselectObject(bool manually = true) {
-        if (manually)
-            ManuallySelected = false;
+        if (manually) {
+            manuallySelected = false;
+            
+        }
         foreach (SelectorItem item in selectorItems.Values.ToList()) {
             item.SetSelected(false, manually);
         }
     }
 
-    public SelectorItem CreateSelectorItem(InteractiveObject interactiveObject, Transform parent, float score) {
-        SelectorItem selectorItem = Instantiate(SelectorItemPrefab, parent).GetComponent<SelectorItem>();
+    public void DestroySelectorItem(string id) {
+        if (selectorItems.TryGetValue(id, out SelectorItem selectorItem)) {
+            TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsAimMenu);
+            TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsNoPoseMenu);
+            Destroy(selectorItem.gameObject);
+            selectorItems.Remove(id);
+        }
+    }
+
+    public void DestroySelectorItem(InteractiveObject interactiveObject) {
+        DestroySelectorItem(interactiveObject.GetId());
+    }
+
+    public void CreateSelectorItem(InteractiveObject interactiveObject) {
+        SelectorItem selectorItem = Instantiate(SelectorItemPrefab, ContentAlphabet.transform).GetComponent<SelectorItem>();
         //selectorItem.gameObject.SetActive(false);
         selectorItem.SetText(interactiveObject.GetName());
-        selectorItem.SetObject(interactiveObject, score, iteration);
-        return selectorItem;
+        selectorItem.SetObject(interactiveObject, 0, iteration);
+        selectorItems.Add(interactiveObject.GetId(), selectorItem);
+    }
+
+    public void UpdateSelectorItem(InteractiveObject interactiveObject) {
+        if (selectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem selectorItem)) {
+            selectorItem.Label.text = interactiveObject.GetName();
+        }
+    }
+
+    private void TryRemoveFromList(InteractiveObject io, List<SelectorItem> selectorItems) {
+        for (int i = 0; i < selectorItems.Count; ++i) {
+            if (string.Compare(selectorItems[i].InteractiveObject.GetId(), io.GetId()) == 0) {
+                selectorItems.RemoveAt(i);
+            }
+        }
     }
 
 
-    public void UpdateAlphabetMenu() {
+    /*public void UpdateAlphabetMenu() {
         //ClearMenu(selectorItemsAlphabetMenu);
         List<string> idsToRemove = selectorItems.Keys.ToList();
         foreach (InteractiveObject io in GameManager.Instance.GetAllInteractiveObjects()) {
-            if (!io.Enabled || io.GetName() == "dabap" || io.GetName() == "dabap2" || io.GetName() == "default")
+            if (!io.Enabled)
                 continue;
             if (selectorItems.TryGetValue(io.GetId(), out SelectorItem item)) {
                 item.transform.SetParent(ContentAlphabet.transform);
                 item.transform.SetAsLastSibling();
-                item.Label.text = io.GetName();
                 idsToRemove.Remove(io.GetId());
                 if (item.InteractiveObject == null)
                     item.InteractiveObject = io;
             } else {
                 SelectorItem newItem = CreateSelectorItem(io, ContentAlphabet.transform, 0);
                 selectorItems.Add(io.GetId(), newItem);
-            }            
+            }
         }
         foreach (string id in idsToRemove) {
             if (selectorItems.TryGetValue(id, out SelectorItem item)) {
                 if (item.IsSelected()) {
                     item.SetSelected(false, true);
-                    if (ManuallySelected) {
-                        ManuallySelected = false;
+                    if (manuallySelected) {
+                        manuallySelected = false;
                     }
-                }                
+                }
                 Destroy(item.gameObject);
                 selectorItems.Remove(id);
                 RemoveItemWithId(id, selectorItemsAimMenu);
             }
-           
+
         }
-        
-    }
+        // force update of left menu icons
+        SelectedObjectChanged(lastSelectedObject, true);
+
+    }*/
 
 
     public void UpdateNoPoseMenu() {
         if (!ContentNoPose.activeSelf || !GameManager.Instance.Scene.activeSelf)
             return;
         selectorItemsNoPoseMenu.Clear();
-        foreach (InteractiveObject interactiveObject in SceneManager.Instance.GetAllActionObjectsWithoutPose()) {
-            if (!interactiveObject.Enabled)
+        foreach (ActionObject actionObject in SceneManager.Instance.GetAllActionObjectsWithoutPose()) {
+            if (!actionObject.Enabled)
                 continue;
-            SelectorItem newItem = selectorItems[interactiveObject.GetId()];
+            SelectorItem newItem = selectorItems[actionObject.GetId()];
             selectorItemsNoPoseMenu.Add(newItem);
             newItem.transform.SetParent(ContentNoPose.transform);
         }
@@ -354,27 +408,25 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ContentAim.SetActive(true);
         ContentNoPose.SetActive(false);
         ContainerAlphabet.SetActive(false);
-        if (ManuallySelected) {
+        if (manuallySelected) {
             InteractiveObject selectedItem = GetSelectedObject();
             foreach (SelectorItem item in selectorItemsAimMenu) {
                 if (item.InteractiveObject.GetId() == selectedItem.GetId()) {
-                    
+
                     return;
                 }
             }
-            ManuallySelected = false;
+            manuallySelected = false;
             DeselectObject(true);
         }
-        
-        
+
+
     }
 
     public void SwitchToNoPose() {
-        
         ContentAim.SetActive(false);
         ContentNoPose.SetActive(true);
         ContainerAlphabet.SetActive(false);
-        //selectorItems = selectorItemsNoPoseMenu;
         UpdateNoPoseMenu();
     }
 
@@ -382,79 +434,49 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ContentAim.SetActive(false);
         ContentNoPose.SetActive(false);
         ContainerAlphabet.SetActive(true);
-        
-        UpdateAlphabetMenu();
-        /*if (manuallySelected) {
-            InteractiveObject selectedItem = GetSelectedObject();
-            
-            foreach (SelectorItem item in selectorItemsAlphabetMenu) {
-                if (item.InteractiveObject.GetId() == selectedItem.GetId()) {
-                    selectorItems = selectorItemsAimMenu;
-                    selectorItems = selectorItemsAlphabetMenu;
-                    SetSelectedObject(item, true);
-                    return;
-                }
-            }
-        }
-        selectorItems = selectorItemsAlphabetMenu;*/
+        //UpdateAlphabetMenu();
     }
 
     public InteractiveObject GetSelectedObject() {
-        
+        /*
         foreach (SelectorItem item in selectorItems.Values.ToList()) {
             if (item.IsSelected())
                 return item.InteractiveObject;
         }
-        return null;
+        return null;*/
+        return lastSelectedObject;
     }
 
-    public void ShowRobots(bool show, bool updateMenus) {
-        ProjectManager.Instance.EnableAllRobotsEE(false);
+    public async Task ShowRobots(bool show, bool updateMenus) {
+        if (SceneManager.Instance.SceneStarted)
+            ProjectManager.Instance.EnableAllRobotsEE(show);
         SceneManager.Instance.EnableAllRobots(show);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowActionObjects(bool show, bool updateMenus) {
         SceneManager.Instance.EnableAllActionObjects(show, false);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowActionPoints(bool show, bool updateMenus) {
         ProjectManager.Instance.EnableAllActionPoints(show);
         ProjectManager.Instance.EnableAllOrientations(show);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowIO(bool show, bool updateMenus) {
         ProjectManager.Instance.EnableAllActionInputs(show);
         ProjectManager.Instance.EnableAllActionOutputs(show);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowActions(bool show, bool updateMenus) {
         ProjectManager.Instance.EnableAllActions(show);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowOthers(bool show, bool updateMenus) {
         GameManager.Instance.EnableServiceInteractiveObjects(show);
-        if (updateMenus)
-            ForceUpdateMenus();
-    }
-
-    public void ShowConnections(bool show, bool updateMenus) {
-        ProjectManager.Instance.EnableAllConnections(show);
-        if (updateMenus)
-            ForceUpdateMenus();
     }
 
     public void ShowRobots(bool show) {
-        ShowRobots(show, true);
+        _ = ShowRobots(show, true);
     }
 
     public void ShowActionObjects(bool show) {
@@ -469,10 +491,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ShowIO(show, true);
     }
 
-    public void ShowConnections(bool show) {
-        ShowConnections(show, true);
-    }
-
     public void ShowActions(bool show) {
         ShowActions(show, true);
     }
@@ -481,15 +499,4 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ShowOthers(show, true);
     }
 
-
-    internal void UpdateFilters() {
-        ShowRobots(RobotsToggle.Toggled, false);
-        ShowActionObjects(ObjectsToggle.Toggled, false);
-        ShowActionPoints(PointsToggle.Toggled, false);
-        ShowActions(ActionsToggle.Toggled, false);
-        ShowIO(false, false);
-        ShowConnections(IOToggle.Toggled, false);
-        ShowOthers(OthersToggle.Toggled, false);
-        ForceUpdateMenus();
-    }
 }

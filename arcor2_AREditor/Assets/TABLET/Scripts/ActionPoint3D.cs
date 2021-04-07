@@ -135,9 +135,10 @@ public class ActionPoint3D : Base.ActionPoint {
                 action.transform.localPosition = new Vector3(0, 0.02f + i * 0.011f, 0);
                 ++i;
                 action.transform.localScale = new Vector3(1, 1, 1);
+                action.Enable(true);
                 action.UpdateConnections();                
             }
-            SelectorMenu.Instance.UpdateFilters();
+            //SelectorMenu.Instance.UpdateFilters();
         }        
     }
     
@@ -204,21 +205,21 @@ public class ActionPoint3D : Base.ActionPoint {
         ActionPointName.gameObject.SetActive(true);
         if (Locked)
             Lock.SetActive(true);
-        if (SelectorMenu.Instance.ManuallySelected) {
+        /*if (SelectorMenu.Instance.ManuallySelected) {
             ActionsCollapsed = false;
             UpdatePositionsOfPucks();
-        }
+        }*/
     }
 
     public override void OnHoverEnd() {
         HighlightAP(false);
         ActionPointName.gameObject.SetActive(false);
         Lock.SetActive(false);
-
+        /*
         if (SelectorMenu.Instance.ManuallySelected) {
             ActionsCollapsed = true;
             UpdatePositionsOfPucks();
-        }
+        }*/
     }
 
 
@@ -244,6 +245,8 @@ public class ActionPoint3D : Base.ActionPoint {
             sphereMaterial.color = new Color(0.51f, 0.51f, 0.89f);
             if (ConnectionToParent != null)
                 ConnectionToParent.gameObject.SetActive(true);
+
+            SelectorMenu.Instance.CreateSelectorItem(this);
         } else {
             if (GameManager.Instance.GreyVsHide) {
                 sphereMaterial.color = Color.gray;
@@ -253,6 +256,8 @@ public class ActionPoint3D : Base.ActionPoint {
                 if (ConnectionToParent != null)
                     ConnectionToParent.gameObject.SetActive(false);
             }
+
+            SelectorMenu.Instance.DestroySelectorItem(this);
         }
     }
 

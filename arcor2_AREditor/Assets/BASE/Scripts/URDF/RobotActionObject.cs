@@ -639,5 +639,14 @@ namespace Base {
         public override void Rename(string newName) {
             throw new NotImplementedException();
         }
+
+        public override void Enable(bool enable) {
+            base.Enable(enable);
+
+            if (enable)
+                SelectorMenu.Instance.CreateSelectorItem(this);
+            else
+                SelectorMenu.Instance.DestroySelectorItem(this);
+        }
     }
 }

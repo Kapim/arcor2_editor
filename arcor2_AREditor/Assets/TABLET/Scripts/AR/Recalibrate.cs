@@ -19,18 +19,19 @@ public class Recalibrate : InteractiveObject
     }
 
     private void OnEnable() {
-        Enabled = true;
-        SelectorMenu.Instance.ForceUpdateMenus();
+        Enable(true);        
     }
 
     private void OnDisable() {
-        Enabled = false;
-        SelectorMenu.Instance.ForceUpdateMenus();
+        Enable(false);
     }
 
     public override void Enable(bool enable) {
         base.Enable(enable);
-        SelectorMenu.Instance.ForceUpdateMenus();
+        if (enable)
+            SelectorMenu.Instance.CreateSelectorItem(this);
+        else
+            SelectorMenu.Instance.DestroySelectorItem(this);
     }
 
     public override void OnHoverStart() {

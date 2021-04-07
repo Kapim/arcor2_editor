@@ -47,7 +47,8 @@ public class LogicItem
         input.LineToConnection.SetTargets(input.transform.GetComponent<RectTransform>(), input.Action.Center);
         output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionNarrowPrefab).GetComponent<Connection>();
         output.LineToConnection.SetTargets(output.Action.Center, output.transform.GetComponent<RectTransform>());
-        
+
+        SelectorMenu.Instance.CreateSelectorItem(line);
     }
 
     public Connection GetConnection() {

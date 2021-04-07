@@ -71,7 +71,7 @@ namespace Base {
     }
 
     public class BareProjectEventArgs : EventArgs {
-        
+
         public IO.Swagger.Model.BareProject Project {
             get; set;
         }
@@ -81,8 +81,8 @@ namespace Base {
         }
     }
 
-     public class BareSceneEventArgs : EventArgs {
-        
+    public class BareSceneEventArgs : EventArgs {
+
         public IO.Swagger.Model.BareScene Scene {
             get; set;
         }
@@ -93,7 +93,7 @@ namespace Base {
     }
 
     public class BareActionEventArgs : EventArgs {
-        
+
         public IO.Swagger.Model.BareAction Action {
             get; set;
         }
@@ -104,7 +104,7 @@ namespace Base {
     }
 
     public class ActionEventArgs : EventArgs {
-        
+
         public IO.Swagger.Model.Action Action {
             get; set;
         }
@@ -115,7 +115,7 @@ namespace Base {
     }
 
     public class BareActionPointEventArgs : EventArgs {
-        
+
         public IO.Swagger.Model.BareActionPoint ActionPoint {
             get; set;
         }
@@ -126,7 +126,7 @@ namespace Base {
     }
 
     public class ProjectActionPointEventArgs : EventArgs {
-        
+
         public IO.Swagger.Model.ActionPoint ActionPoint {
             get; set;
         }
@@ -137,7 +137,7 @@ namespace Base {
     }
 
     public class ActionPointEventArgs : EventArgs {
-        
+
         public ActionPoint ActionPoint {
             get; set;
         }
@@ -338,6 +338,16 @@ namespace Base {
         }
     }
 
+    public class InteractiveObjectEventArgs : EventArgs {
+        public InteractiveObject InteractiveObject {
+            get; set;
+        }
+
+        public InteractiveObjectEventArgs(InteractiveObject interactiveObject) {
+            InteractiveObject = interactiveObject;
+        }
+    }
+
     public class ObjectTypeEventArgs : EventArgs {
         public ObjectTypeMeta ObjectType {
             get; set;
@@ -357,6 +367,7 @@ namespace Base {
             ObjectTypes = objectTypes;
         }
     }
+
 
 
     public class AREditorEventArgs {
@@ -388,5 +399,7 @@ namespace Base {
         public delegate void ParameterHandler(object sender, ParameterEventArgs args);
         public delegate void ObjectTypeHandler(object sender, ObjectTypeEventArgs args);
         public delegate void ObjectTypesHandler(object sender, ObjectTypesEventArgs args);
+        public delegate void GameObjectEventHandler(object sender, GameObjectEventArgs args);
+        public delegate void InteractiveObjectEventHandler(object sender, InteractiveObjectEventArgs args);
     }
 }

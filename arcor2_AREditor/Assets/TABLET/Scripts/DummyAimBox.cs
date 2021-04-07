@@ -69,7 +69,7 @@ public class DummyAimBox : DummyBox, IActionPointParent {
                 Destroy(gameObject);
             for (int i = 0; i < 4; ++i)
                 PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/PointAimed/" + i, false);
-            SelectorMenu.Instance.ForceUpdateMenus();
+            SelectorMenu.Instance.DestroySelectorItem(this);
         } catch (RequestFailedException e) {
             Notifications.Instance.ShowNotification("Failed to remove BlueBox", e.Message);
         }

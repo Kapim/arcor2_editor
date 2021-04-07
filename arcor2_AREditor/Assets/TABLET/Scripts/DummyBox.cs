@@ -40,7 +40,7 @@ public class DummyBox : InteractiveObject {
         transform.localRotation = PlayerPrefsHelper.LoadQuaternion(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxRot/" + Name, new Quaternion());
         Vector3 dim = PlayerPrefsHelper.LoadVector3(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxDim/" + Name, new Vector3(0.5f, 0.5f, 0.5f));
         SetDimensions(dim.x, dim.y, dim.z);
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     public void Init(string name, float x, float y, float z) {
@@ -54,7 +54,7 @@ public class DummyBox : InteractiveObject {
         else
             dummyBoxes += ";" + name;
         PlayerPrefsHelper.SaveString(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxes", dummyBoxes);
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     public override void Rename(string newName) {
@@ -73,7 +73,7 @@ public class DummyBox : InteractiveObject {
         PlayerPrefsHelper.SaveVector3(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxPos/" + Name, transform.localPosition);
         PlayerPrefsHelper.SaveQuaternion(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxRot/" + Name, transform.localRotation);
         SetDimensions(dim.x, dim.y, dim.z);
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.UpdateSelectorItem(this);
     }
 
     public override string GetId() {
@@ -138,7 +138,7 @@ public class DummyBox : InteractiveObject {
         }
         Destroy(gameObject);
 
-        SelectorMenu.Instance.ForceUpdateMenus();
+        SelectorMenu.Instance.DestroySelectorItem(this);
     }
 
     public override bool Removable() {
@@ -150,5 +150,13 @@ public class DummyBox : InteractiveObject {
         copy.transform.localScale = Visual.transform.localScale;
         copy.transform.localRotation = Quaternion.identity;
         return copy;
+    }
+
+    public override void Enable(bool enable) {
+        base.Enable(enable);
+        if (enable)
+            SelectorMenu.Instance.CreateSelectorItem(this);
+        else
+            SelectorMenu.Instance.DestroySelectorItem(this);
     }
 }

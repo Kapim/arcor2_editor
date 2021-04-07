@@ -168,6 +168,11 @@ public class Action3D : Base.Action {
             Visual.enabled = enable;
         }
 
+        if (enable)
+            SelectorMenu.Instance.CreateSelectorItem(this);
+        else
+            SelectorMenu.Instance.DestroySelectorItem(this);
+
     }
 
     public override string GetName() {

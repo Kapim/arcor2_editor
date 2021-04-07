@@ -55,7 +55,7 @@ public class DummyAimBoxTester : DummyAimBox, IActionPointParent {
                 Destroy(gameObject);
             for (int i = 0; i < 4; ++i)
                 PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/PointAimed/" + i, false);
-            SelectorMenu.Instance.ForceUpdateMenus();
+            SelectorMenu.Instance.DestroySelectorItem(this);
         } catch (RequestFailedException e) {
             Notifications.Instance.ShowNotification("Failed to remove BlueBox", e.Message);
         }

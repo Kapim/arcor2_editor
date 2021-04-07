@@ -29,9 +29,19 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     private ActionPoint3D selectedActionPoint;
     private LeftMenuSelection currentSubmenuOpened;
 
+    protected InteractiveObject selectedObject = null;
+    protected bool selectedObjectUpdated = true, previousUpdateDone = true;
+
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
         GameManager.Instance.OnEditorStateChanged += OnEditorStateChanged;
+
+        SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
+    }
+
+    private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
+        selectedObject = args.InteractiveObject;
+        selectedObjectUpdated = true;
     }
 
     private bool updateButtonsInteractivity = false;
@@ -68,6 +78,16 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (!updateButtonsInteractivity)
             return;
 
+        RobotButton.interactable = true;
+        AddButton.interactable = true;
+        SettingsButton.interactable = true;
+        HomeButton.interactable = true;
+
+        if (ProjectManager.Instance.ProjectMeta != null)
+            ProjectName.text = "Project: \n" + ProjectManager.Instance.ProjectMeta.Name;
+    }
+
+    protected void UpdateBtns(InteractiveObject obj) {
         if (MenuManager.Instance.CheckIsAnyRightMenuOpened()) {
             SetActiveSubmenu(LeftMenuSelection.Favorites);
 
@@ -77,16 +97,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             HomeButton.interactable = false;
             return;
         }
-
-        RobotButton.interactable = true;
-        AddButton.interactable = true;
-        SettingsButton.interactable = true;
-        HomeButton.interactable = true;
-
-
-
-        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
-        if (requestingObject || selectedObject == null) {
+        
+        if (requestingObject || obj == null) {
             SelectedObjectText.text = "";
             MoveButton.interactable = false;
             MoveButton2.interactable = false;
@@ -123,9 +135,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             RunButton.interactable = selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D);
             RunButton2.interactable = RunButton.interactable;
         }
+        previousUpdateDone = true;
+    }
 
-        if (SceneManager.Instance.SceneMeta != null)
-            ProjectName.text = "Project: \n" + SceneManager.Instance.SceneMeta.Name;
+    private void LateUpdate() {
+        if (CanvasGroup.alpha > 0 && selectedObjectUpdated && previousUpdateDone) {
+            selectedObjectUpdated = false;
+            previousUpdateDone = false;
+            UpdateBtns(selectedObject);
+        }
     }
 
     public void UpdateVisibility() {

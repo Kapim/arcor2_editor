@@ -6,6 +6,7 @@ using System;
 
 using IO.Swagger.Model;
 using System.Linq;
+using RuntimeInspectorNamespace;
 
 namespace Base {
     /// <summary>
@@ -77,6 +78,8 @@ namespace Base {
         public GameObject ActionPointSphere;
 
         public GameObject DummyBoxPrefab, DummyBoxVisual, DummyAimBoxPrefab, DummyAimBoxTesterPrefab;
+
+        public ActionPoint SelectedAP = null;
 
         public bool ProjectChanged {
             get => projectChanged;
@@ -269,6 +272,7 @@ namespace Base {
         }
 
         private void OnActionPointRemoved(object sender, StringEventArgs args) {
+            SelectorMenu.Instance.DestroySelectorItem(args.Data);
             RemoveActionPoint(args.Data);
             updateProject = true;
         }
@@ -277,6 +281,7 @@ namespace Base {
             try {
                 ActionPoint actionPoint = GetActionPoint(args.ActionPoint.Id);
                 actionPoint.UpdateActionPoint(args.ActionPoint);
+                SelectorMenu.Instance.UpdateSelectorItem(actionPoint);
                 updateProject = true;
                 // TODO - update orientations, joints etc.
             } catch (KeyNotFoundException ex) {
@@ -467,6 +472,8 @@ namespace Base {
         /// <param name="args"></param>
         private void OnLogicItemRemoved(object sender, StringEventArgs args) {
             if (LogicItems.TryGetValue(args.Data, out LogicItem logicItem)) {
+
+                SelectorMenu.Instance.DestroySelectorItem(args.Data);
                 logicItem.Remove();
                 LogicItems.Remove(args.Data);
             } else {
@@ -599,6 +606,7 @@ namespace Base {
             actionPoint.InitAP(apData, APSize, actionPointParent);
             ActionPoints.Add(actionPoint.Data.Id, actionPoint);
             OnActionPointAddedToScene?.Invoke(this, new ActionPointEventArgs(actionPoint));
+            SelectorMenu.Instance.CreateSelectorItem(actionPoint);
             return actionPoint;
         }
 
@@ -641,7 +649,6 @@ namespace Base {
                 PlayerPrefsHelper.SaveString(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxes", string.Join(";", boxes));
             }
             box.Init(newName, 0.05f, 0.05f, 0.05f);
-            SelectorMenu.Instance.ForceUpdateMenus();
             return box;
         }
 
@@ -661,7 +668,7 @@ namespace Base {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/visible", false);
                 }
-                SelectorMenu.Instance.ForceUpdateMenus();
+                SelectorMenu.Instance.CreateSelectorItem(box);
                 return box;
             } else {
                 DummyAimBox box = Instantiate(DummyAimBoxTesterPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
@@ -678,7 +685,7 @@ namespace Base {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/visible", false);
                 }
-                SelectorMenu.Instance.ForceUpdateMenus();
+                SelectorMenu.Instance.CreateSelectorItem(box);
                 return box;
             }
 
@@ -1090,6 +1097,7 @@ namespace Base {
             ap.UpdatePositionsOfPucks();
             puck.SetActive(true);
 
+            SelectorMenu.Instance.CreateSelectorItem(action);
             return action;
         }
 
@@ -1211,6 +1219,7 @@ namespace Base {
                 return;
             }
             action.ActionUpdate(projectAction, true);
+            SelectorMenu.Instance.UpdateSelectorItem(action);
             updateProject = true;
         }
 
@@ -1225,6 +1234,7 @@ namespace Base {
                 return;
             }
             action.ActionUpdateBaseData(projectAction);
+            SelectorMenu.Instance.UpdateSelectorItem(action);
             updateProject = true;
         }
 
@@ -1241,9 +1251,8 @@ namespace Base {
                 action.ActionUpdateBaseData(DataHelper.ActionToBareAction(projectAction));
                 // updates parameters of the action
                 action.ActionUpdate(projectAction);
+                SelectorMenu.Instance.CreateSelectorItem(action);
 
-
-                SelectorMenu.Instance.UpdateFilters();
                 updateProject = true;
                 if (ActionToSelect == action.GetName()) {
                     SelectorMenu.Instance.SetSelectedObject(action, true);
@@ -1259,6 +1268,7 @@ namespace Base {
         /// </summary>
         /// <param name="action"></param>
         public void ActionRemoved(IO.Swagger.Model.BareAction action) {
+            SelectorMenu.Instance.DestroySelectorItem(action.Id);
             ProjectManager.Instance.RemoveAction(action.Id);
             updateProject = true;
         }
