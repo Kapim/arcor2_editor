@@ -5,7 +5,6 @@ using IO.Swagger.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
 public class SelectorItem : MonoBehaviour
 {
     public TMPro.TMP_Text Label;
@@ -17,10 +16,11 @@ public class SelectorItem : MonoBehaviour
     private long lastUpdate;
     private bool selected;
     public Sprite ActionPoint, ActionObject, Robot, RobotEE, Orientation, ActionInput, ActionOutput, Action, Others, Connection;
+    public Button CollapsableButton;
+    public GameObject CollapsableButtonIcon;
+    public bool Collapsable, Collapsed;
+    public GameObject SublistContent;
 
-    private void Awake() {
-        Button = GetComponent<Button>();
-    }
 
 
     public void SetText(string text) {
@@ -31,9 +31,10 @@ public class SelectorItem : MonoBehaviour
         Score = score;
         Button.onClick.AddListener(() => SelectorMenu.Instance.SetSelectedObject(this, true));
         lastUpdate = currentIteration;
+        CollapsableButton.gameObject.SetActive(false);
         if (interactiveObject.GetType() == typeof(RobotActionObject)) {
             Icon.sprite = Robot;
-        } else if (interactiveObject.GetType().IsSubclassOf(typeof(ActionObject)) || interactiveObject.GetType() == typeof(DummyBox) || interactiveObject.GetType() == typeof(DummyAimBox)) {
+        } else if (interactiveObject.GetType().IsSubclassOf(typeof(ActionObject)) || interactiveObject.GetType() == typeof(DummyBox) || interactiveObject.GetType().IsSubclassOf(typeof(DummyBox))) {
             Icon.sprite = ActionObject;
         } else if (interactiveObject.GetType() == typeof(PuckInput)) {
             Icon.sprite = ActionInput;
@@ -42,6 +43,8 @@ public class SelectorItem : MonoBehaviour
         } else if (interactiveObject.GetType().IsSubclassOf(typeof(Base.Action))) {
             Icon.sprite = Action;
         } else if (interactiveObject.GetType().IsSubclassOf(typeof(Base.ActionPoint))) {
+            Collapsable = true;
+            CollapsableButton.gameObject.SetActive(true);
             Icon.sprite = ActionPoint;
         } else if (interactiveObject.GetType() == typeof(RobotEE)) {
             Icon.sprite = RobotEE;
@@ -54,9 +57,26 @@ public class SelectorItem : MonoBehaviour
         }
     }
 
+    public void CollapseBtnCb() {
+        Collapsed = !Collapsed;
+        ActionPoint3D actionPoint = (ActionPoint3D) InteractiveObject;
+        if (Collapsed) {
+            CollapsableButtonIcon.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
+            actionPoint.ActionsCollapsed = true;
+            actionPoint.UpdatePositionsOfPucks();
+        } else {
+            CollapsableButtonIcon.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+            actionPoint.ActionsCollapsed = false;
+            actionPoint.UpdatePositionsOfPucks();
+        }
+    }
+
     public void UpdateScore(float score, long currentIteration) {
         lastUpdate = currentIteration;
-        Score = score;
+        if (Collapsable && !Collapsed)
+            Score = -1;
+        else
+            Score = score;
     }
 
     public long GetLastUpdate() {

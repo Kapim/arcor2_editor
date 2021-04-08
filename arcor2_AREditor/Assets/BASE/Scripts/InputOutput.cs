@@ -452,6 +452,10 @@ namespace Base {
                 throw new ItemNotFoundException("Not connected to any action");
             }
         }
+
+        public ConnectionLine GetConnectionLine() {
+            return GetConnection().GetComponent<ConnectionLine>();
+        }
     }
 
 }

@@ -79,7 +79,6 @@ namespace Base {
 
         public GameObject DummyBoxPrefab, DummyBoxVisual, DummyAimBoxPrefab, DummyAimBoxTesterPrefab;
 
-        public ActionPoint SelectedAP = null;
 
         public bool ProjectChanged {
             get => projectChanged;

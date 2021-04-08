@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using IO.Swagger.Model;
 using TMPro;
+using OrbCreationExtensions;
 
 [RequireComponent(typeof(OutlineOnClick))]
 public class ActionPoint3D : Base.ActionPoint {
