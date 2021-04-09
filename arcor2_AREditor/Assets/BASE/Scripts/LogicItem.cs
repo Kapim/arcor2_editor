@@ -43,9 +43,9 @@ public class LogicItem
         line.InitConnection(Data.Id, output.Action.GetName() + " => " + input.Action.GetName(), connection);
         input.transform.position = input.Action.ClosestPointOnCircle(output.Action.transform.position);
         output.transform.position = output.Action.ClosestPointOnCircle(input.Action.transform.position);
-        input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionNarrowPrefab).GetComponent<Connection>();
+        input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<Connection>();
         input.LineToConnection.SetTargets(input.transform.GetComponent<RectTransform>(), input.Action.Center);
-        output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionNarrowPrefab).GetComponent<Connection>();
+        output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<Connection>();
         output.LineToConnection.SetTargets(output.Action.Center, output.transform.GetComponent<RectTransform>());
 
         SelectorMenu.Instance.CreateSelectorItem(line);

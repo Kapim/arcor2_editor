@@ -204,7 +204,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     if (item.InteractiveObject == null)
                         continue;
                     float dist = item.InteractiveObject.GetDistance(aimingPoint.Value);
-                    if (item.InteractiveObject is ActionObjectNoPose || (item.Collapsed && dist > 0.2)) // add objects max 20cm away from point of impact
+                    if (item.InteractiveObject is ActionObjectNoPose || (item.Collapsed && dist > 0.2) || item.InteractiveObject is ConnectionLine) // add objects max 20cm away from point of impact
                         continue;
                     items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
                 } catch (MissingReferenceException ex) {
@@ -642,6 +642,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public void ShowOthers(bool show, bool updateMenus) {
         GameManager.Instance.EnableServiceInteractiveObjects(show);
+    }
+
+    public void ShowConnections(bool show) {
+        ProjectManager.Instance.EnableAllConnections(show);
     }
 
     public void ShowRobots(bool show) {

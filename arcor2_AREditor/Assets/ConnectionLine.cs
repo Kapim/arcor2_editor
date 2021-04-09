@@ -137,6 +137,7 @@ public class ConnectionLine : InteractiveObject {
     }
 
     public override void Enable(bool enable) {
+        //Debug.LogError("enable conenction line")
         base.Enable(enable);
         gameObject.SetActive(enable);
 
