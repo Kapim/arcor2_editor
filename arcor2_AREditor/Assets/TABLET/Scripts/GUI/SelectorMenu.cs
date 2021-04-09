@@ -139,11 +139,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private void SelectedObjectChanged(InteractiveObject interactiveObject, bool force = false) {
         if (force || interactiveObject != lastSelectedObject) {
-            
-            
-
             OnObjectSelectedChangedEvent?.Invoke(this, new InteractiveObjectEventArgs(interactiveObject));
-            Debug.LogWarning(interactiveObject?.GetName());
             lastSelectedObject = interactiveObject;
         }
     }
@@ -181,28 +177,108 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     if (item.InteractiveObject == null)
                         continue;
                     float dist = item.InteractiveObject.GetDistance(aimingPoint.Value);
-                    if (dist > 0.2) // add objects max 20cm away from point of impact
+                    if (item.InteractiveObject is ActionObjectNoPose || (item.Collapsed && dist > 0.2)) // add objects max 20cm away from point of impact
                         continue;
                     items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
                 } catch (MissingReferenceException ex) {
                     Debug.LogError(ex);
                 }
             }
-            items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+            //items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
         } else {
             SelectedObjectChanged(null);
         }
         if (ContainerAim.activeSelf) {
+            int itemsWithoutActions = 6;
+            foreach (Tuple<float, InteractiveObject> item in items) {
+                if (item.Item2.GetType() == typeof(ActionObjectNoPose))
+                    continue;
+                if (true) { //selectorItemsAimMenu.Count < 6 || item.Item1 <= selectorItemsAimMenu.Last().Score) {
+                    if (!selectorItems.ContainsKey(item.Item2.GetId())) {
+                        continue;
+                    }
+                    SelectorItem selectorItem = GetSelectorItem(item.Item2);
+                    if (selectorItem == null) {
+                        selectorItem = selectorItems[item.Item2.GetId()];
+                        selectorItemsAimMenu.Add(selectorItem);
+                        if (!(selectorItem.InteractiveObject is Action3D))
+                            AddItemToAimingList(selectorItem);
+                    } else {
+                        if (selectorItem.transform.parent.parent != ContentAim.transform) {
+                            if (!(selectorItem.InteractiveObject is Action3D))
+                                AddItemToAimingList(selectorItem);
+                        }
+                    }
+                    selectorItem.UpdateScore(item.Item1, iteration);
+                    if (selectorItem.InteractiveObject is ActionPoint3D actionPoint && !selectorItem.Collapsed) {
+                        itemsWithoutActions += actionPoint.Actions.Count;
+                    }
+                }
+
+            }
+
+            ++iteration;
+            selectorItemsAimMenu.Sort(new SelectorItemComparer());
+            for (int i = selectorItemsAimMenu.Count - 1; i >= 0; --i) {
+                /*if (selectorItemsAimMenu.Count < itemsWithoutActions) {
+                    break;
+                }*/
+                /*if (!(selectorItemsAimMenu[i].IsSelected() && manuallySelected) && selectorItemsAimMenu[i].Collapsed &&
+                    (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5 && !(selectorItemsAimMenu[i].InteractiveObject is Action3D)) {
+                    selectorItemsAimMenu[i].transform.parent.SetParent(ContentAlphabet.transform);
+                    selectorItemsAimMenu.RemoveAt(i);
+                    continue;
+                }*/ 
+                if (!selectorItemsAimMenu[i].Collapsed ||
+                    selectorItemsAimMenu[i].InteractiveObject is Action3D ||
+                    selectorItemsAimMenu[i].IsSelected() && manuallySelected) {
+                    continue;
+                }
+                if ((iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5 ||
+                    selectorItemsAimMenu.Count > itemsWithoutActions) {
+                    selectorItemsAimMenu[i].transform.parent.SetParent(ContentAlphabet.transform);
+                    selectorItemsAimMenu.RemoveAt(i);
+                }
+            }
+
+            
+        }
+        if (!manuallySelected) {
+            bool selected = false;
+            if (ContainerAim.activeSelf) {
+                if (selectorItemsAimMenu.Count > 0) {
+                    SetSelectedObject(selectorItemsAimMenu.First(), false);
+                    selected = true;
+                }
+            } else if (ContentAlphabet.activeSelf && items.Count > 0) {
+
+                foreach (Tuple<float, InteractiveObject> item in items) {
+                    if (item.Item2.Enabled) {
+                        SetSelectedObject(items.First().Item2, false);
+                        selected = true;
+                        break;
+                    }
+                }
+
+            }
+            if (items.Count == 0 || !selected) {
+                DeselectObject(false);
+            }
+        }
+
+
+        /*
+        if (ContainerAim.activeSelf) {
             int count = 0;
             for (int i = selectorItemsAimMenu.Count - 1; i >= 0; --i) {
-                if (!(selectorItemsAimMenu[i].IsSelected() && manuallySelected) && selectorItemsAimMenu[i].Score >= 0 && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
+                if (!(selectorItemsAimMenu[i].IsSelected() && manuallySelected) && selectorItemsAimMenu[i].Collapsed && (iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5) {
                     selectorItemsAimMenu[i].transform.parent.SetParent(ContentAlphabet.transform);
                     selectorItemsAimMenu.RemoveAt(i);
                 }
             }
             List<SelectorItem> newItems = new List<SelectorItem>();
             foreach (Tuple<float, InteractiveObject> item in items) {
-                if (item.Item2.GetType() == typeof(ActionObjectNoPose) || item.Item2 is Action3D)
+                if (item.Item2.GetType() == typeof(ActionObjectNoPose))
                     continue;
                 if (selectorItemsAimMenu.Count < 6 || item.Item1 <= selectorItemsAimMenu.Last().Score) {
                     if (!selectorItems.ContainsKey(item.Item2.GetId())) {
@@ -212,21 +288,28 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     if (selectorItem == null) {
                         selectorItem = selectorItems[item.Item2.GetId()];
                         selectorItemsAimMenu.Add(selectorItem);
-                        AddItemToAimingList(selectorItem);
+                        if (!(selectorItem.InteractiveObject is Action3D))
+                            AddItemToAimingList(selectorItem);
                         newItems.Add(selectorItem);
                     } else {
                         if (selectorItem.transform.parent.parent != ContentAim.transform) {
                             selectorItemsAimMenu.Add(selectorItem);
-                            AddItemToAimingList(selectorItem);
+                            if (!(selectorItem.InteractiveObject is Action3D))
+                                AddItemToAimingList(selectorItem);
                         }
                     }
                     selectorItem.UpdateScore(item.Item1, iteration);
                 }
-                if (count++ > 7)
-                    break;
+
+            }
+            int maxCountWithActions = 6;
+            foreach (var item in selectorItemsAimMenu) {
+                if (item.InteractiveObject is ActionPoint3D actionPoint) {
+                    maxCountWithActions += actionPoint.Actions.Count;
+                }
             }
             selectorItemsAimMenu.Sort(new SelectorItemComparer());
-            while (selectorItemsAimMenu.Count > 6) {
+            while (selectorItemsAimMenu.Count > maxCountWithActions) {
                 if (!selectorItemsAimMenu.Last().Collapsed) {
                     break;
                 }
@@ -264,8 +347,8 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 DeselectObject(false);
             }
         }
-
         ++iteration;
+        */
     }
 
     public void AddItemToAimingList(SelectorItem selectorItem) {

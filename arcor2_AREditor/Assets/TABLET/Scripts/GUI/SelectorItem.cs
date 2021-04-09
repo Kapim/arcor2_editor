@@ -20,10 +20,12 @@ public class SelectorItem : MonoBehaviour
     public GameObject CollapsableButtonIcon;
     public bool Collapsable, Collapsed;
     public GameObject SublistContent;
+    private string name;
 
 
 
     public void SetText(string text) {
+        name = text;
         Label.text = text;
     }
     public void SetObject(InteractiveObject interactiveObject, float score, long currentIteration) {
@@ -73,10 +75,8 @@ public class SelectorItem : MonoBehaviour
 
     public void UpdateScore(float score, long currentIteration) {
         lastUpdate = currentIteration;
-        if (Collapsable && !Collapsed)
-            Score = -1;
-        else
-            Score = score;
+        Label.text = name + " (" + score.ToString() + ")";
+        Score = score;
     }
 
     public long GetLastUpdate() {
