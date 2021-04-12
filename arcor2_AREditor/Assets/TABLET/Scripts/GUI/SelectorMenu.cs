@@ -15,7 +15,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     public GameObject SelectorItemPrefab;
 
     public CanvasGroup CanvasGroup;
-    public GameObject ContentAim, ContentAlphabet, ContentNoPose, ContainerAim, ContainerAlphabet, ContentActionPoint, BottomBtns,
+    public GameObject ContentAim, ContentAlphabet, ContentNoPose, ContainerAim, ContainerAlphabet, BottomBtns,
         APHeader, APList;
     private List<SelectorItem> selectorItemsAimMenu = new List<SelectorItem>();
     private List<SelectorItem> selectorItemsNoPoseMenu = new List<SelectorItem>();
@@ -144,9 +144,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 DeselectObject(false);
             lastSelectedItem = selectorItem;
             Debug.LogError(selectorItem);
-            
+
+            return;
             if (selectorItem == null || ((RectTransform) ContentAim.transform).rect.height <= 760)
                 return;
+
             GameObject content;
             if (ContainerAim.activeSelf) {
                 content = ContentAim;
@@ -204,7 +206,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     if (item.InteractiveObject == null)
                         continue;
                     float dist = item.InteractiveObject.GetDistance(aimingPoint.Value);
-                    if (item.InteractiveObject is ActionObjectNoPose || (item.Collapsed && dist > 0.2) || item.InteractiveObject is ConnectionLine) // add objects max 20cm away from point of impact
+                    if (item.InteractiveObject is ActionObjectNoPose || (item.Collapsed && dist > 0.2)) // add objects max 20cm away from point of impact
                         continue;
                     items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
                 } catch (MissingReferenceException ex) {
@@ -214,7 +216,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             //items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
         } 
         if (ContainerAim.activeSelf) {
-            int itemsWithoutActions = 6;
+            int itemsWithoutActions = 10;
             foreach (Tuple<float, InteractiveObject> item in items) {
                 if (item.Item2.GetType() == typeof(ActionObjectNoPose))
                     continue;
@@ -550,7 +552,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ContentNoPose.SetActive(false);
         ContainerAlphabet.SetActive(false);
 
-        ContentActionPoint.SetActive(false);
         BottomBtns.SetActive(true);
         PointsToggle.Button.interactable = true;
         if (manuallySelected) {
@@ -571,17 +572,22 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ContainerAim.SetActive(false);
         ContentNoPose.SetActive(true);
         ContainerAlphabet.SetActive(false);
-        ContentActionPoint.SetActive(false);
         BottomBtns.SetActive(true);
         UpdateNoPoseMenu();
     }
 
     public void SwitchToAlphabet() {
+        foreach (SelectorItem item in selectorItems.Values) {
+            if (!(item.InteractiveObject is Action3D) && item.transform.parent.parent != ContentAlphabet.transform) {
+                item.transform.parent.SetParent(ContentAlphabet.transform);
+            }
+        }
+        selectorItemsAimMenu.Clear();
+        selectorItemsNoPoseMenu.Clear();
         PointsToggle.Button.interactable = true;
         ContainerAim.SetActive(false);
         ContentNoPose.SetActive(false);
         ContainerAlphabet.SetActive(true);
-        ContentActionPoint.SetActive(false);
         BottomBtns.SetActive(true);
     }
 
@@ -601,7 +607,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             ContentNoPose.SetActive(false);
             ContainerAlphabet.SetActive(false);
             BottomBtns.SetActive(false);
-            ContentActionPoint.SetActive(true);
         }
         
     }
@@ -642,10 +647,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public void ShowOthers(bool show, bool updateMenus) {
         GameManager.Instance.EnableServiceInteractiveObjects(show);
-    }
-
-    public void ShowConnections(bool show) {
-        ProjectManager.Instance.EnableAllConnections(show);
     }
 
     public void ShowRobots(bool show) {
