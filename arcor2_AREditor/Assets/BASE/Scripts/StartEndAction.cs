@@ -43,6 +43,15 @@ public abstract class StartEndAction : Action3D {
         return false;
     }
 
+    public override void Enable(bool enable) {
+        
+    }
+
+    public override string GetName() {
+        Debug.LogError(base.GetName());
+        return base.GetName();
+    }
+
     public override void StartManipulation() {
         TransformGizmo.Instance.AddTarget(Visual.transform);
         outlineOnClick.GizmoHighlight();

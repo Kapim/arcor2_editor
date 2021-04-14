@@ -124,12 +124,14 @@ public class Action3D : Base.Action {
             Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
             Input.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0068f;
             //Input.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0068f;
+            //Input.GetConnection().GetComponent<LineRenderer>().endWidth = 0.0068f;
             Input.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
         }
 
         if (Output.ConnectionExists()) {
             Output.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0068f;
             //Output.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0068f;
+            //Output.GetConnection().GetComponent<LineRenderer>().endWidth = 0.0068f;
             Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
             Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
             Output.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.SelectedMat;
@@ -143,13 +145,15 @@ public class Action3D : Base.Action {
             Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
             Input.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
             Input.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0038f;
-            //Input.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0038f;
+            //Input.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0008f;
+            //Input.GetConnection().GetComponent<LineRenderer>().endWidth = 0.0008f;
             Input.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
         }
 
         if (Output.ConnectionExists()) {
             Output.LineToConnection.GetComponent<LineRenderer>().startWidth = 0.0038f;
-             //Output.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0038f;
+            //Output.GetConnection().GetComponent<LineRenderer>().startWidth = 0.0008f;
+            //Output.GetConnection().GetComponent<LineRenderer>().endWidth = 0.0008f;
             Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
             Output.LineToConnection.GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;
             Output.GetConnection().GetComponent<LineRenderer>().material = ConnectionManagerArcoro.Instance.DefaultMat;

@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Enabled: 1
   Colliders:
-  - {fileID: 1910968989511566013}
+  - {fileID: 8689038136714198301}
   Input: {fileID: 4880005387537242525}
   Output: {fileID: 2756236505218533542}
   InputArrow: {fileID: 8711459906157853564}
   OutputArrow: {fileID: 6616330263180599034}
   ActionPoint: {fileID: 0}
   NameText: {fileID: 5451630378588609808}
+  Center: {fileID: 0}
   Visual: {fileID: 2605560298224851498}
   outlineOnClick: {fileID: 6975415401428609950}
 --- !u!114 &6997291219196793752
@@ -73,6 +74,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
         type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -88,6 +94,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -99,16 +110,6 @@ PrefabInstance:
     - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
-        type: 3}
-      propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3166032771580886009, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
@@ -171,6 +172,16 @@ PrefabInstance:
       propertyPath: outlineOnClick
       value: 
       objectReference: {fileID: 6975415401428609950}
+    - target: {fileID: 6819688429266934970, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d2efd014cac5b1a48a466e981dd5b46d, type: 2}
+    - target: {fileID: 7467850720681680514, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4901143462678197493, guid: 95ac9ebcf9bac6045bc0198ac650dd9c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 95ac9ebcf9bac6045bc0198ac650dd9c, type: 3}
@@ -216,9 +227,9 @@ MeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 9017898060511943743}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1910968989511566013 stripped
+--- !u!64 &8689038136714198301 stripped
 MeshCollider:
-  m_CorrespondingSourceObject: {fileID: 7467850720681680514, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+  m_CorrespondingSourceObject: {fileID: 410857429720654114, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
     type: 3}
   m_PrefabInstance: {fileID: 9017898060511943743}
   m_PrefabAsset: {fileID: 0}

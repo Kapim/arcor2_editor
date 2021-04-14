@@ -143,7 +143,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             if (selectorItem == null)
                 DeselectObject(false);
             lastSelectedItem = selectorItem;
-            Debug.LogError(selectorItem);
 
             return;
             if (selectorItem == null || ((RectTransform) ContentAim.transform).rect.height <= 760)

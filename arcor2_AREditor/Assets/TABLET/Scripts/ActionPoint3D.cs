@@ -133,7 +133,7 @@ public class ActionPoint3D : Base.ActionPoint {
         } else {
             int i = 1;
             foreach (Action3D action in Actions.Values) {
-                action.transform.localPosition = new Vector3(0, 0.02f + i * 0.011f, 0);
+                action.transform.localPosition = new Vector3(0, 0.00f + i * 0.011f, 0);
                 ++i;
                 action.transform.localScale = new Vector3(1, 1, 1);
                 action.Enable(true);

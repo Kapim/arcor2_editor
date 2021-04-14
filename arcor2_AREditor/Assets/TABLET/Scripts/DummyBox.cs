@@ -40,7 +40,7 @@ public class DummyBox : InteractiveObject {
         transform.localRotation = PlayerPrefsHelper.LoadQuaternion(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxRot/" + Name, new Quaternion());
         Vector3 dim = PlayerPrefsHelper.LoadVector3(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxDim/" + Name, new Vector3(0.5f, 0.5f, 0.5f));
         SetDimensions(dim.x, dim.y, dim.z);
-        SelectorMenu.Instance.CreateSelectorItem(this);
+        //SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     public void Init(string name, float x, float y, float z) {
@@ -54,7 +54,7 @@ public class DummyBox : InteractiveObject {
         else
             dummyBoxes += ";" + name;
         PlayerPrefsHelper.SaveString(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxes", dummyBoxes);
-        SelectorMenu.Instance.CreateSelectorItem(this);
+        //SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     public override void Rename(string newName) {
