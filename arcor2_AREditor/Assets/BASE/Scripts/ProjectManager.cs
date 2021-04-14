@@ -347,9 +347,11 @@ namespace Base {
 
             StartAction = Instantiate(StartPrefab,  SceneManager.Instance.SceneOrigin.transform).GetComponent<StartAction>();
             StartAction.Init(null, null, null, null, "START");
+            
             EndAction = Instantiate(EndPrefab, SceneManager.Instance.SceneOrigin.transform).GetComponent<EndAction>();
             EndAction.Init(null, null, null, null, "END");
-
+            SelectorMenu.Instance.CreateSelectorItem(StartAction);
+            SelectorMenu.Instance.CreateSelectorItem(EndAction);
             foreach (SceneObjectOverride objectOverrides in project.ObjectOverrides) {
                 ActionObject actionObject = SceneManager.Instance.GetActionObject(objectOverrides.Id);
                 foreach (IO.Swagger.Model.Parameter p in objectOverrides.Parameters) {
@@ -583,7 +585,7 @@ namespace Base {
         /// </summary>
         public void LoadSettings() {
             APOrientationsVisible = PlayerPrefsHelper.LoadBool("project/" + ProjectMeta.Id + "/APOrientationsVisibility", true);
-            APSize = 0.1f;//PlayerPrefsHelper.LoadFloat("project/" + ProjectMeta.Id + "/APSize", 0.2f);
+            APSize = 0.2f;//PlayerPrefsHelper.LoadFloat("project/" + ProjectMeta.Id + "/APSize", 0.2f);
         }
 
         /// <summary>

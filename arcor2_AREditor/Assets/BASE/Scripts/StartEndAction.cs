@@ -48,7 +48,6 @@ public abstract class StartEndAction : Action3D {
     }
 
     public override string GetName() {
-        Debug.LogError(base.GetName());
         return base.GetName();
     }
 

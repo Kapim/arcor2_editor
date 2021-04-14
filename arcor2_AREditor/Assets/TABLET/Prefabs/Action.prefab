@@ -665,7 +665,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Enabled: 1
   Colliders:
-  - {fileID: 7467850720681680514}
+  - {fileID: 410857429720654114}
   Input: {fileID: 4512397415820150178}
   Output: {fileID: 6585983383530919065}
   InputArrow: {fileID: 415263692387985219}
@@ -750,7 +750,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 676c2aff93811b94f8e74edf9f87da0c, type: 2}
 --- !u!114 &6935947317197825817
@@ -784,6 +784,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: puck
       objectReference: {fileID: 0}
+    - target: {fileID: 5231154572839316441, guid: 18606539c0d0632489508d2b6bd58b26,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7287179921203660585, guid: 18606539c0d0632489508d2b6bd58b26,
         type: 3}
       propertyPath: m_RootOrder
@@ -792,17 +797,17 @@ PrefabInstance:
     - target: {fileID: 7287179921203660585, guid: 18606539c0d0632489508d2b6bd58b26,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.025
+      value: 0.035
       objectReference: {fileID: 0}
     - target: {fileID: 7287179921203660585, guid: 18606539c0d0632489508d2b6bd58b26,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.015
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 7287179921203660585, guid: 18606539c0d0632489508d2b6bd58b26,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.025
+      value: 0.035
       objectReference: {fileID: 0}
     - target: {fileID: 7287179921203660585, guid: 18606539c0d0632489508d2b6bd58b26,
         type: 3}

@@ -22,7 +22,7 @@ MonoBehaviour:
   ActionPoint: {fileID: 0}
   NameText: {fileID: 5451630378588609808}
   Center: {fileID: 0}
-  Visual: {fileID: 2605560298224851498}
+  Visual: {fileID: 2558718586091962501}
   outlineOnClick: {fileID: 6975415401428609950}
 --- !u!114 &6997291219196793752
 MonoBehaviour:
@@ -221,9 +221,9 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 9017898060511943743}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &2605560298224851498 stripped
+--- !u!23 &2558718586091962501 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 6417292780173919765, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
+  m_CorrespondingSourceObject: {fileID: 6819688429266934970, guid: 95ac9ebcf9bac6045bc0198ac650dd9c,
     type: 3}
   m_PrefabInstance: {fileID: 9017898060511943743}
   m_PrefabAsset: {fileID: 0}

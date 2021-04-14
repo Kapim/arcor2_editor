@@ -38,10 +38,12 @@ namespace Base {
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
 
             RaycastHit hitinfo = new RaycastHit();
-            bool anyHit = false;
+            bool anyHit = false, directHit = false;
             if (Physics.Raycast(ray, out RaycastHit hit)) {
                 hitinfo = hit;
                 anyHit = true;
+                directHit = true;
+                //Debug.DrawRay(ray.origin, ray.direction);
             } else {
                 RaycastHit[] hits = Physics.BoxCastAll(ray.origin, new Vector3(0.03f, 0.03f, 0.0001f), ray.direction, Camera.main.transform.rotation);
                 if (hits.Length > 0) {
@@ -66,9 +68,45 @@ namespace Base {
 
                 float dotP = Vector3.Dot(lhs, ray.direction.normalized);
                 Vector3 point = ray.origin + ray.direction.normalized * dotP;
-                SelectorMenu.Instance.UpdateAimMenu(hitinfo.point);
+                List<Tuple<float, InteractiveObject>> items = new List<Tuple<float, InteractiveObject>>();
+                bool h = false;
+                foreach (SelectorItem item in SelectorMenu.Instance.SelectorItems.Values) {
+                    try {
+                        if (item.InteractiveObject == null) {
+                            continue;
+
+                        }
+                        float dist = item.InteractiveObject.GetDistance(hitinfo.point);
+                        
+                        foreach (Collider c in item.InteractiveObject.Colliders) {
+                            
+                            if (c == hitinfo.collider) {
+                                dist = 0;
+                                h = true;
+                            }
+                            
+                        }
+                        
+                        
+                        if (item.InteractiveObject is ActionObjectNoPose || (item.InteractiveObject.GetType() != typeof(Action3D) && item.Collapsed && dist > 0.2)) { // add objects max 20cm away from point of impact 
+
+                            Debug.DrawLine(ray.origin, hitinfo.point);
+                            continue;
+                        }
+                        
+                        items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
+                    } catch (MissingReferenceException ex) {
+                        Debug.LogError(ex);
+                    }
+                }
+                Debug.LogError(items.Count);
+                if (h)
+                    SelectorMenu.Instance.UpdateAimMenu(items);
+                else {
+                    SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
+                }
             } else {
-                SelectorMenu.Instance.UpdateAimMenu(null);
+                SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
             }
 
             /*

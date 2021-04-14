@@ -19,7 +19,11 @@ public abstract class InteractiveObject : Clickable {
         float minDist = float.MaxValue;
         foreach (Collider collider in Colliders) {
             try {
-                Vector3 point = collider.ClosestPointOnBounds(origin);
+                Vector3 point;
+                if (collider is MeshCollider meshCollider && meshCollider.convex)
+                    point = collider.ClosestPoint(origin);
+                else 
+                    point = collider.ClosestPointOnBounds(origin);
 
                 minDist = Math.Min(Vector3.Distance(origin, point), minDist);
             } catch (UnassignedReferenceException ex) {

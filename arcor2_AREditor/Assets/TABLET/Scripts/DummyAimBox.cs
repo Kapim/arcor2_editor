@@ -65,8 +65,12 @@ public class DummyAimBox : DummyBox, IActionPointParent {
             await WebsocketManager.Instance.RemoveActionPoint(ActionPoint.Data.Id);
             PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/visible", false);
             PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/inScene", false);
-            if (gameObject != null)
-                Destroy(gameObject);
+            try {
+                if (gameObject != null)
+                    Destroy(gameObject);
+            } catch (MissingReferenceException) {
+
+            }
             for (int i = 0; i < 4; ++i)
                 PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/PointAimed/" + i, false);
             SelectorMenu.Instance.DestroySelectorItem(this);

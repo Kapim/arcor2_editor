@@ -22,7 +22,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     private List<SelectorItem> selectorItemsAPDetail = new List<SelectorItem>();
     public event AREditorEventArgs.InteractiveObjectEventHandler OnObjectSelectedChangedEvent;
 
-    private Dictionary<string, SelectorItem> selectorItems = new Dictionary<string, SelectorItem>();
+    public Dictionary<string, SelectorItem> SelectorItems = new Dictionary<string, SelectorItem>();
 
     private bool manuallySelected;
 
@@ -85,11 +85,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     private void OnCloseProjectScene(object sender, System.EventArgs e) {
-        foreach (SelectorItem selectorItem in selectorItems.Values) {
+        foreach (SelectorItem selectorItem in SelectorItems.Values) {
             Destroy(selectorItem.transform.parent.gameObject);
         }
         selectorItemsAimMenu.Clear();
-        selectorItems.Clear();
+        SelectorItems.Clear();
         selectorItemsNoPoseMenu.Clear();
         manuallySelected = false;
     }
@@ -158,7 +158,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             }
             int yPos = (int) content.transform.localPosition.y - 380;
             int position = (int) (0 - selectorItem.transform.parent.localPosition.y);
-            if (selectorItem.InteractiveObject is Action3D action) {
+            if (selectorItem.InteractiveObject.GetType() == typeof(Action3D)) {
                 position += (int) (0 - selectorItem.transform.parent.parent.parent.localPosition.y) + 120;
             }
             Debug.LogError(position + " - " + yPos);
@@ -196,9 +196,9 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         }
     }
 
-    public void UpdateAimMenu(Vector3? aimingPoint) {
-        List<Tuple<float, InteractiveObject>> items = new List<Tuple<float, InteractiveObject>>();
-
+    //public void UpdateAimMenu(Vector3? aimingPoint) {
+    public void UpdateAimMenu(List<Tuple<float, InteractiveObject>> items) {
+        /*
         if (aimingPoint.HasValue) {
             foreach (SelectorItem item in selectorItems.Values) {
                 try {
@@ -213,25 +213,25 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 }
             }
             //items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-        } 
+        } */
         if (ContainerAim.activeSelf) {
             int itemsWithoutActions = 10;
             foreach (Tuple<float, InteractiveObject> item in items) {
                 if (item.Item2.GetType() == typeof(ActionObjectNoPose))
                     continue;
                 if (true) { //selectorItemsAimMenu.Count < 6 || item.Item1 <= selectorItemsAimMenu.Last().Score) {
-                    if (!selectorItems.ContainsKey(item.Item2.GetId())) {
+                    if (!SelectorItems.ContainsKey(item.Item2.GetId())) {
                         continue;
                     }
                     SelectorItem selectorItem = GetSelectorItem(item.Item2);
                     if (selectorItem == null) {
-                        selectorItem = selectorItems[item.Item2.GetId()];
+                        selectorItem = SelectorItems[item.Item2.GetId()];
                         selectorItemsAimMenu.Add(selectorItem);
-                        if (!(selectorItem.InteractiveObject is Action3D))
+                        if (selectorItem.InteractiveObject.GetType() != typeof(Action3D))
                             AddItemToAimingList(selectorItem);
                     } else {
                         if (selectorItem.transform.parent.parent != ContentAim.transform) {
-                            if (!(selectorItem.InteractiveObject is Action3D))
+                            if (selectorItem.InteractiveObject.GetType() != typeof(Action3D))
                                 AddItemToAimingList(selectorItem);
                         }
                     }
@@ -256,7 +256,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     continue;
                 }*/ 
                 if (!selectorItemsAimMenu[i].Collapsed ||
-                    selectorItemsAimMenu[i].InteractiveObject is Action3D ||
+                    selectorItemsAimMenu[i].InteractiveObject.GetType() == typeof(Action3D) ||
                     selectorItemsAimMenu[i].IsSelected() && manuallySelected) {
                     continue;
                 }
@@ -271,7 +271,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         }
         if (!manuallySelected) {
             bool selected = false;
-            if (aimingPoint.HasValue) {
+            if (items.Count > 0) {
                 if (ContainerAim.activeSelf) {
                     if (selectorItemsAimMenu.Count > 0) {
                         SetSelectedObject(selectorItemsAimMenu.First(), false);
@@ -380,12 +380,12 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void AddItemToAimingList(SelectorItem selectorItem) {
-        if (selectorItem.InteractiveObject is Action3D action) {
+        /*if (selectorItem.InteractiveObject is Action3D action) {
             ActionPoint ap = action.ActionPoint;
             if (selectorItems.TryGetValue(ap.GetId(), out SelectorItem selectorItemAP)) {
 
             }
-        }
+        }*/
         selectorItem.transform.parent.SetParent(ContentAim.transform);
 
     }
@@ -400,7 +400,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void SetSelectedObject(InteractiveObject interactiveObject, bool manually = false) {
-        if (selectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem item)) {
+        if (SelectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem item)) {
             SetSelectedObject(item, manually);
         }
     }
@@ -443,11 +443,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void DestroySelectorItem(string id) {
-        if (selectorItems.TryGetValue(id, out SelectorItem selectorItem)) {
+        if (SelectorItems.TryGetValue(id, out SelectorItem selectorItem)) {
             TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsAimMenu);
             TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsNoPoseMenu);
             Destroy(selectorItem.transform.parent.gameObject);
-            selectorItems.Remove(id);
+            SelectorItems.Remove(id);
         }
     }
 
@@ -456,10 +456,16 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void CreateSelectorItem(InteractiveObject interactiveObject) {
+        if (string.IsNullOrEmpty(interactiveObject.GetId()))
+            return;
+        if (interactiveObject.GetName() == "dabap" || interactiveObject.GetName() == "dabap2")
+            return;
+        if (SelectorItems.ContainsKey(interactiveObject.GetId()))
+            return;
         SelectorItem selectorItem = Instantiate(SelectorItemPrefab).GetComponentInChildren<SelectorItem>();
-
-        if (interactiveObject is Action3D action) {
-            if (selectorItems.TryGetValue(action.ActionPoint.GetId(), out SelectorItem selectorItemAP)) {
+        if (interactiveObject.GetType() == typeof(Action3D)) {
+            Action3D action = (Action3D) interactiveObject;
+            if (SelectorItems.TryGetValue(action.ActionPoint.GetId(), out SelectorItem selectorItemAP)) {
                 selectorItem.transform.parent.SetParent(selectorItemAP.SublistContent.transform);
             } else {
                 selectorItem.transform.parent.SetParent(ContentAlphabet.transform);
@@ -470,11 +476,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         //selectorItem.gameObject.SetActive(false);
         selectorItem.SetText(interactiveObject.GetName());
         selectorItem.SetObject(interactiveObject, 0, iteration);
-        selectorItems.Add(interactiveObject.GetId(), selectorItem);
+        SelectorItems.Add(interactiveObject.GetId(), selectorItem);
     }
 
     public void UpdateSelectorItem(InteractiveObject interactiveObject) {
-        if (selectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem selectorItem)) {
+        if (SelectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem selectorItem)) {
             selectorItem.Label.text = interactiveObject.GetName();
         }
     }
@@ -530,10 +536,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         if (!ContentNoPose.activeSelf || !GameManager.Instance.Scene.activeSelf)
             return;
         selectorItemsNoPoseMenu.Clear();
-        foreach (ActionObject actionObject in SceneManager.Instance.GetAllActionObjectsWithoutPose()) {
-            if (!actionObject.Enabled)
+        foreach (InteractiveObject interactiveObject in SceneManager.Instance.GetAllActionObjectsWithoutPose()) {
+            if (!interactiveObject.Enabled)
                 continue;
-            SelectorItem newItem = selectorItems[actionObject.GetId()];
+            SelectorItem newItem = SelectorItems[interactiveObject.GetId()];
             selectorItemsNoPoseMenu.Add(newItem);
             newItem.transform.parent.SetParent(ContentNoPose.transform);
         }
@@ -576,8 +582,8 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void SwitchToAlphabet() {
-        foreach (SelectorItem item in selectorItems.Values) {
-            if (!(item.InteractiveObject is Action3D) && item.transform.parent.parent != ContentAlphabet.transform) {
+        foreach (SelectorItem item in SelectorItems.Values) {
+            if ((item.InteractiveObject.GetType() != typeof(Action3D)) && item.transform.parent.parent != ContentAlphabet.transform) {
                 item.transform.parent.SetParent(ContentAlphabet.transform);
             }
         }
@@ -592,11 +598,11 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public void SwitchToAPDetail(ActionPoint3D actionPoint) {
         //selectorItemsAPDetail.Clear();
-        if (selectorItems.TryGetValue(actionPoint.GetId(), out SelectorItem selectorItem)) {
+        if (SelectorItems.TryGetValue(actionPoint.GetId(), out SelectorItem selectorItem)) {
             selectorItem.transform.parent.SetParent(APHeader.transform);
             //selectorItemsAPDetail.Add(selectorItem);
             foreach (string actionId in actionPoint.Actions.Keys) {
-                if (selectorItems.TryGetValue(actionId, out SelectorItem actionItem)) {
+                if (SelectorItems.TryGetValue(actionId, out SelectorItem actionItem)) {
                     actionItem.transform.parent.SetParent(APList.transform);
                     //selectorItemsAPDetail.Add(selectorItem);
                 }
