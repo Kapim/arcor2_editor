@@ -99,9 +99,10 @@ namespace Base {
                         Debug.LogError(ex);
                     }
                 }
-                Debug.LogError(items.Count);
-                if (h)
+                if (h) {
+                    items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
                     SelectorMenu.Instance.UpdateAimMenu(items);
+                }
                 else {
                     SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
                 }

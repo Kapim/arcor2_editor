@@ -281,7 +281,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
                     foreach (Tuple<float, InteractiveObject> item in items) {
                         if (item.Item2.Enabled) {
-                            SetSelectedObject(items.First().Item2, false);
+                            SetSelectedObject(item.Item2, false);
                             selected = true;
                             break;
                         }
