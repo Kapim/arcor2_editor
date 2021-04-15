@@ -2,88 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(OnClickCollider))]
 [RequireComponent(typeof(OutlineOnClick))]
 public class ConnectionLine : InteractiveObject {
     public string LogicItemId = "", Name = "connection";
 
     public OnClickCollider OnClickCollider;
     public OutlineOnClick OutlineOnClick;
-    private LineRenderer lineRenderer;
-    private MeshCollider meshCollider;
-    public Connection Connection;
-    public void InitConnection(string logicItemId, string name, Connection connection) {
+    public MeshCollider MeshCollider;
+    public RectTransform[] target = new RectTransform[2];
+    public GameObject Cone;
+
+    public void InitConnection(string logicItemId, string name) {
         LogicItemId = logicItemId;
         Name = name;
-        Connection = connection;
 
     }
 
-    private void Awake() {
 
-        OnClickCollider = GetComponent<OnClickCollider>();
-        OutlineOnClick = GetComponent<OutlineOnClick>();
-        OnClickCollider.Target = gameObject;
-        lineRenderer = gameObject.GetComponent<LineRenderer>();
-        meshCollider = gameObject.GetComponent<MeshCollider>();
-        lineRenderer.rayTracingMode = UnityEngine.Experimental.Rendering.RayTracingMode.DynamicGeometry;
+
+    private void Awake() {
+        //OutlineOnClick = GetComponent<OutlineOnClick>();
+        //OnClickCollider.Target = gameObject;
+        //lineRenderer = gameObject.GetComponent<LineRenderer>();
+        //meshCollider = gameObject.GetComponent<MeshCollider>();
+        //lineRenderer.rayTracingMode = UnityEngine.Experimental.Rendering.RayTracingMode.DynamicGeometry;
+    }
+
+    public void SetTargets(RectTransform transform1, RectTransform transform2) {
+        target[0] = transform1;
+        target[1] = transform2;
     }
 
     private void FixedUpdate() {
-        /*
-                for (int j = 0; j < lineRenderer.GetPositions().Count; j++) {
-                    Vector2 distanceBetweenPoints = bezierPoints[j - 1] - bezierPoints[j];
-                    Vector3 crossProduct = Vector3.Cross(distanceBetweenPoints, Vector3.forward);
-
-                    Vector2 up = (wireWidth / 2) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + bezierPoints[j - 1];
-                    Vector2 down = -(wireWidth / 2) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + bezierPoints[j - 1];
-
-                    edgePoints.Insert(0, down);
-                    edgePoints.Add(up);
-
-                    if (j == bezierPoints.Count - 1) {
-                        // Compute the values for the last point on the Bezier curve
-                        up = (wireWidth / 2) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + bezierPoints[j];
-                        down = -(wireWidth / 2) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + bezierPoints[j];
-
-                        edgePoints.Insert(0, down);
-                        edgePoints.Add(up);
-                    }
-                }
-
-                collider.points = edgePoints.ToArray();*/
-
-        /*float x;
-        float y;
-        float z = 0f;
-        int segments;
-
-        float angle = 0f;
-
-        for (int i = 0; i < (segments + 1) - (segments / gap); i++) {
-            float halfWidth = lineRenderer.startWidth / 2f;
-            Vector2 rightPoint = colliderPoints[i];
-            Vector2 leftPoint = colliderPoints[i];
-            rightPoint.x -= halfWidth;
-            leftPoint.x += halfWidth;
-            colliderPoints2.Add(rightPoint);
-            colliderPoints2.Add(leftPoint));*/
-
-
-
-       /* Mesh mesh = new Mesh();
-        //lineRenderer.useWorldSpace = false;
-        //lineRenderer.SetPosition(0, transform.InverseTransformPoint(Connection.target[0].position));
-        lineRenderer.BakeMesh(mesh, true);
-        for (int i = 0; i < mesh.vertexCount; ++i) {
-            mesh.vertices[i] = Base.GameManager.Instance.Scene.transform.TransformPoint(mesh.vertices[i]);
-        }
-        meshCollider.sharedMesh = mesh;*/
-        //meshCollider.convex = true;
+        
     }
 
     private void Start() {
         
+    }
+
+    public void UpdateConnection() {
+        if (target[0] != null && target[1] != null) {
+            transform.position = target[0].position;
+            transform.rotation = Quaternion.LookRotation(target[1].position - target[0].position);
+            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (target[1].position - target[0].position).magnitude);
+        }
     }
 
 

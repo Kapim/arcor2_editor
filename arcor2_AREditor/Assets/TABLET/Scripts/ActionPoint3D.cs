@@ -70,6 +70,8 @@ public class ActionPoint3D : Base.ActionPoint {
             orientations.transform.rotation = Base.SceneManager.Instance.SceneOrigin.transform.rotation;
     }
 
+    
+
     public override void OnClick(Click type) {
         if (!enabled)
             return;
@@ -128,6 +130,7 @@ public class ActionPoint3D : Base.ActionPoint {
                 action.transform.localPosition = new Vector3(0, 0, 0);
                 action.transform.localScale = new Vector3(0, 0, 0);
                 action.Enable(false);
+                action.UpdateConnections();
             }
             
         } else {
@@ -227,6 +230,9 @@ public class ActionPoint3D : Base.ActionPoint {
     public override void ActionPointBaseUpdate(IO.Swagger.Model.BareActionPoint apData) {
         base.ActionPointBaseUpdate(apData);
         ActionPointName.text = apData.Name;
+        foreach (Base.Action action in Actions.Values) {
+            ((Action3D) action).UpdateConnections(true);
+        }
     }
 
     public override void InitAP(IO.Swagger.Model.ActionPoint apData, float size, IActionPointParent parent = null) {

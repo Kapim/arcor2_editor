@@ -6,7 +6,7 @@ public class LogicItem
 {
     public IO.Swagger.Model.LogicItem Data;
 
-    private Connection connection;
+    private ConnectionLine connection;
 
     private PuckInput input;
     private PuckOutput output;
@@ -37,21 +37,24 @@ public class LogicItem
         output = ProjectManager.Instance.GetAction(logicItem.Start).Output;
         input.AddLogicItem(Data.Id);
         output.AddLogicItem(Data.Id);
+
         connection = ConnectionManagerArcoro.Instance.CreateConnection(input.gameObject, output.gameObject);
 
-        ConnectionLine line = connection.GetComponent<ConnectionLine>();
-        line.InitConnection(Data.Id, output.Action.GetName() + " => " + input.Action.GetName(), connection);
-        input.transform.position = input.Action.ClosestPointOnCircle(output.Action.transform.position);
-        output.transform.position = output.Action.ClosestPointOnCircle(input.Action.transform.position);
-        input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<Connection>();
+        connection.InitConnection(Data.Id, output.Action.GetName() + " => " + input.Action.GetName());
+        
+
+        input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
         input.LineToConnection.SetTargets(input.transform.GetComponent<RectTransform>(), input.Action.Center);
-        output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<Connection>();
+        output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
         output.LineToConnection.SetTargets(output.Action.Center, output.transform.GetComponent<RectTransform>());
 
-        SelectorMenu.Instance.CreateSelectorItem(line);
+        SelectorMenu.Instance.CreateSelectorItem(connection);
+        connection.UpdateConnection();
     }
 
-    public Connection GetConnection() {
+
+
+    public ConnectionLine GetConnection() {
         return connection;
     }
 

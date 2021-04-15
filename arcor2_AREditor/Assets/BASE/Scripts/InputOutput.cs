@@ -19,7 +19,7 @@ namespace Base {
 
         public object ifValue;
 
-        public Connection LineToConnection;
+        public ConnectionLine LineToConnection;
 
 
         public void AddLogicItem(string logicItemId) {
@@ -444,7 +444,7 @@ namespace Base {
             throw new ItemNotFoundException("Not connected to any action");
         }
 
-        public Connection GetConnection() {
+        public ConnectionLine GetConnection() {
             Debug.Assert(ConnectionExists());
             if (ProjectManager.Instance.LogicItems.TryGetValue(logicItemIds[0], out LogicItem logicItem)) {
                 return logicItem.GetConnection();

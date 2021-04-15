@@ -366,6 +366,7 @@ namespace Base {
             UpdateActionPoints(project);
             if (project.HasLogic)
                 UpdateLogicItems(project.Logic);
+            
             HideAPOrientations();
 
 
@@ -406,9 +407,9 @@ namespace Base {
         }
 
         internal void EnableAllConnections(bool show) {
-            foreach (Connection c in ConnectionManagerArcoro.Instance.Connections) {
-                if (c != null && c.GetComponent<ConnectionLine>() != null)
-                    c.GetComponent<ConnectionLine>().Enable(show);
+            foreach (ConnectionLine c in ConnectionManagerArcoro.Instance.Connections) {
+                if (c != null)
+                    c.Enable(show);
             }
         }
 
