@@ -49,7 +49,7 @@ public class RenameDialog : Dialog
 
     public override void Close() {
         LeftMenu.Instance.UpdateVisibility();
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        LeftMenu.Instance.RestoreSelector();
 
         base.Close();
     }

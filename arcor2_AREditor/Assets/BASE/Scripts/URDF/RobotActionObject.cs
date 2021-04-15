@@ -217,7 +217,7 @@ namespace Base {
             SetGrey(!SceneManager.Instance.SceneStarted);
 
             SetDefaultJoints();
-
+            SceneManager.Instance.EnableAllRobots(SelectorMenu.Instance.RobotsToggle.Toggled);
             // Show or hide the robot based on global settings of displaying ActionObjects.
             // Needs to be called additionally, because when global setting is called, robot model is not loaded and only its placeholder is active.
             /*if (robotVisible) {
@@ -642,7 +642,6 @@ namespace Base {
 
         public override void Enable(bool enable) {
             base.Enable(enable);
-
             if (enable)
                 SelectorMenu.Instance.CreateSelectorItem(this);
             else

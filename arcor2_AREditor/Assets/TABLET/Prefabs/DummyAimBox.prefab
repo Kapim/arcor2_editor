@@ -64,6 +64,7 @@ MonoBehaviour:
   OutlineOnClick: {fileID: 6220236518711663953}
   Visible: 0
   ActionPoint: {fileID: 0}
+  Reseted: 1
 --- !u!1001 &419540330699776852
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -24,7 +24,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     public Dictionary<string, SelectorItem> SelectorItems = new Dictionary<string, SelectorItem>();
 
-    private bool manuallySelected;
+    public bool ManuallySelected;
 
     private long iteration = 0;
 
@@ -32,7 +32,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private bool requestingObject = false;
 
-
+    public bool Active;
 
     public ToggleIconButton RobotsToggle, ObjectsToggle, PointsToggle, ActionsToggle, IOToggle, OthersToggle;
     private SelectorItem lastSelectedItem = null;
@@ -48,6 +48,8 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         ProjectManager.Instance.OnLoadProject += OnLoadProjectScene;
         SceneManager.Instance.OnLoadScene += OnLoadProjectScene;
         GameManager.Instance.OnRunPackage += OnLoadProjectScene;
+        Active = true;
+        gameObject.SetActive(false);
     }
 
     private void OnLoadProjectScene(object sender, EventArgs e) {
@@ -67,10 +69,15 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         editorState = args.Data;
         switch (editorState) {
             case EditorStateEnum.Normal:
+                DeselectObject(true);
+                requestingObject = false;
+                Active = true;
+                break;
             case EditorStateEnum.Closed:
             case EditorStateEnum.InteractionDisabled:
                 DeselectObject(true);
                 requestingObject = false;
+                Active = false;
                 break;
             case EditorStateEnum.SelectingAction:
             case EditorStateEnum.SelectingActionInput:
@@ -80,6 +87,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             case EditorStateEnum.SelectingActionPointParent:
                 DeselectObject(true);
                 requestingObject = true;
+                Active = true;
                 break;
         }
     }
@@ -91,7 +99,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         selectorItemsAimMenu.Clear();
         SelectorItems.Clear();
         selectorItemsNoPoseMenu.Clear();
-        manuallySelected = false;
+        ManuallySelected = false;
     }
 
     private class SelectorItemComparer : IComparer<SelectorItem> {
@@ -257,7 +265,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 }*/ 
                 if (!selectorItemsAimMenu[i].Collapsed ||
                     selectorItemsAimMenu[i].InteractiveObject.GetType() == typeof(Action3D) ||
-                    selectorItemsAimMenu[i].IsSelected() && manuallySelected) {
+                    selectorItemsAimMenu[i].IsSelected() && ManuallySelected) {
                     continue;
                 }
                 if ((iteration - selectorItemsAimMenu[i].GetLastUpdate()) > 5 ||
@@ -269,7 +277,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
             
         }
-        if (!manuallySelected) {
+        if (!ManuallySelected) {
             bool selected = false;
             if (items.Count > 0) {
                 if (ContainerAim.activeSelf) {
@@ -392,7 +400,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private void RemoveItem(int index, List<SelectorItem> selectorItems) {
         if (selectorItems[index].IsSelected()) {
-            manuallySelected = false;
+            ManuallySelected = false;
             selectorItems[index].SetSelected(false, true);
         }
         Destroy(selectorItems[index].transform.parent.gameObject);
@@ -410,9 +418,9 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             GameManager.Instance.ObjectSelected(selectorItem.InteractiveObject);
         } else {
             if (manually) {
-                if (selectorItem.IsSelected() && manuallySelected) {
+                if (selectorItem.IsSelected() && ManuallySelected) {
                     selectorItem.SetSelected(false, manually);
-                    manuallySelected = false;
+                    ManuallySelected = false;
                     SelectedObjectChanged(null);
                     return;
                 }
@@ -420,16 +428,16 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             DeselectObject(manually);
             selectorItem.SetSelected(true, manually);
             if (manually) {
-                manuallySelected = true;
+                ManuallySelected = true;
                 
             }
-            SelectedObjectChanged(selectorItem, manuallySelected);
+            SelectedObjectChanged(selectorItem, ManuallySelected);
         }
     }
 
     public void DeselectObject(bool manually = true) {
         if (manually) {
-            manuallySelected = false;
+            ManuallySelected = false;
             
         }
         /*foreach (SelectorItem item in selectorItems.Values.ToList()) {
@@ -559,7 +567,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
         BottomBtns.SetActive(true);
         PointsToggle.Button.interactable = true;
-        if (manuallySelected) {
+        if (ManuallySelected) {
             InteractiveObject selectedItem = GetSelectedObject();
             foreach (SelectorItem item in selectorItemsAimMenu) {
                 if (item.InteractiveObject.GetId() == selectedItem.GetId()) {
@@ -567,7 +575,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                     return;
                 }
             }
-            manuallySelected = false;
+            ManuallySelected = false;
             DeselectObject(true);
         }
     }

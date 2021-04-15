@@ -32,7 +32,8 @@ namespace Base {
         }
 
         private void Update() {
-            if (SelectorMenu.Instance.CanvasGroup.alpha == 0 || !SelectorMenu.Instance.gameObject.activeSelf)
+            //if (SelectorMenu.Instance.CanvasGroup.alpha == 0 || !SelectorMenu.Instance.gameObject.activeSelf)
+            if (!SelectorMenu.Instance.Active)
                 return;
             //if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0)), out hit, Mathf.Infinity)) {
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));

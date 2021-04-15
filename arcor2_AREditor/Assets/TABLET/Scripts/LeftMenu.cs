@@ -17,7 +17,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public Button FavoritesButton, RobotButton, AddButton, SettingsButton, HomeButton;
     public Button AddMeshButton, MoveButton, MoveButton2, RemoveButton, SetActionPointParentButton,
         AddActionButton, AddActionButton2, RenameButton, CalibrationButton, ResizeCubeButton,
-        AddConnectionButton, AddConnectionButton2, RunButton, RunButton2; //Buttons with number 2 are duplicates in favorites submenu
+        AddConnectionButton, RunButton, RunButton2, SelectorMenuButton; //Buttons with number 2 are duplicates in favorites submenu
     public GameObject FavoritesButtons, HomeButtons, SettingsButtons, AddButtons, MeshPicker, ActionPicker;
     public RenameDialog RenameDialog;
     public CubeSizeDialog CubeSizeDialog;
@@ -31,6 +31,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     protected InteractiveObject selectedObject = null;
     protected bool selectedObjectUpdated = true, previousUpdateDone = true;
+
+    public RightButtonsMenu RightButtonsMenu;
 
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
@@ -97,7 +99,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             HomeButton.interactable = false;
             return;
         }
-        
+
         if (requestingObject || obj == null) {
             SelectedObjectText.text = "";
             MoveButton.interactable = false;
@@ -110,7 +112,6 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             CalibrationButton.interactable = false;
             ResizeCubeButton.interactable = false;
             AddConnectionButton.interactable = false;
-            AddConnectionButton2.interactable = false;
             RunButton.interactable = false;
             RunButton2.interactable = false;
         } else {
@@ -131,7 +132,6 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             ResizeCubeButton.interactable = selectedObject is DummyBox || (selectedObject is Base.Action action && !(selectedObject is StartEndAction) && action.Metadata.Name == "move");
             AddConnectionButton.interactable = (selectedObject.GetType() == typeof(Action3D) ||
                 selectedObject.GetType() == typeof(StartAction)) && !((Action3D) selectedObject).Output.ConnectionExists();
-            AddConnectionButton2.interactable = AddConnectionButton.interactable;
             RunButton.interactable = selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D);
             RunButton2.interactable = RunButton.interactable;
         }
@@ -237,18 +237,33 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             clickedButton = AddActionButton2;
         }
 
-        if (!SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         if (clickedButton.GetComponent<Image>().enabled) {
             clickedButton.GetComponent<Image>().enabled = false;
-            SelectorMenu.Instance.gameObject.SetActive(true);
+            RestoreSelector();
             ActionPicker.SetActive(false);
+            SelectorMenu.Instance.Active = true;
         } else {
             clickedButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
             SelectorMenu.Instance.gameObject.SetActive(false);
             ActionPicker.SetActive(true);
+            SelectorMenu.Instance.Active = false;
+        }
+    }
+
+    public void SelectorMenuClick() {
+        if (SelectorMenuButton.GetComponent<Image>().enabled) {
+            SelectorMenuButton.GetComponent<Image>().enabled = false;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+        } else {
+            SelectorMenuButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
+            SelectorMenu.Instance.gameObject.SetActive(true);
         }
     }
 
@@ -259,10 +274,11 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void AddMeshClick() {
         if (AddMeshButton.GetComponent<Image>().enabled) {
             AddMeshButton.GetComponent<Image>().enabled = false;
-            SelectorMenu.Instance.gameObject.SetActive(true);
+            RestoreSelector();
             MeshPicker.SetActive(false);
         } else {
             AddMeshButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
             SelectorMenu.Instance.gameObject.SetActive(false);
             MeshPicker.SetActive(true);
         }
@@ -278,7 +294,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (selectedObject is null || !(selectedObject is ActionPoint3D))
             return;
 
-        if (!SelectorMenu.Instance.gameObject.activeSelf) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf) { //other menu/dialog opened
             SetActiveSubmenu(LeftMenuSelection.None); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
@@ -305,16 +321,17 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (currentSubmenuOpened == LeftMenuSelection.Favorites)
             clickedButton = MoveButton2;
 
-        if (!SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         if (clickedButton.GetComponent<Image>().enabled) {
             clickedButton.GetComponent<Image>().enabled = false;
-            SelectorMenu.Instance.gameObject.SetActive(true);
+            RestoreSelector();
             TransformMenu.Instance.Hide();
         } else {
             clickedButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
             SelectorMenu.Instance.gameObject.SetActive(false);
             //selectedObject.StartManipulation();
             TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
@@ -327,13 +344,13 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (selectedObject is null)
             return;
 
-        if (!SelectorMenu.Instance.gameObject.activeSelf && !ResizeCubeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !ResizeCubeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(LeftMenuSelection.Settings); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         if (ResizeCubeButton.GetComponent<Image>().enabled) {
             ResizeCubeButton.GetComponent<Image>().enabled = false;
-            SelectorMenu.Instance.gameObject.SetActive(true);
+            RestoreSelector();
             if (selectedObject is DummyBox) {
                 CubeSizeDialog.Cancel(false);
             } else if (selectedObject is Base.Action) {
@@ -341,6 +358,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             }
         } else {
             ResizeCubeButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
             SelectorMenu.Instance.gameObject.SetActive(false);
             if (selectedObject is DummyBox) {
                 CubeSizeDialog.Init((DummyBox) selectedObject);
@@ -357,12 +375,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (selectedObject is null)
             return;
 
-        if (!SelectorMenu.Instance.gameObject.activeSelf) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf) { //other menu/dialog opened
             SetActiveSubmenu(LeftMenuSelection.Settings); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         UpdateVisibility(false, true);
-        SelectorMenu.Instance.gameObject.SetActive(false);
+        RightButtonsMenu.Instance.gameObject.SetActive(false);
 
         RenameDialog.Init(selectedObject);
         RenameDialog.Open();
@@ -374,18 +392,18 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             return;
 
         UpdateVisibility(false, true);
-        SelectorMenu.Instance.gameObject.SetActive(false);
+        RightButtonsMenu.Instance.gameObject.SetActive(false);
         ConfirmationDialog.Open("Remove object",
                          "Are you sure you want to remove " + selectedObject.GetName() + "?",
                          () => {
                              selectedObject.Remove();
                              UpdateVisibility(true);
-                             SelectorMenu.Instance.gameObject.SetActive(true);
+                             RestoreSelector();
                              ConfirmationDialog.Close();
                          },
                          () => {
                              UpdateVisibility(true);
-                             SelectorMenu.Instance.gameObject.SetActive(true);
+                             RestoreSelector();
                              ConfirmationDialog.Close();
                              });
     }
@@ -448,7 +466,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     #region Mesh picker click methods
 
     public void BlueBoxClick() {
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SwitchToNoPose();
@@ -458,7 +476,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void TesterClick() {
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SwitchToNoPose();
@@ -468,7 +486,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void CubeClick() {
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyBox("Cube"), true);
@@ -497,9 +515,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
         ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RestoreSelector();
         ActionPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
     }
 
     public void ActionPickClick() {
@@ -520,9 +537,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
         ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RestoreSelector();
         ActionPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
     }
 
     public void ActionReleaseClick() {
@@ -543,9 +559,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
         ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        RestoreSelector();
         ActionPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
     }
     #endregion
 
@@ -578,8 +593,20 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         }
     }
 
+    public void RestoreSelector() {
+        if (SelectorMenuButton.GetComponent<Image>().enabled) {
+            RightButtonsMenu.Instance.gameObject.SetActive(false);
+            SelectorMenu.Instance.gameObject.SetActive(true);
+        } else {
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+        }
+    }
+
     private void DeactivateAllSubmenus() {
-        SelectorMenu.Instance.gameObject.SetActive(true);
+        //RightButtonsMenu.Instance.gameObject.SetActive(true);
+        //SelectorMenu.Instance.gameObject.SetActive(false);
+        RestoreSelector();
         CubeSizeDialog.Cancel(false);
         if (RenameDialog.isActiveAndEnabled)
             RenameDialog.Close();

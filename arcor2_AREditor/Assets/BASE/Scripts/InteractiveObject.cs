@@ -35,6 +35,12 @@ public abstract class InteractiveObject : Clickable {
         return minDist;
     }
 
+    public virtual void Enable(bool enable) {
+        Enabled = enable;
+        foreach (Collider c in Colliders)
+            c.enabled = enable;
+    }
+
     public List<Collider> Colliders = new List<Collider>();
 
 

@@ -489,6 +489,7 @@ MonoBehaviour:
   BottomBtns: {fileID: 638215861093463503}
   APHeader: {fileID: 0}
   APList: {fileID: 0}
+  Active: 1
   RobotsToggle: {fileID: 818930589149904451}
   ObjectsToggle: {fileID: 5310191362025510449}
   PointsToggle: {fileID: 4437946979404544316}

@@ -581,7 +581,7 @@ namespace Base {
                     EnableServiceInteractiveObjects(false);
                     break;
                 case EditorStateEnum.SelectingAction:
-                    ProjectManager.Instance.EnableAllConnections(false);
+                    /*ProjectManager.Instance.EnableAllConnections(false);
                     ProjectManager.Instance.EnableAllActionPoints(false);
                     ProjectManager.Instance.EnableAllActionInputs(false);
                     ProjectManager.Instance.EnableAllActions(true);
@@ -590,7 +590,7 @@ namespace Base {
                     ProjectManager.Instance.EnableAllOrientations(false);
                     ProjectManager.Instance.EnableAllRobotsEE(false);
                     EnableServiceInteractiveObjects(false);
-                    ProjectManager.Instance.EnableAllActionOutputs(false);
+                    ProjectManager.Instance.EnableAllActionOutputs(false);*/
                     break;
 
             }
