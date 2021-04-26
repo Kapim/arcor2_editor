@@ -454,6 +454,9 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         if (SelectorItems.TryGetValue(id, out SelectorItem selectorItem)) {
             TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsAimMenu);
             TryRemoveFromList(selectorItem.InteractiveObject, selectorItemsNoPoseMenu);
+            if (selectorItem.IsSelected()) {
+                DeselectObject(true);
+            }
             Destroy(selectorItem.transform.parent.gameObject);
             SelectorItems.Remove(id);
         }
