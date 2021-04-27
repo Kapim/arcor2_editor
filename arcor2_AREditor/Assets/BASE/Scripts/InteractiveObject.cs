@@ -31,6 +31,10 @@ public abstract class InteractiveObject : Clickable {
             }            
 
         }
+        foreach (Collider2D collider in Colliders2D) {
+            Vector3 point = collider.ClosestPoint(origin);
+            minDist = Math.Min(Vector3.Distance(origin, point), minDist);
+        }
         
         return minDist;
     }
@@ -42,6 +46,7 @@ public abstract class InteractiveObject : Clickable {
     }
 
     public List<Collider> Colliders = new List<Collider>();
+    public List<Collider2D> Colliders2D = new List<Collider2D>();
 
 
 }

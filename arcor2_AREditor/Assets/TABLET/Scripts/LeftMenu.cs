@@ -241,6 +241,9 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
+        ActionPicker.transform.position = selectedObject.transform.position;
+        ActionPicker.transform.LookAt(ActionPicker.transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+
         if (clickedButton.GetComponent<Image>().enabled) {
             clickedButton.GetComponent<Image>().enabled = false;
             RestoreSelector();

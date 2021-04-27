@@ -55,7 +55,8 @@ MonoBehaviour:
     type: 2}
   OutlineHoverMaterial: {fileID: 2100000, guid: 93e96bf4f8c5dbb458a878182ad82748,
     type: 2}
-  Renderers: []
+  Renderers:
+  - {fileID: 1615898364581384329}
   HoverOnly: 0
 --- !u!114 &120830425844978859
 MonoBehaviour:
@@ -71,11 +72,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Enabled: 1
   Colliders:
-  - {fileID: 0}
+  - {fileID: 120830424940317713}
   LogicItemId: 
   Name: connection
   OnClickCollider: {fileID: 0}
   OutlineOnClick: {fileID: 120830425844978860}
+  MeshCollider: {fileID: 0}
   target:
   - {fileID: 0}
   - {fileID: 0}
@@ -237,6 +239,12 @@ GameObject:
 --- !u!4 &443604412470782950 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 68a4841b4976dd64a9ccb70bec15d313,
+    type: 3}
+  m_PrefabInstance: {fileID: 120830424940317709}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1615898364581384329 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 68a4841b4976dd64a9ccb70bec15d313,
     type: 3}
   m_PrefabInstance: {fileID: 120830424940317709}
   m_PrefabAsset: {fileID: 0}
