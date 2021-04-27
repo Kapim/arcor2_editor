@@ -18,6 +18,8 @@ namespace Base {
 
         private ButtonInteractiveObject buttonInteractiveObject;
 
+        public event AREditorEventArgs.ButtonInteractiveObjectEventHandler OnObjectSelectedChangedEvent;
+
         private void Awake() {
             GameManager.Instance.OnEditorStateChanged += OnEditorStateChanged;
         }
@@ -36,6 +38,7 @@ namespace Base {
 
         private void Update() {
             //if (SelectorMenu.Instance.CanvasGroup.alpha == 0 || !SelectorMenu.Instance.gameObject.activeSelf)
+            //Debug.LogError(SelectorMenu.Instance.Active);
             if (SelectorMenu.Instance.Active) {
                 //if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0)), out hit, Mathf.Infinity)) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
@@ -129,10 +132,18 @@ namespace Base {
                                 buttonInteractiveObject.OnHoverEnd();
                                 buttonInteractiveObject = button;
                                 buttonInteractiveObject.OnHoverStart();
+                                OnObjectSelectedChangedEvent.Invoke(this, new ButtonInteractiveObjectEventArgs(buttonInteractiveObject));
                             }
                         } else {
                             buttonInteractiveObject = button;
                             buttonInteractiveObject.OnHoverStart();
+                            OnObjectSelectedChangedEvent.Invoke(this, new ButtonInteractiveObjectEventArgs(buttonInteractiveObject));
+                        }
+                    } else {
+                        if (buttonInteractiveObject != null) {
+                            buttonInteractiveObject.OnHoverEnd();
+                            buttonInteractiveObject = null;
+                            OnObjectSelectedChangedEvent.Invoke(this, new ButtonInteractiveObjectEventArgs(null));
                         }
                     }
                 }

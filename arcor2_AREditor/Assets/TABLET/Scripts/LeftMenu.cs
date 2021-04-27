@@ -106,8 +106,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             MoveButton2.interactable = false;
             RemoveButton.interactable = false;
             SetActionPointParentButton.interactable = false;
-            AddActionButton.interactable = false;
-            AddActionButton2.interactable = false;
+            //AddActionButton.interactable = false;
+            //AddActionButton2.interactable = false;
             RenameButton.interactable = false;
             CalibrationButton.interactable = false;
             ResizeCubeButton.interactable = false;
@@ -122,8 +122,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             RemoveButton.interactable = selectedObject.Removable();
 
             SetActionPointParentButton.interactable = selectedObject is ActionPoint3D;
-            AddActionButton.interactable = selectedObject is ActionPoint3D;
-            AddActionButton2.interactable = selectedObject is ActionPoint3D;
+            //AddActionButton.interactable = selectedObject is ActionPoint3D;
+            //AddActionButton2.interactable = selectedObject is ActionPoint3D;
             RenameButton.interactable = selectedObject is ActionPoint3D ||
                 selectedObject is DummyBox ||
                 selectedObject is Action3D;
@@ -241,9 +241,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
-        ActionPicker.transform.position = selectedObject.transform.position;
-        ActionPicker.transform.LookAt(ActionPicker.transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
-
+        
+        
         if (clickedButton.GetComponent<Image>().enabled) {
             clickedButton.GetComponent<Image>().enabled = false;
             RestoreSelector();
@@ -251,10 +250,11 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SelectorMenu.Instance.Active = true;
         } else {
             clickedButton.GetComponent<Image>().enabled = true;
-            RightButtonsMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
-            ActionPicker.SetActive(true);
-            SelectorMenu.Instance.Active = false;
+            RightButtonsMenu.SetActionMode();
+            //ActionPicker.SetActive(true);
+            //SelectorMenu.Instance.Active = false;
         }
     }
 
@@ -516,10 +516,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             new ActionParameter(name: "acceleration", type: "double", value: "50.0")
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
-        ProjectManager.Instance.ActionToSelect = name;
+        //ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
-        RestoreSelector();
+        //RestoreSelector();
         ActionPicker.SetActive(false);
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.Instance.SetActionMode();
     }
 
     public void ActionPickClick() {
@@ -538,10 +540,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
-        ProjectManager.Instance.ActionToSelect = name;
+        //ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
-        RestoreSelector();
+        //RestoreSelector();
         ActionPicker.SetActive(false);
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.Instance.SetActionMode();
     }
 
     public void ActionReleaseClick() {
@@ -560,10 +564,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
-        ProjectManager.Instance.ActionToSelect = name;
+        //ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
-        RestoreSelector();
+        //RestoreSelector();
         ActionPicker.SetActive(false);
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.Instance.SetActionMode();
     }
     #endregion
 
@@ -604,6 +610,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
         }
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.SetSelectorMode();
     }
 
     private void DeactivateAllSubmenus() {

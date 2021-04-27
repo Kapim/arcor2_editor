@@ -348,6 +348,16 @@ namespace Base {
         }
     }
 
+    public class ButtonInteractiveObjectEventArgs : EventArgs {
+        public ButtonInteractiveObject InteractiveObject {
+            get; set;
+        }
+
+        public ButtonInteractiveObjectEventArgs(ButtonInteractiveObject interactiveObject) {
+            InteractiveObject = interactiveObject;
+        }
+    }
+
     public class ObjectTypeEventArgs : EventArgs {
         public ObjectTypeMeta ObjectType {
             get; set;
@@ -401,5 +411,6 @@ namespace Base {
         public delegate void ObjectTypesHandler(object sender, ObjectTypesEventArgs args);
         public delegate void GameObjectEventHandler(object sender, GameObjectEventArgs args);
         public delegate void InteractiveObjectEventHandler(object sender, InteractiveObjectEventArgs args);
+        public delegate void ButtonInteractiveObjectEventHandler(object sender, ButtonInteractiveObjectEventArgs args);
     }
 }
