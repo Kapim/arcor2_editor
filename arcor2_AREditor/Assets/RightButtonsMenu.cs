@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Base;
@@ -6,13 +7,22 @@ using UnityEngine.UI;
 
 public class RightButtonsMenu : Singleton<RightButtonsMenu>
 {
-    public ButtonWithTooltip SelectBtn, CollapseBtn;
+    public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
     private InteractiveObject selectedObject;
+    private ButtonInteractiveObject selectedButton;
+
+    public GameObject ActionPicker;
 
     private void Awake() {
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
+        Sight.Instance.OnObjectSelectedChangedEvent += OnButtonObjectSelectedChangedEvent;
+    }
+
+    private void OnButtonObjectSelectedChangedEvent(object sender, ButtonInteractiveObjectEventArgs args) {
+        selectedButton = args.InteractiveObject;
+        MenuTriggerBtn.SetInteractivity(selectedButton != null, "No item selected");
     }
 
     private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
@@ -73,4 +83,38 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             }
         }
     }
+
+    public void TriggerClick() {
+        selectedButton.OnClick(Clickable.Click.MOUSE_LEFT_BUTTON);
+    }
+
+    public void AddAction() {
+        ActionPicker.transform.position = selectedObject.transform.position;
+        ActionPicker.SetActive(true);
+        SelectorMenu.Instance.Active = false;
+        SetMenuTriggerMode();
+    }
+
+    public void SetMenuTriggerMode() {
+        MenuTriggerBtn.gameObject.SetActive(true);
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        AddActionBtn.gameObject.SetActive(false);
+    }
+
+    public void SetSelectorMode() {
+        SelectBtn.gameObject.SetActive(true);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(false);
+    }
+
+    public void SetActionMode() {
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(true);
+    }
+
+
 }
