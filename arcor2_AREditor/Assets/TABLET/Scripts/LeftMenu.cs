@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Base;
 using IO.Swagger.Model;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using static Base.GameManager;
 
@@ -34,11 +35,28 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public RightButtonsMenu RightButtonsMenu;
 
+    public string ApToAddActionName = null;
+    public UnityAction<ActionPoint3D> ActionCb;
+
+    public ActionPoint3D APToRemoveOnCancel;
+
+    public bool ActionAddMode = false;
+
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
         GameManager.Instance.OnEditorStateChanged += OnEditorStateChanged;
 
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
+        ProjectManager.Instance.OnActionPointAddedToScene += OnActionPointAddedToScene;
+    }
+
+    private void OnActionPointAddedToScene(object sender, ActionPointEventArgs args) {
+        Debug.LogError(ApToAddActionName + " - " + ActionCb + " - " + args.ActionPoint.GetName() + " - ");
+        if (ApToAddActionName != null && ActionCb != null && args.ActionPoint.GetName() == ApToAddActionName) {
+            ApToAddActionName = null;
+            ActionCb.Invoke((ActionPoint3D) args.ActionPoint);
+            ActionCb = null;
+        } 
     }
 
     private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
@@ -241,18 +259,21 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
-        
-        
+
+
         if (clickedButton.GetComponent<Image>().enabled) {
             clickedButton.GetComponent<Image>().enabled = false;
             RestoreSelector();
             ActionPicker.SetActive(false);
+
+            ActionAddMode = false;
             SelectorMenu.Instance.Active = true;
         } else {
             clickedButton.GetComponent<Image>().enabled = true;
             RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
             RightButtonsMenu.SetActionMode();
+            ActionAddMode = true;
             //ActionPicker.SetActive(true);
             //SelectorMenu.Instance.Active = false;
         }
@@ -408,7 +429,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
                              UpdateVisibility(true);
                              RestoreSelector();
                              ConfirmationDialog.Close();
-                             });
+                         });
     }
 
 
@@ -460,8 +481,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
             IRobot robot = SceneManager.Instance.GetRobot(robotId);
             await WebsocketManager.Instance.MoveToActionPointOrientation(robot.GetId(), (await robot.GetEndEffectorIds())[0], 0.5m, o.Id, false);
-        }            
-        
+        }
+
     }
 
     #endregion
@@ -499,16 +520,22 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     #endregion
 
     #region Action picker click methods
-    public void ActionMoveToClick() {
+    public async void ActionMoveToClick() {
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
-        if (selectedObject is null)
-            return;
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionMoveToClick(actionPoint);
+        } else if (selectedObject is Action3D action) {
+            ActionMoveToClick((ActionPoint3D) action.ActionPoint);
+        }
+    }
+
+    public void ActionMoveToClick(ActionPoint3D actionPoint) {
         string robotId = "";
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
         string name = ProjectManager.Instance.GetFreeActionName("MoveTo");
-        NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
+        NamedOrientation o = actionPoint.GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pose", type: "pose", value: "\"" + o.Id + "\""),
             new ActionParameter(name: "move_type", type: "string_enum", value: "\"JOINTS\""),
@@ -517,23 +544,33 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
         //ProjectManager.Instance.ActionToSelect = name;
-        WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
+        WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
         SelectorMenu.Instance.Active = true;
         RightButtonsMenu.Instance.SetActionMode();
+        if (APToRemoveOnCancel != null)
+            MoveClick();
+        APToRemoveOnCancel = null;
+    }
+    public async void ActionPickClick() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionPickClick(actionPoint);
+        } else if (selectedObject is Action3D action) {
+            ActionPickClick((ActionPoint3D) action.ActionPoint);
+        }
     }
 
-    public void ActionPickClick() {
-        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
-        if (selectedObject is null)
-            return;
+
+    public void ActionPickClick(ActionPoint3D actionPoint) {
+
         string robotId = "";
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
         string name = ProjectManager.Instance.GetFreeActionName("Pick");
-        NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
+        NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
             new ActionParameter(name: "vertical_offset", type: "double", value: "0.05")
@@ -541,23 +578,32 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
         //ProjectManager.Instance.ActionToSelect = name;
-        WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
+        WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
         SelectorMenu.Instance.Active = true;
         RightButtonsMenu.Instance.SetActionMode();
+        if (APToRemoveOnCancel != null)
+            MoveClick();
+        APToRemoveOnCancel = null;
     }
 
-    public void ActionReleaseClick() {
+    public async void ActionReleaseClick() {
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
-        if (selectedObject is null)
-            return;
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionReleaseClick(actionPoint);
+        } else if (selectedObject is Action3D action) {
+            ActionReleaseClick((ActionPoint3D) action.ActionPoint);
+        }
+    }
+
+    public void ActionReleaseClick(ActionPoint3D actionPoint) {
         string robotId = "";
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
         string name = ProjectManager.Instance.GetFreeActionName("Release");
-        NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
+        NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "place_pose", type: "pose", value: "\"" + o.Id + "\""),
             new ActionParameter(name: "vertical_offset", type: "double", value: "0.0")
@@ -565,11 +611,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
         //ProjectManager.Instance.ActionToSelect = name;
-        WebsocketManager.Instance.AddAction(selectedObject.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
+        WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
         SelectorMenu.Instance.Active = true;
         RightButtonsMenu.Instance.SetActionMode();
+        if (APToRemoveOnCancel != null)
+            MoveClick();
+        APToRemoveOnCancel = null;
     }
     #endregion
 
@@ -598,7 +647,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
                 HomeButtons.SetActive(active);
                 HomeButton.GetComponent<Image>().enabled = active;
                 break;
-            
+
         }
     }
 
@@ -612,6 +661,27 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         }
         SelectorMenu.Instance.Active = true;
         RightButtonsMenu.SetSelectorMode();
+    }
+
+    public async void CloseActionPicker() {
+        if (APToRemoveOnCancel != null) {
+            await WebsocketManager.Instance.RemoveActionPoint(APToRemoveOnCancel.GetId());
+        }
+        if (ProjectManager.Instance.PrevAction != null &&
+            ProjectManager.Instance.NextAction != null) {
+            try {
+                await WebsocketManager.Instance.AddLogicItem(ProjectManager.Instance.PrevAction,
+                    ProjectManager.Instance.NextAction, null, false);
+            } catch (RequestFailedException) {
+            } finally {
+                ProjectManager.Instance.PrevAction = null;
+                ProjectManager.Instance.NextAction = null;
+            }            
+        }
+        APToRemoveOnCancel = null;
+        ActionPicker.SetActive(false);
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.Instance.SetActionMode();
     }
 
     private void DeactivateAllSubmenus() {

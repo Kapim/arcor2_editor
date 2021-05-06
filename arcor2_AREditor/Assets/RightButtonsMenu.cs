@@ -15,6 +15,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
 
     public GameObject ActionPicker;
 
+
     private void Awake() {
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
         Sight.Instance.OnObjectSelectedChangedEvent += OnButtonObjectSelectedChangedEvent;
@@ -89,10 +90,46 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void AddAction() {
-        ActionPicker.transform.position = selectedObject.transform.position;
-        ActionPicker.SetActive(true);
+        Debug.LogError(selectedObject);
+        if (selectedObject != null && (selectedObject is Action3D || selectedObject is ActionPoint3D)) {
+
+            ActionPicker.transform.position = selectedObject.transform.position - Camera.main.transform.forward * 0.05f;
+            ActionPicker.SetActive(true);
+            if (selectedObject is Action3D action) {
+                action.ActionPoint.SetApCollapsed(false);
+            } else if (selectedObject is ActionPoint3D actionPoint) {
+                actionPoint.SetApCollapsed(false);             
+            } else {
+                return;
+            }
+                
+            
+        } else {
+            string name = ProjectManager.Instance.GetFreeAPName("ap");
+            LeftMenu.Instance.ApToAddActionName = name;
+            LeftMenu.Instance.ActionCb = SelectAP;
+            if (selectedObject != null && selectedObject is ConnectionLine connectionLine) {
+                if (ProjectManager.Instance.LogicItems.TryGetValue(connectionLine.LogicItemId, out LogicItem logicItem)) {
+                    logicItem.Input.Action.ActionPoint.SetApCollapsed(false);
+                    logicItem.Output.Action.ActionPoint.SetApCollapsed(false);
+                    ProjectManager.Instance.PrevAction = logicItem.Output.Action.GetId();
+                    ProjectManager.Instance.NextAction = logicItem.Input.Action.GetId();
+                    connectionLine.Remove();
+                }
+            }            
+            GameManager.Instance.AddActionPointExperiment(name, false);
+        } 
         SelectorMenu.Instance.Active = false;
         SetMenuTriggerMode();
+    }
+
+    public void SelectAP(ActionPoint3D actionPoint) {
+
+        actionPoint.SetApCollapsed(false);
+        //SelectorMenu.Instance.SetSelectedObject(actionPoint, true);
+        LeftMenu.Instance.APToRemoveOnCancel = actionPoint;
+        ActionPicker.transform.position = actionPoint.transform.position - Camera.main.transform.forward * 0.05f;
+        ActionPicker.SetActive(true);
     }
 
     public void SetMenuTriggerMode() {

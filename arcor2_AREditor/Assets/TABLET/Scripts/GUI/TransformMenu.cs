@@ -440,6 +440,17 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     }
 
+    public void HideWithButton() {
+        Hide();
+        if (LeftMenu.Instance.ActionAddMode) {
+            SelectorMenu.Instance.DeselectObject();
+            LeftMenu.Instance.RestoreSelector();
+            RightButtonsMenu.Instance.SetActionMode();
+            LeftMenu.Instance.MoveButton.GetComponent<Image>().enabled = false;
+            LeftMenu.Instance.MoveButton2.GetComponent<Image>().enabled = false;
+        }
+    }
+
     public void Hide() {
         for (int i = 0; i < 4; ++i) {
             if (dummyPoints[i] != null) {

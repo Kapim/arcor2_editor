@@ -9,7 +9,7 @@ public class ConnectionLine : InteractiveObject {
     public OnClickCollider OnClickCollider;
     public OutlineOnClick OutlineOnClick;
     public MeshCollider MeshCollider;
-    public RectTransform[] target = new RectTransform[2];
+    public RectTransform[] Target = new RectTransform[2];
     public GameObject Cone;
 
     public void InitConnection(string logicItemId, string name) {
@@ -29,8 +29,8 @@ public class ConnectionLine : InteractiveObject {
     }
 
     public void SetTargets(RectTransform transform1, RectTransform transform2) {
-        target[0] = transform1;
-        target[1] = transform2;
+        Target[0] = transform1;
+        Target[1] = transform2;
     }
 
     private void FixedUpdate() {
@@ -42,10 +42,10 @@ public class ConnectionLine : InteractiveObject {
     }
 
     public void UpdateConnection() {
-        if (target[0] != null && target[1] != null) {
-            transform.position = target[0].position;
-            transform.rotation = Quaternion.LookRotation(target[1].position - target[0].position);
-            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (target[1].position - target[0].position).magnitude);
+        if (Target[0] != null && Target[1] != null) {
+            transform.position = Target[0].position;
+            transform.rotation = Quaternion.LookRotation(Target[1].position - Target[0].position);
+            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (Target[1].position - Target[0].position).magnitude);
         }
     }
 

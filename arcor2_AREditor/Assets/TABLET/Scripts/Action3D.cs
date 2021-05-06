@@ -17,8 +17,15 @@ public class Action3D : Base.Action {
     private bool selected = false;
     [SerializeField]
     protected OutlineOnClick outlineOnClick;
+    int counter = 0;
+    private System.Random rand = new System.Random();
 
-
+    private void FixedUpdate() {
+        if (counter++ > rand.Next(20, 150)) {
+            UpdateConnections();
+            counter = 0;
+        }
+    }
 
     private void Start() {
         GameManager.Instance.OnStopPackage += OnProjectStop;

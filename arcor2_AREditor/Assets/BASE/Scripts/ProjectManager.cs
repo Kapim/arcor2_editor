@@ -79,6 +79,11 @@ namespace Base {
 
         public GameObject DummyBoxPrefab, DummyBoxVisual, DummyAimBoxPrefab, DummyAimBoxTesterPrefab;
 
+        public List<string> LastAddedAPs;
+
+
+        public string PrevAction = null, NextAction = null;
+
 
         public bool ProjectChanged {
             get => projectChanged;
@@ -304,10 +309,9 @@ namespace Base {
                 }
 
             }
-            if (ap != null && SelectAPNameWhenCreated.Contains(ap.GetName())) {
+            if (ap != null) {
                 SelectorMenu.Instance.UpdateFilters();
                 SelectorMenu.Instance.SetSelectedObject(ap, true);
-                SelectAPNameWhenCreated = "";
                 //// FOR EXPERIMENT!!
                 ///
                 /*await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), robot.GetId(),
@@ -317,7 +321,10 @@ namespace Base {
 
                 } catch (RequestFailedException) {
                 }
-                LeftMenu.Instance.MoveClick();
+                if (SelectAPNameWhenCreated == data.ActionPoint.Name)
+                    LeftMenu.Instance.MoveClick();
+                SelectAPNameWhenCreated = "";
+ 
                 //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "def");
             }
             updateProject = true;
@@ -341,6 +348,8 @@ namespace Base {
             if (ProjectMeta != null)
                 return false;
 
+            LastAddedAPs = new List<string>();
+            LastAddedAPs.Add("START");
             SetProjectMeta(DataHelper.ProjectToBareProject(project));
             AllowEdit = allowEdit;
             LoadSettings();
@@ -447,6 +456,9 @@ namespace Base {
                 if (!LogicItems.TryGetValue(projectLogicItem.Id, out LogicItem logicItem)) {
                     logicItem = new LogicItem(projectLogicItem);
                     LogicItems.Add(logicItem.Data.Id, logicItem);
+
+                    ((Action3D) logicItem.Input.Action).UpdateConnections();
+                    ((Action3D) logicItem.Output.Action).UpdateConnections();
                 } else {
                     logicItem.UpdateConnection(projectLogicItem);
                 }
@@ -492,6 +504,8 @@ namespace Base {
             LogicItem logicItem = new LogicItem(args.Data);
             LogicItems.Add(args.Data.Id, logicItem);
 
+            ((Action3D) logicItem.Input.Action).UpdateConnections();
+            ((Action3D) logicItem.Output.Action).UpdateConnections();
             SelectorMenu.Instance.UpdateFilters();
         }
 
@@ -607,8 +621,8 @@ namespace Base {
             ActionPoint actionPoint = AP.GetComponent<ActionPoint>();
             actionPoint.InitAP(apData, APSize, actionPointParent);
             ActionPoints.Add(actionPoint.Data.Id, actionPoint);
-            OnActionPointAddedToScene?.Invoke(this, new ActionPointEventArgs(actionPoint));
             SelectorMenu.Instance.CreateSelectorItem(actionPoint);
+            OnActionPointAddedToScene?.Invoke(this, new ActionPointEventArgs(actionPoint));
             return actionPoint;
         }
 
@@ -618,9 +632,9 @@ namespace Base {
         /// <param name="apDefaultName">Name of parent or "globalAP"</param>
         /// <returns></returns>
         public string GetFreeAPName(string apDefaultName) {
-            int i = 2;
+            int i = 1;
             bool hasFreeName;
-            string freeName = apDefaultName + "_1";
+            string freeName = apDefaultName;
             do {
                 hasFreeName = true;
                 if (ActionPointsContainsName(freeName)) {
@@ -1100,6 +1114,7 @@ namespace Base {
             puck.SetActive(true);
 
             SelectorMenu.Instance.CreateSelectorItem(action);
+            LastAddedAPs.Add(action.GetId());
             return action;
         }
 
@@ -1123,13 +1138,14 @@ namespace Base {
         /// <summary>
         /// Destroys and removes references to action of given Id.
         /// </summary>
-        /// <param name="Id"></param>
-        public void RemoveAction(string Id) {
-            Action aToRemove = GetAction(Id);
+        /// <param name="id"></param>
+        public void RemoveAction(string id) {
+            Action aToRemove = GetAction(id);
             string apIdToRemove = aToRemove.ActionPoint.Data.Id;
             // Call function in corresponding action that will delete it and properly remove all references and connections.
             // We don't want to update project, because we are calling this method only upon received update from server.
-            ActionPoints[apIdToRemove].Actions[Id].DeleteAction();
+            ActionPoints[apIdToRemove].Actions[id].DeleteAction();
+            LastAddedAPs.Remove(id);
         }
 
         public bool ActionsContainsName(string name) {
@@ -1245,7 +1261,7 @@ namespace Base {
         /// </summary>
         /// <param name="projectAction">Action description</param>
         /// <param name="parentId">UUID of action point to which the action should be added</param>
-        public void ActionAdded(IO.Swagger.Model.Action projectAction, string parentId) {
+        public async void ActionAdded(IO.Swagger.Model.Action projectAction, string parentId) {
             ActionPoint actionPoint = GetActionPoint(parentId);
             try {
                 Base.Action action = SpawnAction(projectAction, actionPoint);
@@ -1260,6 +1276,26 @@ namespace Base {
                     SelectorMenu.Instance.SetSelectedObject(action, true);
                     ActionToSelect = "";
                 }
+                Debug.LogError(PrevAction);
+                Debug.LogError(NextAction);
+                if (!string.IsNullOrEmpty(PrevAction) && !string.IsNullOrEmpty(NextAction)) {
+                    await WebsocketManager.Instance.AddLogicItem(PrevAction, action.GetId(), null, false);
+                    await WebsocketManager.Instance.AddLogicItem(action.GetId(), NextAction, null, false);
+                    PrevAction = NextAction = null;
+                } else if (LastAddedAPs.Count > 2) {
+                    for (int i = LastAddedAPs.Count() - 2; i >= 0; --i) {
+                        Action a;
+                        if (LastAddedAPs[i] != "START")
+                            a = GetAction(LastAddedAPs[i]);
+                        else
+                            a = StartAction;
+                        if (!a.Output.ConnectionExists()) {
+                            await WebsocketManager.Instance.AddLogicItem(LastAddedAPs[i], action.GetId(), null, false);
+                            break;
+                        }
+                    }
+                }
+                
             } catch (RequestFailedException ex) {
                 Debug.LogError(ex);
             }            

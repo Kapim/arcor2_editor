@@ -87,6 +87,11 @@ namespace Base {
                 Data.RobotJoints = new List<ProjectRobotJoints>();
         }
 
+        public void SetApCollapsed(bool collapsed) {
+            ActionsCollapsed = collapsed;
+            UpdatePositionsOfPucks();
+        }
+
         public void SetParent(IActionPointParent parent) {
             Parent = parent;
             if(parent != null)

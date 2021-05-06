@@ -8,10 +8,14 @@ public class LogicItem
 
     private ConnectionLine connection;
 
-    private PuckInput input;
-    private PuckOutput output;
-
-    
+    public PuckInput Input {
+        get;
+        private set;
+    }
+    public PuckOutput Output {
+        get;
+        private set;
+    }
 
     public LogicItem(IO.Swagger.Model.LogicItem logicItem) {
         Data = logicItem;
@@ -19,12 +23,12 @@ public class LogicItem
     }
 
     public void Remove() {
-        if (input.LineToConnection != null)
-            GameObject.Destroy(input.LineToConnection);
-        if (output.LineToConnection != null)
-            GameObject.Destroy(output.LineToConnection);
-        input.RemoveLogicItem(Data.Id);
-        output.RemoveLogicItem(Data.Id);
+        if (Input.LineToConnection != null)
+            GameObject.Destroy(Input.LineToConnection);
+        if (Output.LineToConnection != null)
+            GameObject.Destroy(Output.LineToConnection);
+        Input.RemoveLogicItem(Data.Id);
+        Output.RemoveLogicItem(Data.Id);
         UnityEngine.Object.Destroy(connection.gameObject);
         connection = null;
     }
@@ -33,23 +37,26 @@ public class LogicItem
         if (connection != null) {
             Remove();
         }
-        input = ProjectManager.Instance.GetAction(logicItem.End).Input;
-        output = ProjectManager.Instance.GetAction(logicItem.Start).Output;
-        input.AddLogicItem(Data.Id);
-        output.AddLogicItem(Data.Id);
+        Input = ProjectManager.Instance.GetAction(logicItem.End).Input;
+        Output = ProjectManager.Instance.GetAction(logicItem.Start).Output;
+        Input.AddLogicItem(Data.Id);
+        Output.AddLogicItem(Data.Id);
 
-        connection = ConnectionManagerArcoro.Instance.CreateConnection(input.gameObject, output.gameObject);
+        connection = ConnectionManagerArcoro.Instance.CreateConnection(Input.gameObject, Output.gameObject);
 
-        connection.InitConnection(Data.Id, output.Action.GetName() + " => " + input.Action.GetName());
-        
+        connection.InitConnection(Data.Id, Output.Action.GetName() + " => " + Input.Action.GetName());
 
-        input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
-        input.LineToConnection.SetTargets(input.transform.GetComponent<RectTransform>(), input.Action.Center);
-        output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
-        output.LineToConnection.SetTargets(output.Action.Center, output.transform.GetComponent<RectTransform>());
+        if (Input.LineToConnection != null)
+            GameObject.Destroy(Input.LineToConnection.gameObject);
+        if (Output.LineToConnection != null)
+            GameObject.Destroy(Output.LineToConnection.gameObject);
+        Input.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
+        Input.LineToConnection.SetTargets(Input.transform.GetComponent<RectTransform>(), Input.Action.Center);
+        Output.LineToConnection = GameObject.Instantiate(ConnectionManagerArcoro.Instance.ConnectionPrefab).GetComponent<ConnectionLine>();
+        Output.LineToConnection.SetTargets(Output.Action.Center, Output.transform.GetComponent<RectTransform>());
 
         SelectorMenu.Instance.CreateSelectorItem(connection);
-        connection.UpdateConnection();
+        //connection.UpdateConnection();
     }
 
 
@@ -57,6 +64,8 @@ public class LogicItem
     public ConnectionLine GetConnection() {
         return connection;
     }
+
+    
 
     
 

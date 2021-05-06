@@ -634,7 +634,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
                 return item.InteractiveObject;
         }
         return null;*/
-        return lastSelectedItem.InteractiveObject;
+        if (lastSelectedItem == null)
+            return null;
+        else
+            return lastSelectedItem.InteractiveObject;
     }
 
     public async Task ShowRobots(bool show, bool updateMenus) {

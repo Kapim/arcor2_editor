@@ -62,7 +62,7 @@ namespace Base {
                 try {
                     // If action parameter exist in action dictionary, then just update that parameter value (it's metadata will always be unchanged)
                     if (Parameters.TryGetValue(projectActionParameter.Name, out Parameter actionParameter)) {
-                        actionParameter.UpdateActionParameter(DataHelper.ActionParameterToParameter(projectActionParameter));
+                       actionParameter.UpdateActionParameter(DataHelper.ActionParameterToParameter(projectActionParameter));
                     }
                     // Otherwise create a new action parameter, load metadata for it and add it to the dictionary of action
                     else {
@@ -109,7 +109,10 @@ namespace Base {
                 ConnectionManagerArcoro.Instance.Connections.Remove(Output.Connection);
                 Destroy(Output.Connection.gameObject);
             }*/
-
+            if (Input.LineToConnection != null)
+                Destroy(Input.LineToConnection.gameObject);
+            if (Output.LineToConnection != null)
+                Destroy(Output.LineToConnection.gameObject);
             Destroy(gameObject);
 
             ActionPoint.Actions.Remove(Data.Id);

@@ -29,11 +29,11 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
         // Set correct targets. Output has to be always at 0 index, because we are connecting output to input.
         // Output has direction to the east, while input has direction to the west.
         if (o1.GetComponent<Base.InputOutput>().GetType() == typeof(Base.PuckOutput)) {
-            c.target[0] = o1.GetComponent<RectTransform>();
-            c.target[1] = o2.GetComponent<RectTransform>();
+            c.Target[0] = o1.GetComponent<RectTransform>();
+            c.Target[1] = o2.GetComponent<RectTransform>();
         } else {
-            c.target[1] = o1.GetComponent<RectTransform>();
-            c.target[0] = o2.GetComponent<RectTransform>();
+            c.Target[1] = o1.GetComponent<RectTransform>();
+            c.Target[0] = o2.GetComponent<RectTransform>();
         }
         Connections.Add(c);
         if (!ControlBoxManager.Instance.ConnectionsToggle.isOn)
@@ -75,9 +75,9 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
     }
 
     private int GetIndexOf(ConnectionLine c, GameObject o) {
-        if (c.target[0] != null && c.target[0].gameObject == o) {
+        if (c.Target[0] != null && c.Target[0].gameObject == o) {
             return 0;
-        } else if (c.target[1] != null && c.target[1].gameObject == o) {
+        } else if (c.Target[1] != null && c.Target[1].gameObject == o) {
             return 1;
         } else {
             return -1;
@@ -85,9 +85,9 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
     }
 
     private int GetIndexByType(ConnectionLine c, System.Type type) {
-        if (c.target[0] != null && c.target[0].gameObject.GetComponent<Base.InputOutput>() != null && c.target[0].gameObject.GetComponent<Base.InputOutput>().GetType().IsSubclassOf(type))
+        if (c.Target[0] != null && c.Target[0].gameObject.GetComponent<Base.InputOutput>() != null && c.Target[0].gameObject.GetComponent<Base.InputOutput>().GetType().IsSubclassOf(type))
             return 0;
-        else if (c.target[1] != null && c.target[1].gameObject.GetComponent<Base.InputOutput>() != null && c.target[1].gameObject.GetComponent<Base.InputOutput>().GetType().IsSubclassOf(type))
+        else if (c.Target[1] != null && c.Target[1].gameObject.GetComponent<Base.InputOutput>() != null && c.Target[1].gameObject.GetComponent<Base.InputOutput>().GetType().IsSubclassOf(type))
             return 1;
         else
             return -1;
@@ -100,7 +100,7 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
         int i = GetIndexOf(c, o);
         if (i < 0)
             return null;
-        return c.target[1 - i].gameObject;
+        return c.Target[1 - i].gameObject;
     }
 
     /**
