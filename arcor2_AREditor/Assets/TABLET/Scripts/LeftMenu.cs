@@ -16,9 +16,9 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     private CanvasGroup CanvasGroup;
 
     public Button FavoritesButton, RobotButton, AddButton, SettingsButton, HomeButton;
-    public Button AddMeshButton, MoveButton, MoveButton2, RemoveButton, SetActionPointParentButton,
-        AddActionButton, AddActionButton2, RenameButton, CalibrationButton, ResizeCubeButton,
-        AddConnectionButton, RunButton, RunButton2, SelectorMenuButton; //Buttons with number 2 are duplicates in favorites submenu
+    public Button AddMeshButton, MoveButton, MoveModeButton, RemoveButton, SetActionPointParentButton,
+        AddActionButton, AddActionModeBtn, RenameButton, CalibrationButton, ResizeCubeButton,
+        AddConnectionButton, RunButton, RunModeButton, SelectorMenuButton, RemoveModeBtn; //Buttons with number 2 are duplicates in favorites submenu
     public GameObject FavoritesButtons, HomeButtons, SettingsButtons, AddButtons, MeshPicker, ActionPicker;
     public RenameDialog RenameDialog;
     public CubeSizeDialog CubeSizeDialog;
@@ -40,7 +40,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public ActionPoint3D APToRemoveOnCancel;
 
-    public bool ActionAddMode = false;
+    public enum Mode {
+        Normal,
+        AddAction,
+        Remove,
+        Move,
+        Run
+    }
+
+    public Mode CurrentMode = Mode.Normal;
 
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
@@ -51,12 +59,11 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     private void OnActionPointAddedToScene(object sender, ActionPointEventArgs args) {
-        Debug.LogError(ApToAddActionName + " - " + ActionCb + " - " + args.ActionPoint.GetName() + " - ");
         if (ApToAddActionName != null && ActionCb != null && args.ActionPoint.GetName() == ApToAddActionName) {
             ApToAddActionName = null;
             ActionCb.Invoke((ActionPoint3D) args.ActionPoint);
             ActionCb = null;
-        } 
+        }
     }
 
     private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
@@ -121,7 +128,6 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (requestingObject || obj == null) {
             SelectedObjectText.text = "";
             MoveButton.interactable = false;
-            MoveButton2.interactable = false;
             RemoveButton.interactable = false;
             SetActionPointParentButton.interactable = false;
             //AddActionButton.interactable = false;
@@ -131,12 +137,10 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             ResizeCubeButton.interactable = false;
             AddConnectionButton.interactable = false;
             RunButton.interactable = false;
-            RunButton2.interactable = false;
         } else {
             SelectedObjectText.text = selectedObject.GetName() + "\n" + selectedObject.GetType();
 
             MoveButton.interactable = selectedObject.Movable();
-            MoveButton2.interactable = selectedObject.Movable();
             RemoveButton.interactable = selectedObject.Removable();
 
             SetActionPointParentButton.interactable = selectedObject is ActionPoint3D;
@@ -151,9 +155,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             AddConnectionButton.interactable = (selectedObject.GetType() == typeof(Action3D) ||
                 selectedObject.GetType() == typeof(StartAction)) && !((Action3D) selectedObject).Output.ConnectionExists();
             RunButton.interactable = selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D);
-            RunButton2.interactable = RunButton.interactable;
         }
         previousUpdateDone = true;
+    }
+
+    private void Start() {
+        currentSubmenuOpened = LeftMenuSelection.Favorites;
     }
 
     private void LateUpdate() {
@@ -181,6 +188,87 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         CanvasGroup.interactable = visible;
         CanvasGroup.blocksRaycasts = visible;
         CanvasGroup.alpha = visible ? 1 : 0;
+    }
+
+    public void StartAddActionMode() {        
+        if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+
+        if (AddActionModeBtn.GetComponent<Image>().enabled) {
+            AddActionModeBtn.GetComponent<Image>().enabled = false;
+            RestoreSelector();
+            ActionPicker.SetActive(false);
+
+            CurrentMode = Mode.Normal;
+            SelectorMenu.Instance.Active = true;
+        } else {
+            AddActionModeBtn.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.SetActionMode();
+            CurrentMode = Mode.AddAction;
+        }
+    }
+
+    public void StartRemoveMode() {
+        if (!RemoveModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+
+        if (RemoveModeBtn.GetComponent<Image>().enabled) {
+            RemoveModeBtn.GetComponent<Image>().enabled = false;
+            RestoreSelector();
+
+            CurrentMode = Mode.Normal;
+            SelectorMenu.Instance.Active = true;
+        } else {
+            RemoveModeBtn.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.SetRemoveMode();
+            CurrentMode = Mode.Remove;
+        }
+    }
+
+    public void StartMoveMode() {
+        if (!MoveModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+
+        if (MoveModeButton.GetComponent<Image>().enabled) {
+            MoveModeButton.GetComponent<Image>().enabled = false;
+            RestoreSelector();
+
+            CurrentMode = Mode.Normal;
+            SelectorMenu.Instance.Active = true;
+        } else {
+            MoveModeButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.SetMoveMode();
+            CurrentMode = Mode.Move;
+        }
+    }
+
+    public void StartRunMode() {
+        if (!RunModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+
+        if (RunModeButton.GetComponent<Image>().enabled) {
+            RunModeButton.GetComponent<Image>().enabled = false;
+            RestoreSelector();
+
+            CurrentMode = Mode.Normal;
+            SelectorMenu.Instance.Active = true;
+        } else {
+            RunModeButton.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.SetRunMode();
+            CurrentMode = Mode.Run;
+        }
     }
 
 
@@ -250,30 +338,25 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void AddActionClick() {
         //was clicked the button in favorites or settings submenu?
-        Button clickedButton = AddActionButton;
-        if (currentSubmenuOpened == LeftMenuSelection.Favorites) {
-            clickedButton = AddActionButton2;
-        }
-
-        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+         
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !AddActionButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
 
 
-        if (clickedButton.GetComponent<Image>().enabled) {
-            clickedButton.GetComponent<Image>().enabled = false;
+        if (AddActionButton.GetComponent<Image>().enabled) {
+            AddActionButton.GetComponent<Image>().enabled = false;
             RestoreSelector();
             ActionPicker.SetActive(false);
 
-            ActionAddMode = false;
+            CurrentMode = Mode.Normal;
             SelectorMenu.Instance.Active = true;
         } else {
-            clickedButton.GetComponent<Image>().enabled = true;
+            AddActionButton.GetComponent<Image>().enabled = true;
             RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
-            RightButtonsMenu.SetActionMode();
-            ActionAddMode = true;
+            RightButtonsMenu.Instance.AddAction();
             //ActionPicker.SetActive(true);
             //SelectorMenu.Instance.Active = false;
         }
@@ -343,7 +426,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         //was clicked the button in favorites or settings submenu?
         Button clickedButton = MoveButton;
         if (currentSubmenuOpened == LeftMenuSelection.Favorites)
-            clickedButton = MoveButton2;
+            clickedButton = MoveModeButton;
 
         if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
@@ -547,10 +630,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        SelectorMenu.Instance.Active = true;
-        RightButtonsMenu.Instance.SetActionMode();
-        if (APToRemoveOnCancel != null)
-            MoveClick();
+        if (CurrentMode == Mode.AddAction) {
+            SelectorMenu.Instance.Active = true;
+            RightButtonsMenu.Instance.SetActionMode();
+            if (APToRemoveOnCancel != null)
+                MoveClick();
+        } else {
+            RestoreSelector();
+            AddActionButton.GetComponent<Image>().enabled = false;
+        }
         APToRemoveOnCancel = null;
     }
     public async void ActionPickClick() {
@@ -581,10 +669,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        SelectorMenu.Instance.Active = true;
-        RightButtonsMenu.Instance.SetActionMode();
-        if (APToRemoveOnCancel != null)
-            MoveClick();
+        if (CurrentMode == Mode.AddAction) {
+            SelectorMenu.Instance.Active = true;
+            RightButtonsMenu.Instance.SetActionMode();
+            if (APToRemoveOnCancel != null)
+                MoveClick();
+        } else {
+            RestoreSelector();
+            AddActionButton.GetComponent<Image>().enabled = false;
+        }
         APToRemoveOnCancel = null;
     }
 
@@ -614,10 +707,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        SelectorMenu.Instance.Active = true;
-        RightButtonsMenu.Instance.SetActionMode();
-        if (APToRemoveOnCancel != null)
-            MoveClick();
+        if (CurrentMode == Mode.AddAction) {
+            SelectorMenu.Instance.Active = true;
+            RightButtonsMenu.Instance.SetActionMode();
+            if (APToRemoveOnCancel != null)
+                MoveClick();
+        } else {
+            RestoreSelector();
+            AddActionButton.GetComponent<Image>().enabled = false;
+        }
         APToRemoveOnCancel = null;
     }
     #endregion
@@ -664,24 +762,30 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public async void CloseActionPicker() {
-        if (APToRemoveOnCancel != null) {
-            await WebsocketManager.Instance.RemoveActionPoint(APToRemoveOnCancel.GetId());
-        }
-        if (ProjectManager.Instance.PrevAction != null &&
-            ProjectManager.Instance.NextAction != null) {
-            try {
-                await WebsocketManager.Instance.AddLogicItem(ProjectManager.Instance.PrevAction,
-                    ProjectManager.Instance.NextAction, null, false);
-            } catch (RequestFailedException) {
-            } finally {
-                ProjectManager.Instance.PrevAction = null;
-                ProjectManager.Instance.NextAction = null;
-            }            
-        }
-        APToRemoveOnCancel = null;
-        ActionPicker.SetActive(false);
-        SelectorMenu.Instance.Active = true;
-        RightButtonsMenu.Instance.SetActionMode();
+        if (CurrentMode == Mode.AddAction) {
+            if (APToRemoveOnCancel != null) {
+                await WebsocketManager.Instance.RemoveActionPoint(APToRemoveOnCancel.GetId());
+            }
+            if (ProjectManager.Instance.PrevAction != null &&
+                ProjectManager.Instance.NextAction != null) {
+                try {
+                    await WebsocketManager.Instance.AddLogicItem(ProjectManager.Instance.PrevAction,
+                        ProjectManager.Instance.NextAction, null, false);
+                } catch (RequestFailedException) {
+                } finally {
+                    ProjectManager.Instance.PrevAction = null;
+                    ProjectManager.Instance.NextAction = null;
+                }
+            }
+            APToRemoveOnCancel = null;
+            ActionPicker.SetActive(false);
+            SelectorMenu.Instance.Active = true;
+            RightButtonsMenu.Instance.SetActionMode();
+        } else {
+            APToRemoveOnCancel = null;
+            RestoreSelector();
+            ActionPicker.SetActive(false);
+        }        
     }
 
     private void DeactivateAllSubmenus() {
@@ -692,6 +796,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         if (RenameDialog.isActiveAndEnabled)
             RenameDialog.Close();
         TransformMenu.Instance.Hide();
+        CurrentMode = Mode.Normal;
 
         MeshPicker.SetActive(false);
         ActionPicker.SetActive(false);
@@ -709,9 +814,11 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
         AddMeshButton.GetComponent<Image>().enabled = false;
         MoveButton.GetComponent<Image>().enabled = false;
-        MoveButton2.GetComponent<Image>().enabled = false;
+        MoveModeButton.GetComponent<Image>().enabled = false;
         AddActionButton.GetComponent<Image>().enabled = false;
-        AddActionButton2.GetComponent<Image>().enabled = false;
+        AddActionModeBtn.GetComponent<Image>().enabled = false;
+        RunModeButton.GetComponent<Image>().enabled = false;
+        RemoveModeBtn.GetComponent<Image>().enabled = false;
         ResizeCubeButton.GetComponent<Image>().enabled = false;
     }
 

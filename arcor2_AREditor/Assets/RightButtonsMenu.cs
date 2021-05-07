@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Base;
+using IO.Swagger.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class RightButtonsMenu : Singleton<RightButtonsMenu>
 {
-    public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn;
+    public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
     private InteractiveObject selectedObject;
@@ -35,7 +36,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         if (args.InteractiveObject != null) {
             SelectBtn.SetInteractivity(true);
             CollapseBtn.SetInteractivity(true);
-            ActionPoint actionPoint;
+            Base.ActionPoint actionPoint;
             if (args.InteractiveObject is ActionPoint3D || args.InteractiveObject.GetType() == typeof(Action3D)) {
                 if (args.InteractiveObject is Action3D action)
                     if (action.ActionPoint != null)
@@ -44,7 +45,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                         return;
                     }
                 else {
-                    actionPoint = (ActionPoint) args.InteractiveObject;
+                    actionPoint = (Base.ActionPoint) args.InteractiveObject;
                 }
                 if (actionPoint.ActionsCollapsed) {
                     CollapseBtn.GetComponent<IconButton>().Icon.sprite = UncollapseIcon;
@@ -137,6 +138,9 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         SelectBtn.gameObject.SetActive(false);
         CollapseBtn.gameObject.SetActive(true);
         AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(false);
     }
 
     public void SetSelectorMode() {
@@ -144,6 +148,9 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(false);
     }
 
     public void SetActionMode() {
@@ -151,7 +158,111 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(true);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(false);
     }
+
+    public void SetMoveMode() {
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(true);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(false);
+    }
+
+    public void SetRemoveMode() {
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(true);
+        ExecuteBtn.gameObject.SetActive(false);
+    }
+
+    public void SetRunMode() {
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(true);
+
+    }
+
+    public void MoveClick() {
+        
+        if (selectedObject is null)
+            return;
+
+        if (selectedObject.GetType() == typeof(PuckInput) ||
+            selectedObject.GetType() == typeof(PuckOutput)) {
+            selectedObject.StartManipulation();
+            return;
+        }
+
+        SelectorMenu.Instance.Active = false;
+        gameObject.SetActive(false);
+        TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
+        
+    }
+
+    public void RemoveClick() {
+        if (selectedObject is null)
+            return;
+
+        SelectorMenu.Instance.Active = false;
+        gameObject.SetActive(false);
+        LeftMenu.Instance.ConfirmationDialog.Open("Remove object",
+                         "Are you sure you want to remove " + selectedObject.GetName() + "?",
+                         () => {
+                             selectedObject.Remove();
+                             gameObject.SetActive(true);
+                             LeftMenu.Instance.ConfirmationDialog.Close();
+                         },
+                         () => {
+                             gameObject.SetActive(true);
+                             LeftMenu.Instance.ConfirmationDialog.Close();
+                         });
+    }
+
+    public async void RunClick() {
+        if (selectedObject is null)
+            return;
+
+        if (selectedObject.GetType() == typeof(StartAction)) {
+            await GameManager.Instance.SaveProject();
+            GameManager.Instance.ShowLoadingScreen("Running project", true);
+            try {
+                await Base.WebsocketManager.Instance.TemporaryPackage();
+                MenuManager.Instance.MainMenu.Close();
+            } catch (RequestFailedException ex) {
+                Base.Notifications.Instance.ShowNotification("Failed to run temporary package", "");
+                Debug.LogError(ex);
+                GameManager.Instance.HideLoadingScreen(true);
+            }
+        } else if (selectedObject.GetType() == typeof(Action3D)) {
+            try {
+                await WebsocketManager.Instance.ExecuteAction(selectedObject.GetId(), false);
+            } catch (RequestFailedException ex) {
+                Notifications.Instance.ShowNotification("Failed to execute action", ex.Message);
+                return;
+            }
+        } else if (selectedObject.GetType() == typeof(ActionPoint3D)) {
+            string robotId = "";
+            foreach (IRobot r in SceneManager.Instance.GetRobots()) {
+                robotId = r.GetId();
+            }
+            NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
+            IRobot robot = SceneManager.Instance.GetRobot(robotId);
+            await WebsocketManager.Instance.MoveToActionPointOrientation(robot.GetId(), (await robot.GetEndEffectorIds())[0], 0.5m, o.Id, false);
+        }
+    }
+
 
 
 }

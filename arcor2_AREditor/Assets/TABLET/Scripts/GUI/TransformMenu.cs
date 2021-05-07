@@ -442,13 +442,20 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public void HideWithButton() {
         Hide();
-        if (LeftMenu.Instance.ActionAddMode) {
+        if (LeftMenu.Instance.CurrentMode == LeftMenu.Mode.AddAction) {
             SelectorMenu.Instance.DeselectObject();
-            LeftMenu.Instance.RestoreSelector();
             RightButtonsMenu.Instance.SetActionMode();
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+        } else if (LeftMenu.Instance.CurrentMode == LeftMenu.Mode.Move) {
+            SelectorMenu.Instance.DeselectObject();
+            RightButtonsMenu.Instance.SetMoveMode();
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+        } else {
             LeftMenu.Instance.MoveButton.GetComponent<Image>().enabled = false;
-            LeftMenu.Instance.MoveButton2.GetComponent<Image>().enabled = false;
+            LeftMenu.Instance.RestoreSelector();
         }
+
+        SelectorMenu.Instance.Active = true;
     }
 
     public void Hide() {
