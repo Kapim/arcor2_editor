@@ -157,7 +157,7 @@ namespace Base {
         }
 
         public override bool Movable() {
-            return false;
+            return true;
         }
 
     public static Vector3 ClosestPointOnCircle(Vector3 actionPosition, Vector3 otherActionPosition) {

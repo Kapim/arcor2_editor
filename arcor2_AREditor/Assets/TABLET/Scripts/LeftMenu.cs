@@ -232,6 +232,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void StartMoveMode() {
+        Debug.LogError("start move mode");
         if (!MoveModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
@@ -422,26 +423,24 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             return;
         }
 
-
-        //was clicked the button in favorites or settings submenu?
-        Button clickedButton = MoveButton;
-        if (currentSubmenuOpened == LeftMenuSelection.Favorites)
-            clickedButton = MoveModeButton;
-
-        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !clickedButton.GetComponent<Image>().enabled) { //other menu/dialog opened
+        if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !MoveButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
-        if (clickedButton.GetComponent<Image>().enabled) {
-            clickedButton.GetComponent<Image>().enabled = false;
+        if (MoveButton.GetComponent<Image>().enabled) {
+            MoveButton.GetComponent<Image>().enabled = false;
             RestoreSelector();
             TransformMenu.Instance.Hide();
         } else {
-            clickedButton.GetComponent<Image>().enabled = true;
+            MoveButton.GetComponent<Image>().enabled = true;
             RightButtonsMenu.Instance.gameObject.SetActive(false);
             SelectorMenu.Instance.gameObject.SetActive(false);
             //selectedObject.StartManipulation();
-            TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
+            InteractiveObject interactiveObject = selectedObject;
+            if (selectedObject is Action3D action) {
+                interactiveObject = action.ActionPoint;
+            }
+            TransformMenu.Instance.Show(interactiveObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
         }
 
     }
@@ -634,7 +633,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
-                MoveClick();
+                RightButtonsMenu.Instance.MoveClick();
         } else {
             RestoreSelector();
             AddActionButton.GetComponent<Image>().enabled = false;

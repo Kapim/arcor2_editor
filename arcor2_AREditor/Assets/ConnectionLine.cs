@@ -109,4 +109,8 @@ public class ConnectionLine : InteractiveObject {
         else
             SelectorMenu.Instance.DestroySelectorItem(this);
     }
+
+    private void OnDestroy() {
+        
+    }
 }

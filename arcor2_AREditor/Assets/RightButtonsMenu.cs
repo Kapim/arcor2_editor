@@ -57,9 +57,19 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             } else {
                 CollapseBtn.SetInteractivity(false, "Selected object is not action point");
             }
+            MoveBtn.SetInteractivity(selectedObject.Movable());
+            RemoveBtn.SetInteractivity(selectedObject.Removable());
+            ExecuteBtn.SetInteractivity(selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D));
+            AddActionBtn.SetInteractivity(selectedObject.GetType() == typeof(Action3D) ||
+                selectedObject.GetType() == typeof(ActionPoint3D) ||
+                selectedObject.GetType() == typeof(ConnectionLine));
         } else {
             CollapseBtn.SetInteractivity(false, "No object selected");
             SelectBtn.SetInteractivity(false, "No object selected");
+            RemoveBtn.SetInteractivity(false, "No object selected");
+            MoveBtn.SetInteractivity(false, "No object selected");
+            ExecuteBtn.SetInteractivity(false, "No object selected");
+            AddActionBtn.SetInteractivity(true);
         }
         
     }
@@ -154,6 +164,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void SetActionMode() {
+        SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
@@ -164,6 +175,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void SetMoveMode() {
+        SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
@@ -174,6 +186,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void SetRemoveMode() {
+        SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
@@ -184,6 +197,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void SetRunMode() {
+        SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
         CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
@@ -223,10 +237,12 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                              selectedObject.Remove();
                              gameObject.SetActive(true);
                              LeftMenu.Instance.ConfirmationDialog.Close();
+                             SelectorMenu.Instance.Active = true;
                          },
                          () => {
                              gameObject.SetActive(true);
                              LeftMenu.Instance.ConfirmationDialog.Close();
+                             SelectorMenu.Instance.Active = true;
                          });
     }
 

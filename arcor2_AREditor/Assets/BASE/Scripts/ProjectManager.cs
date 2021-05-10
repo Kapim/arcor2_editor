@@ -322,7 +322,7 @@ namespace Base {
                 } catch (RequestFailedException) {
                 }
                 if (SelectAPNameWhenCreated == data.ActionPoint.Name)
-                    LeftMenu.Instance.MoveClick();
+                    RightButtonsMenu.Instance.MoveClick();
                 SelectAPNameWhenCreated = "";
  
                 //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "def");
@@ -486,10 +486,12 @@ namespace Base {
         /// <param name="args"></param>
         private void OnLogicItemRemoved(object sender, StringEventArgs args) {
             if (LogicItems.TryGetValue(args.Data, out LogicItem logicItem)) {
-
+                Destroy(logicItem.Input.LineToConnection.gameObject);
+                Destroy(logicItem.Output.LineToConnection.gameObject);
                 SelectorMenu.Instance.DestroySelectorItem(args.Data);
                 logicItem.Remove();
                 LogicItems.Remove(args.Data);
+
             } else {
                 Debug.LogError("Server tries to remove logic item that does not exists (id: " + args.Data + ")");
             }

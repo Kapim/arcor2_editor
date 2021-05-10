@@ -226,7 +226,7 @@ public class Action3D : Base.Action {
     }
 
     public override void StartManipulation() {
-        throw new NotImplementedException();
+        ActionPoint.StartManipulation();
     }
 
     public override void Remove() {
