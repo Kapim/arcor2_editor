@@ -485,6 +485,7 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             selectorItem.transform.parent.SetParent(ContentAlphabet.transform);
         }
         //selectorItem.gameObject.SetActive(false);
+        Debug.LogError(interactiveObject.GetName());
         selectorItem.SetText(interactiveObject.GetName());
         selectorItem.SetObject(interactiveObject, 0, iteration);
         SelectorItems.Add(interactiveObject.GetId(), selectorItem);
@@ -550,9 +551,10 @@ public class SelectorMenu : Singleton<SelectorMenu> {
         foreach (InteractiveObject interactiveObject in SceneManager.Instance.GetAllActionObjectsWithoutPose()) {
             if (!interactiveObject.Enabled)
                 continue;
-            SelectorItem newItem = SelectorItems[interactiveObject.GetId()];
-            selectorItemsNoPoseMenu.Add(newItem);
-            newItem.transform.parent.SetParent(ContentNoPose.transform);
+            if (SelectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem selectorItem)) {
+                selectorItemsNoPoseMenu.Add(selectorItem);
+                selectorItem.transform.parent.SetParent(ContentNoPose.transform);
+            }
         }
     }
 

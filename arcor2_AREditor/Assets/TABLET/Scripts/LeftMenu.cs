@@ -576,9 +576,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SwitchToNoPose();
-        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(true), true);
-        ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
-        SelectorMenu.Instance.UpdateFilters();
+        DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(true);
+        //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
+        if (obj.ActionPoint != null) {
+            SelectorMenu.Instance.SetSelectedObject(obj, true);
+            LeftMenu.Instance.MoveClick();
+            SelectorMenu.Instance.UpdateFilters();
+        }
+        RestoreSelector();
     }
 
     public void TesterClick() {
@@ -586,9 +591,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         MeshPicker.SetActive(false);
         SetActiveSubmenu(LeftMenuSelection.None);
         SelectorMenu.Instance.SwitchToNoPose();
-        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyAimBox(false), true);
-        ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
-        SelectorMenu.Instance.UpdateFilters();
+        DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(false);
+        //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
+        if (obj.ActionPoint != null) {
+            SelectorMenu.Instance.SetSelectedObject(obj, true);
+            LeftMenu.Instance.MoveClick();
+            SelectorMenu.Instance.UpdateFilters();
+        }
+        RestoreSelector();
     }
 
     public void CubeClick() {

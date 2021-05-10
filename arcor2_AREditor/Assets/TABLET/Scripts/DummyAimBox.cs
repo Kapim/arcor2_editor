@@ -23,6 +23,11 @@ public class DummyAimBox : DummyBox, IActionPointParent {
             transform.SetParent(ActionPoint.transform);
             transform.localPosition = Vector3.zero;
             transform.rotation = GameManager.Instance.Scene.transform.rotation;
+            LeftMenu.Instance.MoveClick();
+            SelectorMenu.Instance.CreateSelectorItem(this);
+            SelectorMenu.Instance.SetSelectedObject(this, true);
+            SelectorMenu.Instance.UpdateFilters();
+
         }
     }
 

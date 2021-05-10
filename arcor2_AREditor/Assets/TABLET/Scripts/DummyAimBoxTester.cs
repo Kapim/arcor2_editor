@@ -18,6 +18,11 @@ public class DummyAimBoxTester : DummyAimBox, IActionPointParent {
             transform.SetParent(ActionPoint.transform);
             transform.localPosition = Vector3.zero;
             transform.rotation = GameManager.Instance.Scene.transform.rotation;
+            LeftMenu.Instance.MoveClick();
+            SelectorMenu.Instance.CreateSelectorItem(this);
+            SelectorMenu.Instance.SetSelectedObject(this, true);
+            SelectorMenu.Instance.UpdateFilters();
+
         }
     }
 
@@ -51,8 +56,9 @@ public class DummyAimBoxTester : DummyAimBox, IActionPointParent {
             await WebsocketManager.Instance.RemoveActionPoint(ActionPoint.Data.Id);
             PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/visible", false);
             PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/inScene", false);
-            if (gameObject != null)
+            try {
                 Destroy(gameObject);
+            } catch (MissingReferenceException) { }
             for (int i = 0; i < 4; ++i)
                 PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/PointAimed/" + i, false);
             SelectorMenu.Instance.DestroySelectorItem(this);

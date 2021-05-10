@@ -789,7 +789,6 @@ namespace Base {
         /// </summary>
         /// <param name="data">Message from server</param>
         private void HandleActionPointChanged(string data) {
-            ProjectManager.Instance.ProjectChanged = true;
             IO.Swagger.Model.ActionPointChanged actionPointChangedEvent = JsonConvert.DeserializeObject<IO.Swagger.Model.ActionPointChanged>(data);
             var actionPointChangedFields = new {
                 data = new IO.Swagger.Model.ActionPoint(id: "", name: "string", parent: "", position: new Position(),
@@ -815,6 +814,7 @@ namespace Base {
                 default:
                     throw new NotImplementedException();
             }
+            ProjectManager.Instance.ProjectChanged = true;
         }
 
         /// <summary>

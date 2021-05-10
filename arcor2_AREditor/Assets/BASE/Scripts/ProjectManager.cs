@@ -686,7 +686,8 @@ namespace Base {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/visible", false);
                 }
-                SelectorMenu.Instance.CreateSelectorItem(box);
+                if (box.ActionPoint != null)
+                    SelectorMenu.Instance.CreateSelectorItem(box);
                 return box;
             } else {
                 DummyAimBox box = Instantiate(DummyAimBoxTesterPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
@@ -703,7 +704,8 @@ namespace Base {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/visible", false);
                 }
-                SelectorMenu.Instance.CreateSelectorItem(box);
+                if (box.ActionPoint != null)
+                    SelectorMenu.Instance.CreateSelectorItem(box);
                 return box;
             }
 

@@ -42,11 +42,12 @@ public class ConnectionLine : InteractiveObject {
     }
 
     public void UpdateConnection() {
-        if (Target[0] != null && Target[1] != null) {
+        //TODO: remove comment
+        /*if (Target[0] != null && Target[1] != null) {
             transform.position = Target[0].position;
             transform.rotation = Quaternion.LookRotation(Target[1].position - Target[0].position);
             transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (Target[1].position - Target[0].position).magnitude);
-        }
+        }  */ 
     }
 
 
