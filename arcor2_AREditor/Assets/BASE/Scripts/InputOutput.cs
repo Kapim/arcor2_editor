@@ -315,7 +315,7 @@ namespace Base {
             }
         }
 
-        private IO.Swagger.Model.ProjectLogicIf GetProjectLogicIf() {
+        public IO.Swagger.Model.ProjectLogicIf GetProjectLogicIf() {
             if (ifValue is null)
                 return null;
             List<Flow> flows = Action.GetFlows();

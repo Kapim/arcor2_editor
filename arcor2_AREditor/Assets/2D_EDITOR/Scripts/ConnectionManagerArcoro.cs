@@ -42,6 +42,11 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
         return c;
     }
 
+    private void FixedUpdate() {
+        if (virtualConnectionToMouse != null)
+            virtualConnectionToMouse.UpdateConnection();
+    }
+
     public void CreateConnectionToPointer(GameObject o) {
         if (virtualConnectionToMouse != null)
             Destroy(virtualConnectionToMouse.gameObject);

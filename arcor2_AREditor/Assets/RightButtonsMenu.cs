@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class RightButtonsMenu : Singleton<RightButtonsMenu>
 {
-    public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn;
+    public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn, ConnectionBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
     private InteractiveObject selectedObject;
@@ -16,10 +16,12 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
 
     public GameObject ActionPicker;
 
+    public bool Connecting;
 
     private void Awake() {
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
         Sight.Instance.OnObjectSelectedChangedEvent += OnButtonObjectSelectedChangedEvent;
+        Connecting = false;
     }
 
     private void OnButtonObjectSelectedChangedEvent(object sender, ButtonInteractiveObjectEventArgs args) {
@@ -151,6 +153,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(false);
         ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(false);
     }
 
     public void SetSelectorMode() {
@@ -161,6 +164,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(false);
         ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(false);
     }
 
     public void SetActionMode() {
@@ -172,6 +176,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(false);
         ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(false);
     }
 
     public void SetMoveMode() {
@@ -183,6 +188,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(true);
         RemoveBtn.gameObject.SetActive(false);
         ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(false);
     }
 
     public void SetRemoveMode() {
@@ -194,6 +200,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(true);
         ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(false);
     }
 
     public void SetRunMode() {
@@ -205,7 +212,20 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(false);
         ExecuteBtn.gameObject.SetActive(true);
+        ConnectionBtn.gameObject.SetActive(false);
 
+    }
+
+    public void SetConnectionsMode() {
+        SelectorMenu.Instance.DeselectObject();
+        SelectBtn.gameObject.SetActive(false);
+        CollapseBtn.gameObject.SetActive(true);
+        MenuTriggerBtn.gameObject.SetActive(false);
+        AddActionBtn.gameObject.SetActive(false);
+        MoveBtn.gameObject.SetActive(false);
+        RemoveBtn.gameObject.SetActive(false);
+        ExecuteBtn.gameObject.SetActive(false);
+        ConnectionBtn.gameObject.SetActive(true);
     }
 
     public void MoveClick() {
@@ -276,6 +296,42 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
             IRobot robot = SceneManager.Instance.GetRobot(robotId);
             await WebsocketManager.Instance.MoveToActionPointOrientation(robot.GetId(), (await robot.GetEndEffectorIds())[0], 0.5m, o.Id, false);
+        }
+    }
+
+    public async void ConnectionClick() {
+        if (selectedObject != null && selectedObject is Action3D action ) {
+            
+            if (Connecting) {
+                if (action.Input.ConnectionExists()) {
+                    Notifications.Instance.ShowNotification("Failed to create connection", "There is already existing connection to this action");
+                    return;
+                }
+                Base.Action from = ConnectionManagerArcoro.Instance.GetActionConnectedToPointer();
+                try {
+                    await WebsocketManager.Instance.AddLogicItem(from.GetId(), action.GetId(), from.Output.GetProjectLogicIf(), false);
+                    ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
+                    Connecting = false;
+                } catch (RequestFailedException ex) {
+                    Notifications.Instance.ShowNotification("Failed to create connection", ex.Message);
+                    return;
+                }
+            } else {
+                if (action.Output.ConnectionExists()) {
+                    Notifications.Instance.ShowNotification("Failed to create connection", "There is already existing connection from this action");
+                    return;
+                }
+                Connecting = true;
+                ConnectionManagerArcoro.Instance.CreateConnectionToPointer(action.Output.gameObject);
+
+            }
+        }
+    }
+
+    public void ResetConnectionMode() {
+        if (Connecting) {
+            ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
+            Connecting = false;
         }
     }
 

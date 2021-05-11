@@ -18,7 +18,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public Button FavoritesButton, RobotButton, AddButton, SettingsButton, HomeButton;
     public Button AddMeshButton, MoveButton, MoveModeButton, RemoveButton, SetActionPointParentButton,
         AddActionButton, AddActionModeBtn, RenameButton, CalibrationButton, ResizeCubeButton,
-        AddConnectionButton, RunButton, RunModeButton, SelectorMenuButton, RemoveModeBtn; //Buttons with number 2 are duplicates in favorites submenu
+        AddConnectionButton, RunButton, RunModeButton, SelectorMenuButton, RemoveModeBtn, ConnectionModeBtn; //Buttons with number 2 are duplicates in favorites submenu
     public GameObject FavoritesButtons, HomeButtons, SettingsButtons, AddButtons, MeshPicker, ActionPicker;
     public RenameDialog RenameDialog;
     public CubeSizeDialog CubeSizeDialog;
@@ -45,10 +45,11 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         AddAction,
         Remove,
         Move,
-        Run
+        Run,
+        Connections,
     }
 
-    public Mode CurrentMode = Mode.Normal;
+    private Mode currentMode = Mode.Normal;
 
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
@@ -74,6 +75,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     private bool updateButtonsInteractivity = false;
 
     private bool requestingObject = false;
+
+    public Mode CurrentMode {
+        get => currentMode;
+        private set {
+            currentMode = value;
+            SelectorMenuButton.interactable = currentMode == Mode.Normal;
+        }
+    }
 
     private void OnEditorStateChanged(object sender, EditorStateEventArgs args) {
         switch (args.Data) {
@@ -269,6 +278,26 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SelectorMenu.Instance.gameObject.SetActive(false);
             RightButtonsMenu.SetRunMode();
             CurrentMode = Mode.Run;
+        }
+    }
+
+    public void StartConnectionsMode() {
+        if (!ConnectionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+
+        if (ConnectionModeBtn.GetComponent<Image>().enabled) {
+            ConnectionModeBtn.GetComponent<Image>().enabled = false;
+            RestoreSelector();
+
+            CurrentMode = Mode.Normal;
+            SelectorMenu.Instance.Active = true;
+        } else {
+            ConnectionModeBtn.GetComponent<Image>().enabled = true;
+            RightButtonsMenu.Instance.gameObject.SetActive(true);
+            SelectorMenu.Instance.gameObject.SetActive(false);
+            RightButtonsMenu.SetConnectionsMode();
+            CurrentMode = Mode.Connections;
         }
     }
 
@@ -670,7 +699,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
-            new ActionParameter(name: "vertical_offset", type: "double", value: "0.05")
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0")
         };
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
@@ -806,6 +835,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             RenameDialog.Close();
         TransformMenu.Instance.Hide();
         CurrentMode = Mode.Normal;
+        RightButtonsMenu.Instance.ResetConnectionMode();
 
         MeshPicker.SetActive(false);
         ActionPicker.SetActive(false);
@@ -829,6 +859,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         RunModeButton.GetComponent<Image>().enabled = false;
         RemoveModeBtn.GetComponent<Image>().enabled = false;
         ResizeCubeButton.GetComponent<Image>().enabled = false;
+        ConnectionModeBtn.GetComponent<Image>().enabled = false;
     }
 
     private async Task<RequestResult> ValidateParent(object selectedParent) {
