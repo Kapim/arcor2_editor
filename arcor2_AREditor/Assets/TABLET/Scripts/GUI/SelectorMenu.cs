@@ -485,7 +485,6 @@ public class SelectorMenu : Singleton<SelectorMenu> {
             selectorItem.transform.parent.SetParent(ContentAlphabet.transform);
         }
         //selectorItem.gameObject.SetActive(false);
-        Debug.LogError(interactiveObject.GetName());
         selectorItem.SetText(interactiveObject.GetName());
         selectorItem.SetObject(interactiveObject, 0, iteration);
         SelectorItems.Add(interactiveObject.GetId(), selectorItem);

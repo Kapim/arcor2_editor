@@ -42,7 +42,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     private List<GameObject> dummyPoints = new List<GameObject>();
     private int currentArrowIndex;
     public Button NextArrowBtn, PreviousArrowBtn, StepuUpButton, StepDownButton, HandBtn;
-    public ButtonWithTooltip SetPivotBtn;
+    public ButtonWithTooltip SetPivotBtn, ConfirmBtn, ResetBtn;
 
 
     private void Awake() {
@@ -155,7 +155,10 @@ public class TransformMenu : Singleton<TransformMenu> {
     private async void UpdateTranslate(float wheelValue) {
         if (model == null)
             return;
-
+        if (wheelValue != 0) {
+            ConfirmBtn.SetInteractivity(true);
+            ResetBtn.SetInteractivity(true);
+        }
         if (handHolding) {
             Vector3 cameraNow = TransformConvertor.UnityToROS(InteractiveObject.transform.InverseTransformPoint(Camera.main.transform.position));
             offsetPosition.x = GetRoundedValue(cameraNow.x - cameraOrig.x);
@@ -198,6 +201,10 @@ public class TransformMenu : Singleton<TransformMenu> {
     private void UpdateRotate(float wheelValue) {
         if (model == null)
             return;
+        if (wheelValue != 0) {
+            ConfirmBtn.SetInteractivity(true);
+            ResetBtn.SetInteractivity(true);
+        }
         if (handHolding) {
             /*Vector3 cameraNow = TransformConvertor.UnityToROS(InteractiveObject.transform.InverseTransformPoint(Camera.main.transform.position));
 
@@ -315,7 +322,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         }
         RotateTranslateBtn.SetInteractivity(false);
         HandBtn.interactable = true;
-        ResetPosition();
+        ResetPosition(default, true);
         UpdateTranslate(0);
     }
 
@@ -335,8 +342,12 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public void SetPivot() {
         InteractiveObject interactiveObject = SelectorMenu.Instance.GetSelectedObject();
-        if (interactiveObject != null)
+        if (interactiveObject != null) {
+            ConfirmBtn.SetInteractivity(true);
+            ResetBtn.SetInteractivity(true);
             model.transform.position = interactiveObject.transform.position;
+        }
+
     }
 
     public void HoldPressed() {
@@ -353,9 +364,11 @@ public class TransformMenu : Singleton<TransformMenu> {
         if (ModeSelector.GetState() == "tablet") {
             handHolding = false;
             StoreInterPosition();
+            ConfirmBtn.SetInteractivity(true);
+            ResetBtn.SetInteractivity(true);
         } else {
             await WebsocketManager.Instance.HandTeachingMode(robotId: robotId, enable: false);
-            var position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(endEffector.transform.position)));
+            IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(endEffector.transform.position)));
             await WebsocketManager.Instance.MoveToPose(robotId, endEffector.GetId(), 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), false);
             
         }
@@ -363,7 +376,6 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     public void StoreInterPosition() {
-
         prevValue = 0;
         interPosition += offsetPosition;
         //interRotation *= offsetRotation;
@@ -380,7 +392,10 @@ public class TransformMenu : Singleton<TransformMenu> {
         foreach (IRobot robot in SceneManager.Instance.GetRobots()) {
             robotId = robot.GetId();
         }
-
+        if (!dummyAimBox) {
+            ConfirmBtn.SetInteractivity(false, "Position / orientation not changed");
+            ResetBtn.SetInteractivity(false, "Position / orientation not changed");
+        }
         RotateTranslateBtn.SetState("translate");
         ModeSelector.SetInteractivity(true);
         RotateTranslateBtn.SetInteractivity(true);
@@ -590,7 +605,11 @@ public class TransformMenu : Singleton<TransformMenu> {
             UpdateRotate(0);
     }
 
-    public void ResetPosition(bool manually = false) {
+    public void ResetPosition() {
+        ResetPosition(default, default);
+    }
+
+    public void ResetPosition(bool manually = false, bool forceConfirmInteracitve = false) {
         if (manually && DummyAimBox) {
             for (int i = 0; i < 4; ++i) {
                 Dots[i].color = Color.red;
@@ -612,6 +631,13 @@ public class TransformMenu : Singleton<TransformMenu> {
                     }
                 }
             }
+        }
+        if (forceConfirmInteracitve) {
+            ConfirmBtn.SetInteractivity(true);
+            ResetBtn.SetInteractivity(true);
+        } else if (!DummyAimBox) {
+            ConfirmBtn.SetInteractivity(false, "Position / orientation not changed");
+            ResetBtn.SetInteractivity(false, "Position / orientation not changed");
         }
         prevValue = 0;
         offsetPosition = Vector3.zero;

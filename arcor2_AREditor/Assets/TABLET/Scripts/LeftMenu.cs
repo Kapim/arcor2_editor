@@ -574,7 +574,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void BlueBoxClick() {
         RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
+        SetActiveSubmenu(currentSubmenuOpened);
         SelectorMenu.Instance.SwitchToNoPose();
         DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(true);
         //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
@@ -589,7 +589,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void TesterClick() {
         RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
+        SetActiveSubmenu(currentSubmenuOpened);
         SelectorMenu.Instance.SwitchToNoPose();
         DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(false);
         //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
@@ -604,7 +604,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void CubeClick() {
         RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(LeftMenuSelection.None);
+        SetActiveSubmenu(currentSubmenuOpened);
         SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyBox("Cube"), true);
         SelectorMenu.Instance.UpdateFilters();
     }

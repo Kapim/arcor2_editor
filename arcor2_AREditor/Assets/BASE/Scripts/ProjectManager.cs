@@ -685,6 +685,8 @@ namespace Base {
                 if (init) {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/BlueBox/visible", false);
+                    for (int i = 0; i < 4; ++i)
+                        PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/BlueBox/PointAimed/" + i, false);
                 }
                 if (box.ActionPoint != null)
                     SelectorMenu.Instance.CreateSelectorItem(box);
@@ -703,6 +705,8 @@ namespace Base {
                 if (init) {
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/inScene", true);
                     PlayerPrefsHelper.SaveBool(Instance.ProjectMeta.Id + "/Tester/visible", false);
+                    for (int i = 0; i < 4; ++i)
+                        PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + "/Tester/PointAimed/" + i, false);
                 }
                 if (box.ActionPoint != null)
                     SelectorMenu.Instance.CreateSelectorItem(box);
@@ -1280,13 +1284,11 @@ namespace Base {
                     SelectorMenu.Instance.SetSelectedObject(action, true);
                     ActionToSelect = "";
                 }
-                Debug.LogError(PrevAction);
-                Debug.LogError(NextAction);
                 if (!string.IsNullOrEmpty(PrevAction) && !string.IsNullOrEmpty(NextAction)) {
                     await WebsocketManager.Instance.AddLogicItem(PrevAction, action.GetId(), null, false);
                     await WebsocketManager.Instance.AddLogicItem(action.GetId(), NextAction, null, false);
                     PrevAction = NextAction = null;
-                } else if (LastAddedAPs.Count > 2) {
+                } else if (LastAddedAPs.Count >= 2) {
                     for (int i = LastAddedAPs.Count() - 2; i >= 0; --i) {
                         Action a;
                         if (LastAddedAPs[i] != "START")
