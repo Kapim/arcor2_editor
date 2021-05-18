@@ -405,7 +405,13 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void AddActionPointClick() {
-        GameManager.Instance.AddActionPointExperiment();
+        if (selectedObject is RobotEE ee) {
+            GameManager.Instance.AddActionPointExperiment(default, default, ee);
+        } else if (selectedObject is RobotActionObject robot) {
+            GameManager.Instance.AddActionPointExperiment(default, default, robot.GetEE("default"));
+        } else {
+            GameManager.Instance.AddActionPointExperiment();
+        }
     }
 
     public void AddMeshClick() {

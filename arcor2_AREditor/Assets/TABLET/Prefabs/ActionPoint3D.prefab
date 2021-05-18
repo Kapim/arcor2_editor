@@ -207,6 +207,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 3117404402831486102}
   m_maskType: 0
+  _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
 --- !u!114 &3275387179227119830
@@ -508,6 +509,7 @@ MonoBehaviour:
   Enabled: 1
   Colliders:
   - {fileID: 2135223395522982168}
+  Colliders2D: []
   ActionsSpawn: {fileID: 1416551817558692293}
   ConnectionToParent: {fileID: 0}
   orientations: {fileID: 1503747242841873625}
@@ -604,7 +606,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9633f43f1ac83d428c278f0d1671bbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ActionPoint: {fileID: 6849433418117681114}
+  GameObj: {fileID: 2740470206176205867}
 --- !u!1 &4940753687191564067
 GameObject:
   m_ObjectHideFlags: 0

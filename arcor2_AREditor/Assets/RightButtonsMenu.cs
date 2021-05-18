@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Base;
 using IO.Swagger.Model;
+using RosSharp.Urdf;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,12 +13,15 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn, ConnectionBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
+    public Image RobotHandBtn;
+
     private InteractiveObject selectedObject;
     private ButtonInteractiveObject selectedButton;
 
     public GameObject ActionPicker;
 
     public bool Connecting;
+    private RobotEE robotEE;
 
     private void Awake() {
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
@@ -66,6 +71,10 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                 selectedObject.GetType() == typeof(ActionPoint3D) ||
                 selectedObject.GetType() == typeof(ConnectionLine) ||
                 selectedObject is RobotEE || selectedObject is RobotActionObject);
+            if (selectedObject is RobotEE || selectedObject is RobotActionObject)
+                RobotHandBtn.color = Color.white;
+            else
+                RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
         } else {
             CollapseBtn.SetInteractivity(false, "No object selected");
             SelectBtn.SetInteractivity(false, "No object selected");
@@ -73,6 +82,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             MoveBtn.SetInteractivity(false, "No object selected");
             ExecuteBtn.SetInteractivity(false, "No object selected");
             AddActionBtn.SetInteractivity(true);
+            RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
         }
         
     }
@@ -345,6 +355,25 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
             Connecting = false;
         }
+    }
+
+    public void RobotHandTeachingPush() {
+        if (selectedObject is RobotEE ee) {
+            robotEE = ee;
+        } else if (selectedObject is RobotActionObject robot) {
+            robotEE = robot.GetEndEffector("default");
+        } else {
+            return;
+        }
+        _ = WebsocketManager.Instance.HandTeachingMode(robotId: robotEE.RobotId, enable: true);
+    }
+
+    public async void RobotHandTeachingRelease() {
+        if (robotEE == null)
+            return;
+        await WebsocketManager.Instance.HandTeachingMode(robotId: robotEE.RobotId, enable: false);
+        IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(robotEE.transform.position)));
+        await WebsocketManager.Instance.MoveToPose(robotEE.RobotId, robotEE.EEId, 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), false);
     }
 
 
