@@ -18,6 +18,7 @@ public class RobotEE : InteractiveObject {
         RobotId = robot.GetId();
         EEId = eeId;
         SetLabel(robot.GetName(), eeId);
+        SelectorMenu.Instance.CreateSelectorItem(this);
     }
 
     public void SetLabel(string robotName, string eeName) {
@@ -86,5 +87,9 @@ public class RobotEE : InteractiveObject {
 
     public override void Rename(string newName) {
         throw new System.NotImplementedException();
+    }
+
+    public override void Enable(bool enable) {
+        base.Enable(enable);
     }
 }

@@ -393,6 +393,14 @@ namespace Base {
             return EndEffectors;            
         }
 
+        public RobotEE GetEndEffector(string id) {
+            foreach (RobotEE ee in EndEffectors) {
+                if (ee.EEId == id)
+                    return ee;
+            }
+            return null;
+        }
+
         private async Task LoadResources() {
             if (!ResourcesLoaded) {
                 await LoadEndEffectors();

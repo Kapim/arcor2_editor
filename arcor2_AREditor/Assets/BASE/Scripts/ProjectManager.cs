@@ -98,7 +98,7 @@ namespace Base {
                 }
             } 
         }
-
+        public RobotEE MoveApToRobot = null;
         public string SelectAPNameWhenCreated {
             get;
             internal set;
@@ -318,6 +318,10 @@ namespace Base {
                   "default", "default");*/
                 try {
                     await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "default");
+
+                    if (MoveApToRobot != null) {
+                        await WebsocketManager.Instance.UpdateActionPointUsingRobot(ap.GetId(), MoveApToRobot.RobotId, MoveApToRobot.EEId);
+                    }
 
                 } catch (RequestFailedException) {
                 }

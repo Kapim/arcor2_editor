@@ -64,7 +64,8 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             ExecuteBtn.SetInteractivity(selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D));
             AddActionBtn.SetInteractivity(selectedObject.GetType() == typeof(Action3D) ||
                 selectedObject.GetType() == typeof(ActionPoint3D) ||
-                selectedObject.GetType() == typeof(ConnectionLine));
+                selectedObject.GetType() == typeof(ConnectionLine) ||
+                selectedObject is RobotEE || selectedObject is RobotActionObject);
         } else {
             CollapseBtn.SetInteractivity(false, "No object selected");
             SelectBtn.SetInteractivity(false, "No object selected");
@@ -121,16 +122,27 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             string name = ProjectManager.Instance.GetFreeAPName("ap");
             LeftMenu.Instance.ApToAddActionName = name;
             LeftMenu.Instance.ActionCb = SelectAP;
-            if (selectedObject != null && selectedObject is ConnectionLine connectionLine) {
-                if (ProjectManager.Instance.LogicItems.TryGetValue(connectionLine.LogicItemId, out LogicItem logicItem)) {
-                    logicItem.Input.Action.ActionPoint.SetApCollapsed(false);
-                    logicItem.Output.Action.ActionPoint.SetApCollapsed(false);
-                    ProjectManager.Instance.PrevAction = logicItem.Output.Action.GetId();
-                    ProjectManager.Instance.NextAction = logicItem.Input.Action.GetId();
-                    connectionLine.Remove();
+            if (selectedObject != null) {
+                if (selectedObject is ConnectionLine connectionLine) {
+                    if (ProjectManager.Instance.LogicItems.TryGetValue(connectionLine.LogicItemId, out LogicItem logicItem)) {
+                        logicItem.Input.Action.ActionPoint.SetApCollapsed(false);
+                        logicItem.Output.Action.ActionPoint.SetApCollapsed(false);
+                        ProjectManager.Instance.PrevAction = logicItem.Output.Action.GetId();
+                        ProjectManager.Instance.NextAction = logicItem.Input.Action.GetId();
+                        connectionLine.Remove();
+                        GameManager.Instance.AddActionPointExperiment(name, false);
+                    }
+                } else if (selectedObject is RobotEE robotEE) {
+                    GameManager.Instance.AddActionPointExperiment(name, false, robotEE);
+                } else if (selectedObject is RobotActionObject robot) {
+                    RobotEE ee = robot.GetEndEffector("default");
+                    GameManager.Instance.AddActionPointExperiment(name, false, ee);
                 }
-            }            
-            GameManager.Instance.AddActionPointExperiment(name, false);
+
+            } else {
+                GameManager.Instance.AddActionPointExperiment(name, false);
+            }          
+            
         } 
         SelectorMenu.Instance.Active = false;
         SetMenuTriggerMode();

@@ -342,6 +342,8 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public void SetPivot() {
         InteractiveObject interactiveObject = SelectorMenu.Instance.GetSelectedObject();
+        if (interactiveObject is Action3D action)
+            interactiveObject = action.ActionPoint;
         if (interactiveObject != null) {
             ConfirmBtn.SetInteractivity(true);
             ResetBtn.SetInteractivity(true);

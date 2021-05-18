@@ -711,12 +711,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
-                MoveClick();
+                RightButtonsMenu.Instance.MoveClick();
         } else {
             RestoreSelector();
             AddActionButton.GetComponent<Image>().enabled = false;
         }
         APToRemoveOnCancel = null;
+
+
     }
 
     public async void ActionReleaseClick() {
@@ -749,12 +751,13 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
-                MoveClick();
+                RightButtonsMenu.Instance.MoveClick();
         } else {
             RestoreSelector();
             AddActionButton.GetComponent<Image>().enabled = false;
         }
         APToRemoveOnCancel = null;
+
     }
     #endregion
 
