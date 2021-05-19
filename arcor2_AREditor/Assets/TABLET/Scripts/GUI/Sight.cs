@@ -12,6 +12,8 @@ namespace Base {
         public GameObject CurrentObject;
         public Collider CameraCollider;
 
+        private Collider activeCollider = null;
+
         public System.DateTime HoverStartTime;
 
         private bool endingHover = false;
@@ -43,6 +45,17 @@ namespace Base {
                 //if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0)), out hit, Mathf.Infinity)) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
 
+
+                RaycastHit[] hitsAll = Physics.RaycastAll(ray);
+                foreach (RaycastHit h in hitsAll) {
+                    if (h.collider.transform.parent.GetComponent<GizmoArrow>() != null) {
+                        if (h.collider != activeCollider) {
+                            h.collider.SendMessage("OnHoverStart");
+                            activeCollider = h.collider;
+                        }
+                        return;
+                    }
+                }
 
 
                 RaycastHit hitinfo = new RaycastHit();

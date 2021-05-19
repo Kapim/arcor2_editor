@@ -261,7 +261,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             return;
         }
 
-        SelectorMenu.Instance.Active = false;
+        //SelectorMenu.Instance.Active = false;
         gameObject.SetActive(false);
         TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
         

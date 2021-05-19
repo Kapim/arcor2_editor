@@ -16,9 +16,10 @@ public class TransformMenu : Singleton<TransformMenu> {
     public CoordinatesBtnGroup Coordinates;
     public TranformWheelUnits Units, UnitsDegrees;
     private GameObject model;
-    public TwoStatesToggle RotateTranslateBtn;
-    public NStateToggle ModeSelector;
+    public TwoStatesToggle RotateTranslateBtn, RobotTabletBtn;
+    //public NStateToggle ModeSelector;
     private float prevValue = 0;
+    private bool manuallySelected = false;
 
     private Vector3 offsetPosition = new Vector3(), interPosition = new Vector3(), cameraOrig = new Vector3();
     //private Quaternion offsetRotation = new Quaternion(), interRotation = Quaternion.identity;
@@ -56,7 +57,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     private void Update() {
         if (model == null)
             return;
-        if (ModeSelector.GetState() == "robot") {
+        if (RobotTabletBtn.CurrentState == "robot") {
             if (endEffector != null) {
                 model.transform.position = endEffector.transform.position;
                 Coordinates.X.SetValueMeters(endEffector.transform.position.x);
@@ -87,8 +88,13 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
     private void Start() {
         WebsocketManager.Instance.OnRobotMoveToPoseEvent += OnRobotMoveToPoseEvent;
+        SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
     }
-    
+
+    private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
+        if (RobotTabletBtn.CurrentState == "tablet" && !handHolding)
+            SetPivotMode();
+    }
 
     private void OnRobotMoveToPoseEvent(object sender, RobotMoveToPoseEventArgs args) {
         if (args.Event.Data.MoveEventType == IO.Swagger.Model.RobotMoveToPoseData.MoveEventTypeEnum.End ||
@@ -290,8 +296,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     public void SwitchToTablet() {
-        SelectorMenu.Instance.Active = false;
-        SelectorMenu.Instance.SetSelectedObject(InteractiveObject, true);
+        //SelectorMenu.Instance.Active = false;
         TransformWheel.gameObject.SetActive(true);
         Wheel.gameObject.SetActive(true);
         StepButtons.gameObject.SetActive(false);
@@ -310,8 +315,7 @@ public class TransformMenu : Singleton<TransformMenu> {
                 return;
             }
         }
-        SelectorMenu.Instance.Active = false;
-        SelectorMenu.Instance.SetSelectedObject(InteractiveObject, true);
+        //SelectorMenu.Instance.Active = false;
         //TransformWheel.gameObject.SetActive(false);
         Wheel.gameObject.SetActive(false);
         StepButtons.gameObject.SetActive(true);
@@ -326,21 +330,12 @@ public class TransformMenu : Singleton<TransformMenu> {
         UpdateTranslate(0);
     }
 
-    public void SwitchToPivot() {
-        TransformWheel.gameObject.SetActive(false);
-        Wheel.gameObject.SetActive(false);
-        StepButtons.gameObject.SetActive(false);
-        RotateTranslateBtn.SetInteractivity(false);
-        SetPivotBtn.gameObject.SetActive(true);
-
-        HandBtn.interactable = false;
-        ResetPosition();
-        UpdateTranslate(0);
-        SelectorMenu.Instance.Active = true;
-        SelectorMenu.Instance.DeselectObject();
-    }
+   
 
     public void SetPivot() {
+        //ResetPosition();
+
+        //UpdateTranslate(0);
         InteractiveObject interactiveObject = SelectorMenu.Instance.GetSelectedObject();
         if (interactiveObject is Action3D action)
             interactiveObject = action.ActionPoint;
@@ -348,12 +343,13 @@ public class TransformMenu : Singleton<TransformMenu> {
             ConfirmBtn.SetInteractivity(true);
             ResetBtn.SetInteractivity(true);
             model.transform.position = interactiveObject.transform.position;
+            
         }
 
     }
 
     public void HoldPressed() {
-        if (ModeSelector.GetState() == "tablet") {
+        if (RobotTabletBtn.CurrentState == "tablet") {
             cameraOrig = TransformConvertor.UnityToROS(InteractiveObject.transform.InverseTransformPoint(Camera.main.transform.position));
             StoreInterPosition();
             handHolding = true;
@@ -363,7 +359,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     public async void HoldReleased() {
-        if (ModeSelector.GetState() == "tablet") {
+        if (RobotTabletBtn.CurrentState == "tablet") {
             handHolding = false;
             StoreInterPosition();
             ConfirmBtn.SetInteractivity(true);
@@ -390,7 +386,21 @@ public class TransformMenu : Singleton<TransformMenu> {
             UpdateRotate(0);
     }
 
+    public void SetHandMode() {
+        HandBtn.gameObject.SetActive(true);
+        SetPivotBtn.gameObject.SetActive(false);
+    }
+
+    public void SetPivotMode() {
+
+        HandBtn.gameObject.SetActive(false);
+        SetPivotBtn.gameObject.SetActive(true);
+    }
+
     public void Show(InteractiveObject interactiveObject, bool dummyAimBox = false, bool tester = false) {
+        manuallySelected = SelectorMenu.Instance.ManuallySelected;
+        
+        SelectorMenu.Instance.DeselectObject();
         foreach (IRobot robot in SceneManager.Instance.GetRobots()) {
             robotId = robot.GetId();
         }
@@ -399,7 +409,7 @@ public class TransformMenu : Singleton<TransformMenu> {
             ResetBtn.SetInteractivity(false, "Position / orientation not changed");
         }
         RotateTranslateBtn.SetState("translate");
-        ModeSelector.SetInteractivity(true);
+        RobotTabletBtn.SetInteractivity(true);
         RotateTranslateBtn.SetInteractivity(true);
         DummyBoxing.SetActive(false);
         offsetPosition = Vector3.zero;
@@ -409,11 +419,13 @@ public class TransformMenu : Singleton<TransformMenu> {
         SwitchToTranslate();
         if (DummyAimBox) {
             InteractiveObject = ((DummyAimBox) interactiveObject).ActionPoint;
-            ModeSelector.SetState("robot", true);
+            RobotTabletBtn.SetState("robot");
+            SwitchToTablet();
         }
         else {
             InteractiveObject = interactiveObject;
-            ModeSelector.SetState("tablet", true);
+            RobotTabletBtn.SetState("tablet");
+            SwitchToTablet();
         }
 
         if (interactiveObject.GetType() == typeof(ActionPoint3D)) {
@@ -432,7 +444,7 @@ public class TransformMenu : Singleton<TransformMenu> {
                     Dots[i].color = Color.red;
             }
             DummyBoxing.SetActive(true);
-            ModeSelector.SetInteractivity(false);
+            RobotTabletBtn.SetInteractivity(false);
             RotateTranslateBtn.SetInteractivity(false);
             currentArrowIndex = 0;
             SetArrowVisible(0);
@@ -509,6 +521,8 @@ public class TransformMenu : Singleton<TransformMenu> {
                 Destroy(dummyPoints[i]);
             }
         }
+        if (manuallySelected)
+            SelectorMenu.Instance.SetSelectedObject(InteractiveObject, true);
         InteractiveObject = null;
         GameManager.Instance.Gizmo.SetActive(false);
         GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
@@ -582,9 +596,9 @@ public class TransformMenu : Singleton<TransformMenu> {
 
                 //Vector3 position = interPosition + offsetPosition;
                 //model.transform.localPosition = TransformConvertor.ROSToUnity(origRotation) * position;
-                if (ModeSelector.GetState() == "tablet" || ModeSelector.GetState() == "pivot")
+                if (RobotTabletBtn.CurrentState == "tablet" || RobotTabletBtn.CurrentState == "pivot")
                     await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition + model.transform.localPosition)));
-                else if (ModeSelector.GetState() == "robot") {
+                else if (RobotTabletBtn.CurrentState == "robot") {
                     await WebsocketManager.Instance.UpdateActionPointUsingRobot(InteractiveObject.GetId(), robotId, endEffector.GetId());
                 } 
                ((ActionPoint3D) InteractiveObject).SetRotation(model.transform.localRotation);
@@ -704,7 +718,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         }
 
         public async void RobotStep(float step) {
-            if (ModeSelector.GetState() == "robot" && endEffector != null) {
+            if (RobotTabletBtn.CurrentState == "robot" && endEffector != null) {
                 IO.Swagger.Model.Position position = endEffector.Position;
                 Vector3 offset = Vector3.zero;
 

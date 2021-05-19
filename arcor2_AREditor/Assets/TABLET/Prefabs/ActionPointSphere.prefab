@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 640591556625908295}
   - component: {fileID: 9111793433937563989}
   - component: {fileID: 1233063988993839881}
+  - component: {fileID: 5569870834110764040}
+  - component: {fileID: 6349461366787634533}
   m_Layer: 0
   m_Name: ActionPointSphere
   m_TagString: ActionPoint
@@ -79,3 +81,33 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &5569870834110764040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4432893342769744454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30b1086868842f446aa58035d382a2d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OnHoverCallback:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!64 &6349461366787634533
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4432893342769744454}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

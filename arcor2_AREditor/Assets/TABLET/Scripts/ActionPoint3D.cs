@@ -315,6 +315,7 @@ public class ActionPoint3D : Base.ActionPoint {
 
     public GameObject GetModelCopy() {
         GameObject copy = Instantiate(ProjectManager.Instance.ActionPointSphere, transform);
+        copy.GetComponent<GizmoArrow>().OnHoverCallback.AddListener(TransformMenu.Instance.SetHandMode);
         copy.transform.localScale = Visual.transform.localScale;
         copy.transform.localPosition = Visual.transform.localPosition;
         copy.transform.localRotation = Visual.transform.localRotation;

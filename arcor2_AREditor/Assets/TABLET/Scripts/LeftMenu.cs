@@ -469,7 +469,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         } else {
             MoveButton.GetComponent<Image>().enabled = true;
             RightButtonsMenu.Instance.gameObject.SetActive(false);
-            SelectorMenu.Instance.gameObject.SetActive(false);
+            //SelectorMenu.Instance.gameObject.SetActive(false);
             //selectedObject.StartManipulation();
             InteractiveObject interactiveObject = selectedObject;
             if (selectedObject is Action3D action) {
