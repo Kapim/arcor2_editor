@@ -584,7 +584,7 @@ public class TransformMenu : Singleton<TransformMenu> {
             RightButtonsMenu.Instance.gameObject.SetActive(true);
         } else {
             LeftMenu.Instance.MoveButton.GetComponent<Image>().enabled = false;
-            LeftMenu.Instance.RestoreSelector();
+            //LeftMenu.Instance.RestoreSelector();
         }
 
         SelectorMenu.Instance.Active = true;
@@ -673,6 +673,8 @@ public class TransformMenu : Singleton<TransformMenu> {
                 }
             }
         } else if (InteractiveObject is ActionPoint3D actionPoint) {
+            if (model == null)
+                return;
             try {
                 if (!robot) {
                     //await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition + model.transform.localPosition)));
@@ -680,7 +682,10 @@ public class TransformMenu : Singleton<TransformMenu> {
                 } else {
                     await WebsocketManager.Instance.UpdateActionPointUsingRobot(InteractiveObject.GetId(), robotId, endEffector.EEId);
                 }
-                ResetPosition();
+                if (model != null) {
+                    actionPoint.SetRotation(model.transform.localRotation);
+                    ResetPosition();
+                }
             } catch (RequestFailedException e) {
                 Notifications.Instance.ShowNotification("Failed to update action point position", e.Message);
             }
