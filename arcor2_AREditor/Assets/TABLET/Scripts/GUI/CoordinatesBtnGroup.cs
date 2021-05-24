@@ -6,6 +6,7 @@ public class CoordinatesBtnGroup : MonoBehaviour
 {
     public CoordBtn X, Y, Z;
     private CoordBtn selectedBtn;
+    public bool AllAxis = false;
 
 
     private void Awake() {
@@ -27,6 +28,9 @@ public class CoordinatesBtnGroup : MonoBehaviour
     }
 
     public string GetSelectedAxis() {
-        return selectedBtn.Axis;
+        if (AllAxis)
+            return "all";
+        else
+            return selectedBtn.Axis;
     }
 }

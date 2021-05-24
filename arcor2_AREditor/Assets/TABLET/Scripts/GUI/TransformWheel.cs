@@ -19,6 +19,7 @@ public class TransformWheel : MonoBehaviour
         }
         TransformWheelItem newItem = Instantiate(ItemPrefab, List.transform).GetComponent<TransformWheelItem>();
         newItem.SetValue(0);
+        newItem.SetColor(List.enabled ? Color.white : Color.gray);
         TransformWheelItems.Add(newItem);
         while (TransformWheelItems.Count < 12) {
             GenerateNewItem();
@@ -32,7 +33,7 @@ public class TransformWheel : MonoBehaviour
     }
 
     public int GetValue() {        
-        return 0 - ClosestInteger((int) List.transform.localPosition.y, 80) / 80;        
+        return ClosestInteger((int) List.transform.localPosition.y, 80) / 80;        
     }
 
     private int ClosestInteger(int n, int m) {
@@ -71,9 +72,18 @@ public class TransformWheel : MonoBehaviour
         TransformWheelItem newFirst = Instantiate(ItemPrefab, List.transform).GetComponent<TransformWheelItem>();
         TransformWheelItem newLast = Instantiate(ItemPrefab, List.transform).GetComponent<TransformWheelItem>();
         newFirst.transform.SetAsFirstSibling();
-        newFirst.SetValue(TransformWheelItems.First().Value + 1);
-        newLast.SetValue(TransformWheelItems.Last().Value - 1);
+        newFirst.SetColor(List.enabled ? Color.white : Color.gray);
+        newLast.SetColor(List.enabled ? Color.white : Color.gray);
+        newFirst.SetValue(TransformWheelItems.First().Value - 1);
+        newLast.SetValue(TransformWheelItems.Last().Value + 1);
         TransformWheelItems.Insert(0, newFirst);
         TransformWheelItems.Add(newLast);
+    }
+
+    public void SetInteractive(bool interactive) {
+        foreach (TransformWheelItem item in TransformWheelItems) {
+            item.SetColor(interactive ? Color.white : Color.gray);
+        }
+        List.enabled = interactive;
     }
 }

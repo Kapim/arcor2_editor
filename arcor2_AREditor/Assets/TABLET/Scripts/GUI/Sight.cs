@@ -22,6 +22,8 @@ namespace Base {
 
         public event AREditorEventArgs.ButtonInteractiveObjectEventHandler OnObjectSelectedChangedEvent;
 
+        public List<MeshCollider> GizmoArrowsColliders = new List<MeshCollider>();
+
         private void Awake() {
             GameManager.Instance.OnEditorStateChanged += OnEditorStateChanged;
         }
@@ -45,17 +47,28 @@ namespace Base {
                 //if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0)), out hit, Mathf.Infinity)) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
 
-
-                RaycastHit[] hitsAll = Physics.RaycastAll(ray);
-                foreach (RaycastHit h in hitsAll) {
-                    if (h.collider.transform.parent.GetComponent<GizmoArrow>() != null) {
-                        if (h.collider != activeCollider) {
-                            h.collider.SendMessage("OnHoverStart");
+                if (GizmoArrowsColliders.Count > 0 && !TransformMenu.Instance.HandHolding && TransformMenu.Instance.TransformWheel.List.Velocity.magnitude < 0.01f) {
+                    RaycastHit[] hitsAll = Physics.RaycastAll(ray);
+                    foreach (RaycastHit h in hitsAll) {
+                        /*if (h.collider.transform.parent.GetComponent<GizmoArrow>() != null) {
+                            if (h.collider != activeCollider) {
+                                h.collider.SendMessage("OnHoverStart");
+                                activeCollider = h.collider;
+                            }
+                            return;
+                        }*/
+                        if (GizmoArrowsColliders.Contains(h.collider)) {
+                            if (h.collider == activeCollider)
+                                continue;
                             activeCollider = h.collider;
+                            foreach (MeshCollider c in GizmoArrowsColliders) {
+                                c.SendMessage("OnHoverEnd");
+                            }
+                            h.collider.SendMessage("OnHoverStart");
                         }
-                        return;
                     }
                 }
+                
 
 
                 RaycastHit hitinfo = new RaycastHit();

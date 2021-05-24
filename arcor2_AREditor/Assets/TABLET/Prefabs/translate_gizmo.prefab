@@ -174,6 +174,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 1504320610141916268}
   m_maskType: 0
+  _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
 --- !u!114 &6589175546517425924
@@ -372,7 +373,7 @@ Transform:
   m_GameObject: {fileID: 2239472359815064102}
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: -0, y: 0.015, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 1.5}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 1.25}
   m_Children: []
   m_Father: {fileID: 5928467840304333378}
   m_RootOrder: 1
@@ -525,7 +526,7 @@ Transform:
   m_GameObject: {fileID: 3122675589697459979}
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: -0, y: 0.015, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 1.5}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 1.25}
   m_Children: []
   m_Father: {fileID: 4835714445030280203}
   m_RootOrder: 1
@@ -615,6 +616,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5928467840304333378}
   - component: {fileID: 3872263885091110844}
+  - component: {fileID: 1493965052277721858}
   m_Layer: 0
   m_Name: y_axis
   m_TagString: Untagged
@@ -654,6 +656,34 @@ MonoBehaviour:
   OnHoverCallback:
     m_PersistentCalls:
       m_Calls: []
+  OutlineOnClick: {fileID: 1493965052277721858}
+  ID: y
+--- !u!114 &1493965052277721858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3522078958004257797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 2100000, guid: 1ef88d2e88b167344b7db905a28877ad,
+    type: 2}
+  OutlineHoverMaterial: {fileID: 2100000, guid: 6f85ebaaa5685a345b1269fa36ddcf6c,
+    type: 2}
+  Renderers:
+  - {fileID: 3567316156974347277}
+  - {fileID: 5823236871553031986}
+  HoverOnly: 0
 --- !u!1 &3564586896738005472
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,7 +757,7 @@ Transform:
   m_GameObject: {fileID: 3682299084571422949}
   m_LocalRotation: {x: 1, y: -4.6322114e-23, z: 8.416431e-31, w: 0.0000000754979}
   m_LocalPosition: {x: -0, y: -6.556708e-10, z: -0.015}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 1.5}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 1.25}
   m_Children: []
   m_Father: {fileID: 5930655711831903963}
   m_RootOrder: 1
@@ -981,6 +1011,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 7626479505229948956}
   m_maskType: 0
+  _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
 --- !u!114 &5409841683214173378
@@ -1347,6 +1378,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6896940369016034131}
   m_maskType: 0
+  _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
 --- !u!114 &850897225893537721
@@ -1373,6 +1405,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5930655711831903963}
   - component: {fileID: 4937949202244307628}
+  - component: {fileID: 3968383054788291268}
   m_Layer: 0
   m_Name: x_axis
   m_TagString: Untagged
@@ -1412,6 +1445,34 @@ MonoBehaviour:
   OnHoverCallback:
     m_PersistentCalls:
       m_Calls: []
+  OutlineOnClick: {fileID: 3968383054788291268}
+  ID: x
+--- !u!114 &3968383054788291268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7004380003237092292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 2100000, guid: 1ef88d2e88b167344b7db905a28877ad,
+    type: 2}
+  OutlineHoverMaterial: {fileID: 2100000, guid: 6f85ebaaa5685a345b1269fa36ddcf6c,
+    type: 2}
+  Renderers:
+  - {fileID: 1234762060746722024}
+  - {fileID: 2823126468211630520}
+  HoverOnly: 0
 --- !u!1 &7296996380313285958
 GameObject:
   m_ObjectHideFlags: 0
@@ -1422,6 +1483,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4835714445030280203}
   - component: {fileID: 4012949159796247755}
+  - component: {fileID: 6916614262976051453}
   m_Layer: 0
   m_Name: z_axis
   m_TagString: Untagged
@@ -1461,6 +1523,34 @@ MonoBehaviour:
   OnHoverCallback:
     m_PersistentCalls:
       m_Calls: []
+  OutlineOnClick: {fileID: 6916614262976051453}
+  ID: z
+--- !u!114 &6916614262976051453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7296996380313285958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 2100000, guid: 1ef88d2e88b167344b7db905a28877ad,
+    type: 2}
+  OutlineHoverMaterial: {fileID: 2100000, guid: 6f85ebaaa5685a345b1269fa36ddcf6c,
+    type: 2}
+  Renderers:
+  - {fileID: 4111316239125657606}
+  - {fileID: 6794274618706887510}
+  HoverOnly: 0
 --- !u!1 &8850115768964184479
 GameObject:
   m_ObjectHideFlags: 0

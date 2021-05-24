@@ -11,4 +11,7 @@ public class TransformWheelItem : MonoBehaviour
         Value = value;
         Label.SetText(value.ToString());
     }
+    public void SetColor(Color color) {
+        Label.color = color;
+    }
 }

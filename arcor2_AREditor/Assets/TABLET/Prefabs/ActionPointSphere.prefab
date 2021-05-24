@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1233063988993839881}
   - component: {fileID: 5569870834110764040}
   - component: {fileID: 6349461366787634533}
+  - component: {fileID: 2066879050623560689}
   m_Layer: 0
   m_Name: ActionPointSphere
   m_TagString: ActionPoint
@@ -97,6 +98,8 @@ MonoBehaviour:
   OnHoverCallback:
     m_PersistentCalls:
       m_Calls: []
+  OutlineOnClick: {fileID: 2066879050623560689}
+  ID: model
 --- !u!64 &6349461366787634533
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -111,3 +114,26 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &2066879050623560689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4432893342769744454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 0}
+  OutlineHoverMaterial: {fileID: 0}
+  Renderers:
+  - {fileID: 1233063988993839881}
+  HoverOnly: 0

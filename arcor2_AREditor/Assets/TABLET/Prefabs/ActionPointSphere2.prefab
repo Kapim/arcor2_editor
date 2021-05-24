@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7474335035476753590}
   - component: {fileID: 3367360256423598810}
   - component: {fileID: 5413986687622112760}
+  - component: {fileID: 2156548557109045849}
   m_Layer: 0
   m_Name: sphere
   m_TagString: ActionPoint
@@ -109,6 +110,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Enabled: 1
   Target: {fileID: 6214011602484015110}
+--- !u!114 &2156548557109045849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5413986687622112761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d190eacf2d73849ba8866ad2cb6072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  OutlineShaderType: 0
+  OutlineClickFirstPass: {fileID: 0}
+  OutlineClickSecondPass: {fileID: 0}
+  OutlineHoverFirstPass: {fileID: 0}
+  OutlineHoverSecondPass: {fileID: 0}
+  OutlineClickMaterial: {fileID: 2100000, guid: 1ef88d2e88b167344b7db905a28877ad,
+    type: 2}
+  OutlineHoverMaterial: {fileID: 2100000, guid: 6f85ebaaa5685a345b1269fa36ddcf6c,
+    type: 2}
+  Renderers:
+  - {fileID: 7474335035476753590}
+  HoverOnly: 0
 --- !u!1 &6214011602484015110
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,3 +183,5 @@ MonoBehaviour:
   OnHoverCallback:
     m_PersistentCalls:
       m_Calls: []
+  OutlineOnClick: {fileID: 2156548557109045849}
+  ID: model
