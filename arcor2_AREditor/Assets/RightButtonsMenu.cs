@@ -114,7 +114,6 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void AddAction() {
-        Debug.LogError(selectedObject);
         if (selectedObject != null && (selectedObject is Action3D || selectedObject is ActionPoint3D)) {
 
             ActionPicker.transform.position = selectedObject.transform.position - Camera.main.transform.forward * 0.05f;

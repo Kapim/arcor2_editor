@@ -21,9 +21,9 @@ public class VelocityDialog : Dialog
         this.action = action;
         if (action == null)
             return;
-
+        Debug.LogError(action.Parameters["velocity"].Value);
         VelocityInput.SetValue(action.Parameters["velocity"].Value);
-        TransformWheel.SetValue(int.Parse(action.Parameters["velocity"].Value, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("en-US")));
+        TransformWheel.SetValue(int.Parse(action.Parameters["velocity"].Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
     }
 
     private void Update() {

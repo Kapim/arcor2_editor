@@ -863,12 +863,13 @@ namespace Base {
                     continue;
                 ao.Enable(enable);
             }
-            foreach (DummyBox db in Resources.FindObjectsOfTypeAll(typeof(DummyBox))) {
+            foreach (DummyBox db in ProjectManager.Instance.DummyBoxes) {
                 db.Enable(enable);
             }
-            foreach (DummyBox db in Resources.FindObjectsOfTypeAll(typeof(DummyAimBox))) {
-                db.Enable(enable);
-            }
+            if (ProjectManager.Instance.DummyAimBox != null)
+                ProjectManager.Instance.DummyAimBox.Enable(enable);
+            if (ProjectManager.Instance.DummyAimBoxTester != null)
+                ProjectManager.Instance.DummyAimBoxTester.Enable(enable);
         }
 
         public void EnableAllRobots(bool enable) {

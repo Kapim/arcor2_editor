@@ -28,8 +28,8 @@ public class TransformWheel : MonoBehaviour
         SetValue(value);
     }
 
-    public void SetValue(int value) {        
-        List.transform.localPosition = new Vector2(0, 0 - value * 80);
+    public void SetValue(int value) {
+        List.transform.localPosition = new Vector2(0, value * 80);
     }
 
     public int GetValue() {        

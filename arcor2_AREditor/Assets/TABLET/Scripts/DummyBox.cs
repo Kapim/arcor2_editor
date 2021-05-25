@@ -149,6 +149,8 @@ public class DummyBox : InteractiveObject {
         GameObject copy = Instantiate(ProjectManager.Instance.DummyBoxVisual, Vector3.zero, Quaternion.identity, transform);
         copy.transform.localScale = Visual.transform.localScale;
         copy.transform.localRotation = Quaternion.identity;
+        copy.transform.localPosition = Vector3.zero;
+
         return copy;
     }
 

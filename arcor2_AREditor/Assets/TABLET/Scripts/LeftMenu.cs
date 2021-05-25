@@ -81,7 +81,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         private set {
             currentMode = value;
             //SelectorMenuButton.interactable = currentMode == Mode.Normal;
-            Debug.LogError($"mode changed to {currentMode}");
+
         }
     }
 
@@ -171,6 +171,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     private void Start() {
         CurrentMode = Mode.AddAction;
+        RightButtonsMenu.SetActionMode();
         SetActiveSubmenu(LeftMenuSelection.None);
     }
 
@@ -204,7 +205,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void StartAddActionMode() {
 
         if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
         if (AddActionModeBtn.GetComponent<Image>().enabled) {
             //AddActionModeBtn.GetComponent<Image>().enabled = false;
@@ -229,7 +230,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void StartRemoveMode() {
 
         if (!RemoveModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         if (RemoveModeBtn.GetComponent<Image>().enabled) {
@@ -252,7 +253,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void StartMoveMode() {
         if (!MoveModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
         if (MoveModeButton.GetComponent<Image>().enabled) {
             //MoveModeButton.GetComponent<Image>().enabled = false;
@@ -274,7 +275,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void StartRunMode() {
         if (!RunModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
         if (RunModeButton.GetComponent<Image>().enabled) {
             //RunModeButton.GetComponent<Image>().enabled = false;
@@ -296,7 +297,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void StartConnectionsMode() {
         if (!ConnectionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
         if (ConnectionModeBtn.GetComponent<Image>().enabled) {
             ConnectionModeBtn.GetComponent<Image>().enabled = false;
@@ -352,6 +353,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             return;
         if (selectedObject.GetType() == typeof(ActionPoint3D)) {
             ProjectManager.Instance.SelectAPNameWhenCreated = selectedObject.GetName() + "_copy";
+            Debug.LogError(ProjectManager.Instance.SelectAPNameWhenCreated);
             WebsocketManager.Instance.CopyActionPoint(selectedObject.GetId(), null);
         } else if (selectedObject.GetType() == typeof(Action3D)) {
             Action3D action = (Action3D) selectedObject;
@@ -407,12 +409,25 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void SelectorMenuClick() {
+        if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
+            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+        }
+       
+            
         if (SelectorMenuButton.GetComponent<Image>().enabled) {
-            SelectorMenuButton.GetComponent<Image>().enabled = false;
-            RightButtonsMenu.Instance.gameObject.SetActive(true);
-            SelectorMenu.Instance.gameObject.SetActive(false);
-            SetActiveSubmenu(LeftMenuSelection.None);
-            SelectorMenu.Instance.DeselectObject();
+            SelectorMenu.Instance.Active = true;
+            SetActiveSubmenu(LeftMenuSelection.Settings, true, false);
+            SelectorMenu.Instance.gameObject.SetActive(true);
+            /*
+            if (TransformMenu.Instance.CanvasGroup.alpha > 0) {
+                TransformMenu.Instance.Hide();
+            } else {
+                SelectorMenuButton.GetComponent<Image>().enabled = false;
+                RightButtonsMenu.Instance.gameObject.SetActive(true);
+                SelectorMenu.Instance.gameObject.SetActive(false);
+                SetActiveSubmenu(LeftMenuSelection.None);
+                SelectorMenu.Instance.DeselectObject();
+            }*/
         } else {
             SelectorMenuButton.GetComponent<Image>().enabled = true;
             RightButtonsMenu.Instance.gameObject.SetActive(false);
@@ -654,11 +669,14 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     }
 
     public void CubeClick() {
-        RightButtonsMenu.Instance.gameObject.SetActive(true);
+        //RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(currentSubmenuOpened);
-        SelectorMenu.Instance.SetSelectedObject(ProjectManager.Instance.AddDummyBox("Cube"), true);
+        SetActiveSubmenu(LeftMenuSelection.Settings);
+        var box = ProjectManager.Instance.AddDummyBox("Cube");
         SelectorMenu.Instance.UpdateFilters();
+        SelectorMenu.Instance.SetSelectedObject(box, true);
+        RightButtonsMenu.MoveClick();
+
     }
 
     #endregion
@@ -786,15 +804,12 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
 
     public void SetActiveSubmenu(LeftMenuSelection which, bool active = true, bool force = false) {
-        Debug.LogError(which);
-        Debug.LogError(active);
         DeactivateAllSubmenus(force);
         currentSubmenuOpened = which;
         if (!active)
             return;
         switch (which) {
             case LeftMenuSelection.None:
-                Debug.LogError("asdfasdf");
                 RightButtonsMenu.Instance.gameObject.SetActive(true);
                 break;
             case LeftMenuSelection.Favorites:

@@ -21,6 +21,8 @@ public class TransformMenu : Singleton<TransformMenu> {
     private float prevValue = 0;
     private bool manuallySelected = false;
 
+    private LineConnection connectionToModel;
+
     private Vector3 offsetPosition = new Vector3(), interPosition = new Vector3(), cameraOrig = new Vector3();
     //private Quaternion offsetRotation = new Quaternion(), interRotation = Quaternion.identity;
 
@@ -467,6 +469,18 @@ public class TransformMenu : Singleton<TransformMenu> {
         SetPivotBtn.gameObject.SetActive(true);*/
     }
 
+    private LineConnection CreateConnection(Transform obj, Transform model) {
+        GameObject c = Instantiate(SceneManager.Instance.LineConnectionPrefab);
+        c.transform.parent = transform;
+        LineConnection newConnection = c.GetComponent<LineConnection>();
+        newConnection.targets[0] = model;
+        newConnection.targets[1] = obj;
+
+        // add the connection to connections manager
+        return newConnection;
+
+    }
+
     public void Show(InteractiveObject interactiveObject, bool dummyAimBox = false, bool tester = false) {
         manuallySelected = SelectorMenu.Instance.ManuallySelected;
         
@@ -500,9 +514,11 @@ public class TransformMenu : Singleton<TransformMenu> {
 
         if (interactiveObject.GetType() == typeof(ActionPoint3D)) {
             model = ((ActionPoint3D) interactiveObject).GetModelCopy();
+            connectionToModel = CreateConnection(interactiveObject.transform, model.transform);
             //origRotation = TransformConvertor.UnityToROS(((ActionPoint3D) interactiveObject).GetRotation());
         } else if (interactiveObject.GetType() == typeof(DummyBox)) {
             model = ((DummyBox) interactiveObject).GetModelCopy();
+            connectionToModel = CreateConnection(interactiveObject.transform, model.transform);
             //origRotation = interactiveObject.transform.localRotation;
         } else if (DummyAimBox) {
             model = GetPointModel();
@@ -609,7 +625,8 @@ public class TransformMenu : Singleton<TransformMenu> {
         enabled = false;
         EditorHelper.EnableCanvasGroup(CanvasGroup, false);
         Sight.Instance.GizmoArrowsColliders.Clear();
-
+        if (connectionToModel != null)
+            Destroy(connectionToModel.gameObject);
     }
 
     public void ResetTransformWheel() {

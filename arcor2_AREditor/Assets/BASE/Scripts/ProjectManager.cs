@@ -81,6 +81,11 @@ namespace Base {
 
         public List<string> LastAddedAPs;
 
+        public List<DummyBox> DummyBoxes = new List<DummyBox>();
+        public DummyAimBox DummyAimBox;
+        public DummyAimBoxTester DummyAimBoxTester;
+
+
 
         public string PrevAction = null, NextAction = null;
 
@@ -215,6 +220,7 @@ namespace Base {
             try {
                 ActionPoint actionPoint = GetActionPoint(args.ActionPoint.Id);
                 actionPoint.ActionPointBaseUpdate(args.ActionPoint);
+                SelectorMenu.Instance.UpdateSelectorItem(actionPoint);
                 updateProject = true;
             } catch (KeyNotFoundException ex) {
                 Debug.Log("Action point " + args.ActionPoint.Id + " not found!");
@@ -325,7 +331,7 @@ namespace Base {
 
                 } catch (RequestFailedException) {
                 }
-                if (SelectAPNameWhenCreated == data.ActionPoint.Name)
+                if (!string.IsNullOrEmpty(SelectAPNameWhenCreated) && data.ActionPoint.Name.Contains(SelectAPNameWhenCreated))
                     RightButtonsMenu.Instance.MoveClick();
                 SelectAPNameWhenCreated = "";
  
@@ -352,11 +358,13 @@ namespace Base {
             if (ProjectMeta != null)
                 return false;
 
-            LastAddedAPs = new List<string>();
-            LastAddedAPs.Add("START");
+            LastAddedAPs = new List<string> {
+                "START"
+            };
             SetProjectMeta(DataHelper.ProjectToBareProject(project));
             AllowEdit = allowEdit;
             LoadSettings();
+            DummyBoxes.Clear();
 
             StartAction = Instantiate(StartPrefab,  SceneManager.Instance.SceneOrigin.transform).GetComponent<StartAction>();
             StartAction.Init(null, null, null, null, "START");
@@ -394,6 +402,7 @@ namespace Base {
                 foreach (string name in boxes) {
                     DummyBox b = Instantiate(DummyBoxPrefab, GameManager.Instance.Scene.transform).GetComponent<DummyBox>();
                     b.Init(name);
+                    DummyBoxes.Add(b);
                 }
             }
 
@@ -660,6 +669,7 @@ namespace Base {
         public DummyBox AddDummyBox(string name) {
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
             DummyBox box = Instantiate(DummyBoxPrefab, ray.GetPoint(0.5f), GameManager.Instance.Scene.transform.rotation, GameManager.Instance.Scene.transform).GetComponent<DummyBox>();
+            DummyBoxes.Add(box);
             string dummyBoxes = PlayerPrefsHelper.LoadString(Base.ProjectManager.Instance.ProjectMeta.Id + "/DummyBoxes", "");
             string newName = name;
             int i = 2;
@@ -677,6 +687,7 @@ namespace Base {
         public DummyAimBox AddDummyAimBox(bool blueBox, bool init = true) {
             if (blueBox) {
                 DummyAimBox box = Instantiate(DummyAimBoxPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
+                DummyAimBox = box;
                 try {
                     box.ActionPoint = GetactionpointByName("dabap");
                     box.transform.SetParent(box.ActionPoint.transform);
@@ -696,7 +707,8 @@ namespace Base {
                     SelectorMenu.Instance.CreateSelectorItem(box);
                 return box;
             } else {
-                DummyAimBox box = Instantiate(DummyAimBoxTesterPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBox>();
+                DummyAimBoxTester box = Instantiate(DummyAimBoxTesterPrefab, new Vector3(0, 0, 0), Quaternion.identity, GameManager.Instance.Scene.transform).GetComponent<DummyAimBoxTester>();
+                DummyAimBoxTester = box;
                 try {
                     box.ActionPoint = GetactionpointByName("dabap2");
                     box.transform.SetParent(box.ActionPoint.transform);

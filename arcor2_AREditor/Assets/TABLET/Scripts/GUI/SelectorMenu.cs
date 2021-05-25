@@ -408,6 +408,8 @@ public class SelectorMenu : Singleton<SelectorMenu> {
     }
 
     public void SetSelectedObject(InteractiveObject interactiveObject, bool manually = false) {
+        if (interactiveObject == null)
+            return;
         if (SelectorItems.TryGetValue(interactiveObject.GetId(), out SelectorItem item)) {
             SetSelectedObject(item, manually);
         }
