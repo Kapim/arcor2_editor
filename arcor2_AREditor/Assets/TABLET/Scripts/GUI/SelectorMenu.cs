@@ -104,7 +104,21 @@ public class SelectorMenu : Singleton<SelectorMenu> {
 
     private class SelectorItemComparer : IComparer<SelectorItem> {
         public int Compare(SelectorItem x, SelectorItem y) {
-            return x.Score.CompareTo(y.Score);
+            if (x.Score != y.Score)
+                return x.Score.CompareTo(y.Score);
+            else {
+                if (x.InteractiveObject is ActionPoint3D || x.InteractiveObject is Action3D) {
+                    if (y.InteractiveObject is ActionPoint3D || y.InteractiveObject is Action3D)
+                        return 0;
+                    else {
+                        return -1;
+                    }
+                } else if (y.InteractiveObject is ActionPoint3D || y.InteractiveObject is Action3D) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
         }
     }
 

@@ -47,8 +47,12 @@ namespace Base {
                 //if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0)), out hit, Mathf.Infinity)) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
 
+                RaycastHit hitinfo = new RaycastHit();
+                bool anyHit = false, directHit = false;
+                string directId = null;
+                RaycastHit[] hitsAll = Physics.RaycastAll(ray);
                 if (GizmoArrowsColliders.Count > 0 && !TransformMenu.Instance.HandHolding && TransformMenu.Instance.TransformWheel.List.Velocity.magnitude < 0.01f) {
-                    RaycastHit[] hitsAll = Physics.RaycastAll(ray);
+                    
                     foreach (RaycastHit h in hitsAll) {
                         /*if (h.collider.transform.parent.GetComponent<GizmoArrow>() != null) {
                             if (h.collider != activeCollider) {
@@ -57,6 +61,7 @@ namespace Base {
                             }
                             return;
                         }*/
+                        
                         if (GizmoArrowsColliders.Contains(h.collider)) {
                             if (h.collider == activeCollider)
                                 continue;
@@ -65,15 +70,25 @@ namespace Base {
                                 c.SendMessage("OnHoverEnd");
                             }
                             h.collider.SendMessage("OnHoverStart");
+                            return;
                         }
                     }
                 }
-                
 
 
-                RaycastHit hitinfo = new RaycastHit();
-                bool anyHit = false, directHit = false;
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                foreach (RaycastHit h in hitsAll) {
+                    InteractiveObject io = h.collider.transform.GetComponentInParent<InteractiveObject>();
+
+                    if (!anyHit && io != null && (io is ActionPoint3D || io is Action)) {
+                        anyHit = true;
+                        hitinfo = h;
+                        directId = io.GetId();
+                        break;
+                    }
+                }
+
+
+                if (!anyHit && Physics.Raycast(ray, out RaycastHit hit)) {
                     hitinfo = hit;
                     anyHit = true;
                     directHit = true;
@@ -114,7 +129,7 @@ namespace Base {
 
                             foreach (Collider c in item.InteractiveObject.Colliders) {
 
-                                if (c == hitinfo.collider) {
+                                if (c == hitinfo.collider && string.IsNullOrEmpty(directId)) {
                                     dist = 0;
                                     h = true;
                                 }
@@ -124,17 +139,20 @@ namespace Base {
 
                             if (item.InteractiveObject is ActionObjectNoPose || (item.InteractiveObject.GetType() != typeof(Action3D) && item.Collapsed && dist > 0.2)) { // add objects max 20cm away from point of impact 
 
-                                Debug.DrawLine(ray.origin, hitinfo.point);
+                                //Debug.DrawLine(ray.origin, hitinfo.point);
                                 continue;
                             }
-
+                            if (item.InteractiveObject.GetId() == directId) {
+                                dist = 0;
+                                h = true;
+                            }
                             items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
                         } catch (MissingReferenceException ex) {
                             Debug.LogError(ex);
                         }
                     }
                     if (h) {
-                        items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                        items.Sort((x, y) => CompareTwoItems(x, y));
                         if (items.Count > 0 && items[0].Item2 is ButtonInteractiveObject interactiveObject) {
                             interactiveObject.OnHoverStart();
                         } else {
@@ -275,7 +293,32 @@ namespace Base {
                 }
             }
             return false;
-        }        
+        }
+
+        private int CompareTwoItems(Tuple<float, InteractiveObject> x, Tuple<float, InteractiveObject> y) {
+            //if (x.Item1 != y.Item1)
+                return x.Item1.CompareTo(y.Item1);
+            /*else {
+                if (x.Item2 is ActionPoint3D) {
+                    if (y.Item2 is ActionPoint3D)
+                        return 0;
+                    else {
+                        return -1;
+                    }
+                } else if (x.Item2 is Action3D) {
+                    if (y.Item2 is Action3D)
+                        return 0;
+                    else {
+                        return -1;
+                    }
+                } else if (y.Item2 is ActionPoint3D || y.Item2 is Action3D) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }*/
+                
+        }
 
         private IEnumerator HoverEnd() {
             endingHover = true;

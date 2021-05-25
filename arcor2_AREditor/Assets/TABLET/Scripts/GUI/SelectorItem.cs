@@ -75,7 +75,8 @@ public class SelectorItem : MonoBehaviour
 
     public void UpdateScore(float score, long currentIteration) {
         lastUpdate = currentIteration;
-        //Label.text = name + " (" + score.ToString() + ")";
+        Label.text = name + " (" + score.ToString() + ")";
+        
         Score = score;
     }
 
