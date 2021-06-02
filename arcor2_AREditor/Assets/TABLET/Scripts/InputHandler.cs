@@ -158,13 +158,17 @@ public class InputHandler : Singleton<InputHandler> {
             } else if (touch.phase == TouchPhase.Ended) {
                 if (pointerOverUI)
                     return;
-                if (TransformGizmo.Instance.mainTargetRoot != null) {
+                /*if (TransformGizmo.Instance.mainTargetRoot != null) {
                     if (TransformGizmo.Instance.translatingAxis == Axis.None) {
                         TransformGizmo.Instance.ClearTargets();
                     }
+                }*/
+                LeftMenu.Instance.SetActiveSubmenu(LeftMenu.Instance.CurrentSubmenuOpened, true, false);
+                if (LeftMenu.Instance.CurrentMode != LeftMenu.Mode.Normal) {
+                    RightButtonsMenu.Instance.gameObject.SetActive(true);
+                } else {
+                    SelectorMenu.Instance.gameObject.SetActive(true);
                 }
-                TransformMenu.Instance.Hide();
-                SelectorMenu.Instance.DeselectObject(true);
             }
         }
     }

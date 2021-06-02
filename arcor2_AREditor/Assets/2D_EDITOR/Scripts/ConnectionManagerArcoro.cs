@@ -55,9 +55,11 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
     }
 
     public void DestroyConnectionToMouse() {
-        Destroy(virtualConnectionToMouse.gameObject);
-        Connections.Remove(virtualConnectionToMouse);
-        VirtualConnectionOnTouch.Instance.DrawVirtualConnection = false;
+        if (virtualConnectionToMouse != null) {
+            Destroy(virtualConnectionToMouse.gameObject);
+            Connections.Remove(virtualConnectionToMouse);
+            VirtualConnectionOnTouch.Instance.DrawVirtualConnection = false;
+        }
     }
 
     public bool IsConnecting() {

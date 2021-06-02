@@ -28,7 +28,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     private bool isVisibilityForced = false;
     private ActionPoint3D selectedActionPoint;
-    private LeftMenuSelection currentSubmenuOpened;
+    public LeftMenuSelection CurrentSubmenuOpened;
 
     protected InteractiveObject selectedObject = null;
     protected bool selectedObjectUpdated = true, previousUpdateDone = true;
@@ -39,6 +39,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public UnityAction<ActionPoint3D> ActionCb;
 
     public ActionPoint3D APToRemoveOnCancel;
+
+    
 
     public enum Mode {
         Normal,
@@ -205,7 +207,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void StartAddActionMode() {
 
         if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+             //close all other opened menus/dialogs and takes care of red background of buttons
         }
         if (AddActionModeBtn.GetComponent<Image>().enabled) {
             //AddActionModeBtn.GetComponent<Image>().enabled = false;
@@ -221,6 +223,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
             RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
             RightButtonsMenu.SetActionMode();
+            if (currentMode == Mode.Normal)
+
             CurrentMode = Mode.AddAction;
             SelectorMenuButton.GetComponent<Image>().enabled = false;
         }
@@ -386,7 +390,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         //was clicked the button in favorites or settings submenu?
          
         if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !AddActionButton.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(CurrentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
 
@@ -410,7 +414,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void SelectorMenuClick() {
         if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(CurrentSubmenuOpened, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
         }
        
             
@@ -491,7 +495,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         }
 
         if (!RightButtonsMenu.Instance.gameObject.activeSelf && !SelectorMenu.Instance.gameObject.activeSelf && !MoveButton.GetComponent<Image>().enabled) { //other menu/dialog opened
-            SetActiveSubmenu(currentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(CurrentSubmenuOpened); //close all other opened menus/dialogs and takes care of red background of buttons
         }
 
         if (MoveButton.GetComponent<Image>().enabled) {
@@ -641,7 +645,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void BlueBoxClick() {
         RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(currentSubmenuOpened);
+        SetActiveSubmenu(CurrentSubmenuOpened);
         SelectorMenu.Instance.SwitchToNoPose();
         DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(true);
         //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
@@ -656,7 +660,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void TesterClick() {
         RightButtonsMenu.Instance.gameObject.SetActive(true);
         MeshPicker.SetActive(false);
-        SetActiveSubmenu(currentSubmenuOpened);
+        SetActiveSubmenu(CurrentSubmenuOpened);
         SelectorMenu.Instance.SwitchToNoPose();
         DummyAimBox obj = ProjectManager.Instance.AddDummyAimBox(false);
         //ToggleGroupIconButtons.Instance.SelectButton(ToggleGroupIconButtons.Instance.Buttons[2]);
@@ -805,7 +809,7 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
     public void SetActiveSubmenu(LeftMenuSelection which, bool active = true, bool force = false) {
         DeactivateAllSubmenus(force);
-        currentSubmenuOpened = which;
+        CurrentSubmenuOpened = which;
         if (!active)
             return;
         switch (which) {
@@ -886,6 +890,9 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
 
         MeshPicker.SetActive(false);
         ActionPicker.SetActive(false);
+        if (ConfirmationDialog.Visible) {
+            ConfirmationDialog.Close();
+        }
 
         //FavoritesButtons.SetActive(true);
         HomeButtons.SetActive(false);

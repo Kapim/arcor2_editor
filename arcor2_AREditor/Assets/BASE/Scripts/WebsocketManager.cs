@@ -1828,7 +1828,6 @@ namespace Base {
             IO.Swagger.Model.RenameActionPointJointsRequest request = new IO.Swagger.Model.RenameActionPointJointsRequest(r_id, "RenameActionPointJoints", args);
             SendDataToServer(request.ToJson(), r_id, true);
             IO.Swagger.Model.RenameActionPointJointsResponse response = await WaitForResult<IO.Swagger.Model.RenameActionPointJointsResponse>(r_id);
-
             if (response == null || !response.Result)
                 throw new RequestFailedException(response == null ? "Request timed out" : response.Messages[0]);
         }

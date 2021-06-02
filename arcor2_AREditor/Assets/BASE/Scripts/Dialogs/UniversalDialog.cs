@@ -10,7 +10,9 @@ public class UniversalDialog : Dialog
     [SerializeField]
     protected ButtonWithTooltip okBtn, cancelBtn;
 
-    protected UnityAction confirmCallback;
+    protected UnityAction confirmCallback, cancelCallback;
+
+    public bool Visible;
 
     public void SetConfirmLabel(string name) {
         OKButtonLabelNormal.text = name;
@@ -23,12 +25,13 @@ public class UniversalDialog : Dialog
     }
 
     public void AddConfirmCallback(UnityAction callback) {
-        windowManager.onConfirm.AddListener(callback);
+        //windowManager.onConfirm.AddListener(callback);
         confirmCallback = callback;
     }
 
     public void AddCancelCallback(UnityAction callback) {
-        windowManager.onCancel.AddListener(callback);
+        //windowManager.onCancel.AddListener(callback);
+        cancelCallback = callback;
     }
 
     public void SetDescription(string description) {
@@ -54,9 +57,18 @@ public class UniversalDialog : Dialog
         SetConfirmLabel(confirmLabel);
         SetCancelLabel(cancelLabel);
         Open();
+        Visible = true;
     }
 
     public override void Confirm() {
-        confirmCallback();
+        confirmCallback?.Invoke();
+        windowManager.CloseWindow();
+        Visible = false;
+    }
+
+    public override void Close() {
+        base.Close();
+        cancelCallback?.Invoke();
+        Visible = false;
     }
 }

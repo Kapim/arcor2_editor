@@ -8,8 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RightButtonsMenu : Singleton<RightButtonsMenu>
-{
+public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn, ConnectionBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
@@ -71,7 +70,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                 selectedObject.GetType() == typeof(ActionPoint3D) ||
                 selectedObject.GetType() == typeof(ConnectionLine) ||
                 selectedObject is RobotEE || selectedObject is RobotActionObject);
-            if (selectedObject is RobotEE || selectedObject is RobotActionObject)
+            if (selectedObject is RobotEE)
                 RobotHandBtn.color = Color.white;
             else
                 RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
@@ -84,7 +83,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             AddActionBtn.SetInteractivity(true);
             RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
         }
-        
+
     }
 
     public void SelectClick() {
@@ -102,7 +101,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                 apId = action.ActionPoint.GetId();
             else
                 return;
-            if (SelectorMenu.Instance.SelectorItems.TryGetValue(apId, out SelectorItem selectorItem)) {                
+            if (SelectorMenu.Instance.SelectorItems.TryGetValue(apId, out SelectorItem selectorItem)) {
                 selectorItem.CollapseBtnCb();
                 OnObjectSelectedChangedEvent(this, new InteractiveObjectEventArgs(selectedObject));
             }
@@ -116,17 +115,18 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     public void AddAction() {
         if (selectedObject != null && (selectedObject is Action3D || selectedObject is ActionPoint3D)) {
 
-            ActionPicker.transform.position = selectedObject.transform.position - Camera.main.transform.forward * 0.05f;
+            ActionPicker.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.2f;
+            ActionPicker.GetComponent<FaceCamera>().Update();
             ActionPicker.SetActive(true);
             if (selectedObject is Action3D action) {
                 action.ActionPoint.SetApCollapsed(false);
             } else if (selectedObject is ActionPoint3D actionPoint) {
-                actionPoint.SetApCollapsed(false);             
+                actionPoint.SetApCollapsed(false);
             } else {
                 return;
             }
-                
-            
+
+
         } else {
             string name = ProjectManager.Instance.GetFreeAPName("ap");
             LeftMenu.Instance.ApToAddActionName = name;
@@ -143,16 +143,15 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                     }
                 } else if (selectedObject is RobotEE robotEE) {
                     GameManager.Instance.AddActionPointExperiment(name, false, robotEE);
-                } else if (selectedObject is RobotActionObject robot) {
-                    RobotEE ee = robot.GetEndEffector("default");
-                    GameManager.Instance.AddActionPointExperiment(name, false, ee);
+                } else {
+                    GameManager.Instance.AddActionPointExperiment(name, false);
                 }
 
             } else {
                 GameManager.Instance.AddActionPointExperiment(name, false);
-            }          
-            
-        } 
+            }
+
+        }
         SelectorMenu.Instance.Active = false;
         SetMenuTriggerMode();
     }
@@ -250,7 +249,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public void MoveClick() {
-        
+
         if (selectedObject is null)
             return;
 
@@ -263,7 +262,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         //SelectorMenu.Instance.Active = false;
         gameObject.SetActive(false);
         TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
-        
+
     }
 
     public void RemoveClick() {
@@ -271,19 +270,18 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
             return;
 
         SelectorMenu.Instance.Active = false;
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
         LeftMenu.Instance.ConfirmationDialog.Open("Remove object",
                          "Are you sure you want to remove " + selectedObject.GetName() + "?",
                          () => {
                              selectedObject.Remove();
-                             gameObject.SetActive(true);
-                             LeftMenu.Instance.ConfirmationDialog.Close();
+                             SetRemoveMode();
                              SelectorMenu.Instance.Active = true;
                          },
                          () => {
-                             gameObject.SetActive(true);
-                             LeftMenu.Instance.ConfirmationDialog.Close();
+                             SetRemoveMode();
                              SelectorMenu.Instance.Active = true;
+                             Debug.LogError("fasdhfjkkjyxchv");
                          });
     }
 
@@ -321,21 +319,24 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     }
 
     public async void ConnectionClick() {
-        if (selectedObject != null && selectedObject is Action3D action ) {
-            
+        if (selectedObject != null && selectedObject is Action3D action) {
+
             if (Connecting) {
                 if (action.Input.ConnectionExists()) {
                     Notifications.Instance.ShowNotification("Failed to create connection", "There is already existing connection to this action");
+                    ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
+                    Connecting = false;
                     return;
                 }
                 Base.Action from = ConnectionManagerArcoro.Instance.GetActionConnectedToPointer();
                 try {
-                    await WebsocketManager.Instance.AddLogicItem(from.GetId(), action.GetId(), from.Output.GetProjectLogicIf(), false);
-                    ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
-                    Connecting = false;
+                    await WebsocketManager.Instance.AddLogicItem(from.GetId(), action.GetId(), from.Output.GetProjectLogicIf(), false);                
                 } catch (RequestFailedException ex) {
                     Notifications.Instance.ShowNotification("Failed to create connection", ex.Message);
                     return;
+                } finally {
+                    ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
+                    Connecting = false;
                 }
             } else {
                 if (action.Output.ConnectionExists()) {
@@ -345,6 +346,11 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
                 Connecting = true;
                 ConnectionManagerArcoro.Instance.CreateConnectionToPointer(action.Output.gameObject);
 
+            }
+        } else {
+            if (Connecting) {
+                Connecting = false;
+                ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
             }
         }
     }
@@ -359,8 +365,6 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
     public void RobotHandTeachingPush() {
         if (selectedObject is RobotEE ee) {
             robotEE = ee;
-        } else if (selectedObject is RobotActionObject robot) {
-            robotEE = robot.GetEndEffector("default");
         } else {
             return;
         }
@@ -373,6 +377,14 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu>
         await WebsocketManager.Instance.HandTeachingMode(robotId: robotEE.RobotId, enable: false);
         IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(robotEE.transform.position)));
         await WebsocketManager.Instance.MoveToPose(robotEE.RobotId, robotEE.EEId, 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), false);
+    }
+
+    public void AddConnectionPush() {
+        ConnectionClick();
+    }
+
+    public void AddConnectionRelease() {
+        ConnectionClick();
     }
 
 

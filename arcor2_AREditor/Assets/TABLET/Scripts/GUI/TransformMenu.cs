@@ -199,24 +199,34 @@ public class TransformMenu : Singleton<TransformMenu> {
             Vector3 cameraNow = Camera.main.transform.position;
             switch (SelectedAxis) {
                 case "x":
-                    cameraOffset += Vector3.forward * (cameraNow.z - cameraPrev.z);
+                   /* cameraOffset = model.transform.InverseTransformDirection(Vector3.forward).normalized * (cameraNow.z - cameraPrev.z);
                     float offset = GetRoundedValue(cameraOffset.z);
-                    model.transform.position += Vector3.forward * offset;
-                    cameraOffset -= Vector3.forward * offset;
+                    model.transform.Translate(cameraOffset, Space.Self);*/
+                    //cameraOffset -= cameraOffset;
+                    /*float dist = (Quaternion.Inverse(model.transform.rotation) * (cameraNow - cameraPrev)).magnitude;
+                    model.transform.Translate(Vector3.forward * dist, Space.Self);*/
                     break;
                 case "y":
-                    cameraOffset += Vector3.right * (cameraNow.x - cameraPrev.x);
+                    /*cameraOffset += Vector3.right * (cameraNow.x - cameraPrev.x);
                     offset = GetRoundedValue(cameraOffset.x);
-                    model.transform.position += Vector3.right * offset;
-                    cameraOffset -= Vector3.right * offset;
+                    model.transform.Translate(Vector3.right * offset);
+                    cameraOffset -= Vector3.right * offset;*/
                     //model.transform.position += new Vector3(GetRoundedValue(cameraNow.x - cameraPrev.x), 0, 0);
+                    cameraOffset = model.transform.InverseTransformDirection(Vector3.right) * (cameraNow.x - cameraPrev.x);
+                    //offset = GetRoundedValue(cameraOffset.z);
+                    model.transform.Translate(cameraOffset, Space.World);
+                    //cameraOffset -= cameraOffset;
                     break;
                 case "z":
-                    cameraOffset += Vector3.up * (cameraNow.y - cameraPrev.y);
+                    /*cameraOffset += Vector3.up * (cameraNow.y - cameraPrev.y);
                     offset = GetRoundedValue(cameraOffset.y);
-                    model.transform.position += Vector3.up * offset;
-                    cameraOffset -= Vector3.up * offset;
+                    model.transform.Translate(Vector3.up * offset);
+                    cameraOffset -= Vector3.up * offset;*/
                     //model.transform.position += new Vector3(0, GetRoundedValue(cameraNow.y - cameraPrev.y), 0);
+                    /*cameraOffset = model.transform.InverseTransformDirection(Vector3.up) * (cameraNow.y - cameraPrev.y);
+                    offset = GetRoundedValue(cameraOffset.z);
+                    model.transform.Translate(cameraOffset, Space.Self);*/
+                    //cameraOffset -= cameraOffset;
                     break;
                 case "all":
                     cameraOffset += new Vector3(cameraNow.x - cameraPrev.x, cameraNow.y - cameraPrev.y, cameraNow.z - cameraPrev.z);
@@ -457,6 +467,7 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public void SetSelectedAxis(string axis) {
         SelectedAxis = axis;
+        ResetTransformWheel();
         if (SelectedAxis == "all")
             TransformWheel.SetInteractive(false);
         else
@@ -553,6 +564,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         }
         enabled = true;
         EditorHelper.EnableCanvasGroup(CanvasGroup, true);
+        SelectorMenu.Instance.gameObject.SetActive(false);
     }
 
     private GameObject GetPointModel() {

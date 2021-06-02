@@ -124,7 +124,7 @@ public class ActionPoint3D : Base.ActionPoint {
     }
 
     public override void UpdatePositionsOfPucks() {
-        //CollapsedPucksVisual.SetActive(ProjectManager.Instance.AllowEdit && ActionsCollapsed);
+        CollapsedPucksVisual.SetActive(ProjectManager.Instance.AllowEdit && ActionsCollapsed && Actions.Count > 0);
         if (ProjectManager.Instance.AllowEdit && ActionsCollapsed) {
             foreach (Action3D action in Actions.Values) {
                 action.transform.localPosition = new Vector3(0, 0, 0);

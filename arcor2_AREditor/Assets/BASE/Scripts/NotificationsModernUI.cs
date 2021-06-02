@@ -12,6 +12,8 @@ namespace Base {
 
         public NotificationManager NotificationManager;
 
+        public Transform NotifBox;
+
         [SerializeField]
         private Canvas Canvas;
 
@@ -23,12 +25,16 @@ namespace Base {
         public override void ShowNotification(string title, string text) {
             // HACK to make notifiaction in foreground
             // TODO - find better way
+
+            NotifBox.position = Camera.main.transform.position + Camera.main.transform.forward * 0.2f;
+
             Canvas.enabled = false;
             Canvas.enabled = true;
             NotificationManager.title = title;
             NotificationManager.description = text;
             NotificationManager.UpdateUI();
             NotificationManager.OpenNotification();
+
             LogEntries.Add(new LogEntry("Notification", title, text));
             NotificationEntry notificationEntry = Instantiate(NotificationEntryPrefab, NotificationMenuContent.transform).GetComponent<NotificationEntry>();
             notificationEntry.transform.SetAsFirstSibling();
