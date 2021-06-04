@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Animations;
 using System.Threading.Tasks;
+using UnityEditor;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class TransformMenu : Singleton<TransformMenu> {
@@ -55,6 +56,8 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public string SelectedAxis = "all";
 
+    private Transform originalParent;
+
 
     private void Awake() {
         CanvasGroup = GetComponent<CanvasGroup>();
@@ -71,11 +74,11 @@ public class TransformMenu : Singleton<TransformMenu> {
             if (endEffector != null) {
                 model.transform.position = endEffector.transform.position;
                 Coordinates.X.SetValueMeters(endEffector.transform.position.x);
-                Coordinates.X.SetDeltaMeters(model.transform.position.x - InteractiveObject.transform.position.x);
+                Coordinates.X.SetDeltaMeters(InteractiveObject.transform.localPosition.x);
                 Coordinates.Y.SetValueMeters(endEffector.transform.position.y);
-                Coordinates.Y.SetDeltaMeters(model.transform.position.y - InteractiveObject.transform.position.y);
+                Coordinates.Y.SetDeltaMeters(InteractiveObject.transform.localPosition.y);
                 Coordinates.Z.SetValueMeters(endEffector.transform.position.z);
-                Coordinates.Z.SetDeltaMeters(model.transform.position.z - InteractiveObject.transform.position.z);
+                Coordinates.Z.SetDeltaMeters(InteractiveObject.transform.localPosition.z);
                 //UpdateTranslate(GetPositionValue(TransformWheel.GetValue()));
                 return;
             }
@@ -85,25 +88,56 @@ public class TransformMenu : Singleton<TransformMenu> {
             newValue = GetRotationValue(TransformWheel.GetValue());
             if (prevValue != newValue)
                 UpdateRotate(newValue - prevValue);
-            Quaternion delta = TransformConvertor.UnityToROS(model.transform.localRotation);
+            Quaternion delta = TransformConvertor.UnityToROS(GameManager.Instance.Gizmo.transform.localRotation);
+            if (InteractiveObject is ActionPoint3D actionPoint)
+                delta = TransformConvertor.UnityToROS(Quaternion.Inverse(actionPoint.GetRotation()) * GameManager.Instance.Gizmo.transform.localRotation);
             Quaternion newrotation = TransformConvertor.UnityToROS(model.transform.rotation * Quaternion.Inverse(GameManager.Instance.Scene.transform.rotation));
-            Coordinates.X.SetValueDegrees(newrotation.eulerAngles.x);
+            //Coordinates.X.SetValueDegrees(newrotation.eulerAngles.x);
             Coordinates.X.SetDeltaDegrees(delta.eulerAngles.x);
-            Coordinates.Y.SetValueDegrees(newrotation.eulerAngles.y);
+            //Coordinates.Y.SetValueDegrees(newrotation.eulerAngles.y);
             Coordinates.Y.SetDeltaDegrees(delta.eulerAngles.y);
-            Coordinates.Z.SetValueDegrees(newrotation.eulerAngles.z);
+            //Coordinates.Z.SetValueDegrees(newrotation.eulerAngles.z);
             Coordinates.Z.SetDeltaDegrees(delta.eulerAngles.z);
 
         } else {
             newValue = GetPositionValue(TransformWheel.GetValue());
             if (HandHolding || prevValue != newValue)
                 UpdateTranslate(newValue - prevValue);
-            Coordinates.X.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).x);
-            Coordinates.X.SetDeltaMeters(TransformConvertor.UnityToROS(model.transform.localPosition).x);
-            Coordinates.Y.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).y);
-            Coordinates.Y.SetDeltaMeters(TransformConvertor.UnityToROS(model.transform.localPosition).y);
-            Coordinates.Z.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).z);
-            Coordinates.Z.SetDeltaMeters(TransformConvertor.UnityToROS(model.transform.localPosition).z);
+            //Coordinates.X.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).x);
+            if (InteractiveObject is ActionPoint3D actionPoint) {
+                Vector3 gizmoVector = GameManager.Instance.ModelGizmo.transform.forward;
+                Vector3 transformVector = InteractiveObject.transform.position - model.transform.position;
+                float angle = Vector3.Angle(gizmoVector, transformVector);
+                var length = transformVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                //InteractiveObject.transform.Translate(gizmoVector * lengthNormalized, Space.World);
+
+
+                Coordinates.X.SetDeltaMeters(length);
+                gizmoVector = GameManager.Instance.ModelGizmo.transform.right;
+                angle = Vector3.Angle(gizmoVector, transformVector);
+                length = transformVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                Coordinates.Y.SetDeltaMeters(length);
+                gizmoVector = GameManager.Instance.ModelGizmo.transform.up;
+                angle = Vector3.Angle(gizmoVector, transformVector);
+                length = transformVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                Coordinates.Z.SetDeltaMeters(length);
+            } else {
+                Coordinates.X.SetDeltaMeters(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition).x / 50);
+                /*Vector3 gizmoVector = model.transform.forward;
+                float angle = Vector3.Angle(gizmoVector, cameraVector);
+                float length = cameraVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                //cameraOffset += Vector3.forward * length;
+                //lengthNormalized = GetRoundedValue(cameraOffset.z);
+                Debug.LogError(lengthNormalized);
+                //cameraOffset -= Vector3.forward * lengthNormalized;
+                model.transform.Translate(model.transform.forward * lengthNormalized, Space.World);*/
+                //Coordinates.X.SetDeltaMeters(TransformConvertor.UnityToROS(model.transform.position - InteractiveObject.transform.position).x);
+                //Coordinates.Y.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).y);
+                Coordinates.Y.SetDeltaMeters(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition).y / 50);
+                //Coordinates.Z.SetValueMeters(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(model.transform.position)).z);
+                Coordinates.Z.SetDeltaMeters(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition).z / 50);
+            }
+
         }
         
         
@@ -198,14 +232,26 @@ public class TransformMenu : Singleton<TransformMenu> {
             offsetPosition.y = GetRoundedValue(cameraNow.y - cameraOrig.y);
             offsetPosition.z = GetRoundedValue(cameraNow.z - cameraOrig.z);*/
             Vector3 cameraNow = Camera.main.transform.position;
+            Vector3 cameraVector = cameraNow - cameraPrev;
+            Vector3 gizmoVector;
+            float length, lengthNormalized;
+            float angle;
             switch (SelectedAxis) {
                 case "x":
-                   /* cameraOffset = model.transform.InverseTransformDirection(Vector3.forward).normalized * (cameraNow.z - cameraPrev.z);
-                    float offset = GetRoundedValue(cameraOffset.z);
-                    model.transform.Translate(cameraOffset, Space.Self);*/
+                    /* cameraOffset = model.transform.InverseTransformDirection(Vector3.forward).normalized * (cameraNow.z - cameraPrev.z);
+                     float offset = GetRoundedValue(cameraOffset.z);
+                     model.transform.Translate(cameraOffset, Space.Self);*/
                     //cameraOffset -= cameraOffset;
                     /*float dist = (Quaternion.Inverse(model.transform.rotation) * (cameraNow - cameraPrev)).magnitude;
                     model.transform.Translate(Vector3.forward * dist, Space.Self);*/
+                    gizmoVector = GameManager.Instance.Gizmo.transform.forward;
+                    angle = Vector3.Angle(gizmoVector, cameraVector);
+                    length = cameraVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                    cameraOffset += Vector3.forward * length;
+                    lengthNormalized = GetRoundedValue(cameraOffset.z);
+                    Debug.LogError(lengthNormalized);
+                    cameraOffset -= Vector3.forward * lengthNormalized;
+                    InteractiveObject.transform.Translate(gizmoVector * lengthNormalized, Space.World);
                     break;
                 case "y":
                     /*cameraOffset += Vector3.right * (cameraNow.x - cameraPrev.x);
@@ -213,10 +259,18 @@ public class TransformMenu : Singleton<TransformMenu> {
                     model.transform.Translate(Vector3.right * offset);
                     cameraOffset -= Vector3.right * offset;*/
                     //model.transform.position += new Vector3(GetRoundedValue(cameraNow.x - cameraPrev.x), 0, 0);
-                    cameraOffset = model.transform.InverseTransformDirection(Vector3.right) * (cameraNow.x - cameraPrev.x);
+                    //cameraOffset = model.transform.InverseTransformDirection(Vector3.right) * (cameraNow.x - cameraPrev.x);
                     //offset = GetRoundedValue(cameraOffset.z);
-                    model.transform.Translate(cameraOffset, Space.World);
+                    //model.transform.Translate(cameraOffset, Space.World);
                     //cameraOffset -= cameraOffset;
+                    gizmoVector = GameManager.Instance.Gizmo.transform.right;
+                    angle = Vector3.Angle(gizmoVector, cameraVector);
+                    length = cameraVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                    cameraOffset += Vector3.right * length;
+                    lengthNormalized = GetRoundedValue(cameraOffset.x);
+                    Debug.LogError(lengthNormalized);
+                    cameraOffset -= Vector3.right * lengthNormalized;
+                    InteractiveObject.transform.Translate(gizmoVector * lengthNormalized, Space.World);
                     break;
                 case "z":
                     /*cameraOffset += Vector3.up * (cameraNow.y - cameraPrev.y);
@@ -228,11 +282,19 @@ public class TransformMenu : Singleton<TransformMenu> {
                     offset = GetRoundedValue(cameraOffset.z);
                     model.transform.Translate(cameraOffset, Space.Self);*/
                     //cameraOffset -= cameraOffset;
+                    gizmoVector = GameManager.Instance.Gizmo.transform.up;
+                    angle = Vector3.Angle(gizmoVector, cameraVector);
+                    length = cameraVector.magnitude * Mathf.Cos(Mathf.Deg2Rad * angle);
+                    cameraOffset += Vector3.up * length;
+                    lengthNormalized = GetRoundedValue(cameraOffset.y);
+                    Debug.LogError(lengthNormalized);
+                    cameraOffset -= Vector3.up * lengthNormalized;
+                    InteractiveObject.transform.Translate(gizmoVector * lengthNormalized, Space.World);
                     break;
                 case "all":
                     cameraOffset += new Vector3(cameraNow.x - cameraPrev.x, cameraNow.y - cameraPrev.y, cameraNow.z - cameraPrev.z);
                     Vector3 vectorOffset = new Vector3(GetRoundedValue(cameraOffset.x), GetRoundedValue(cameraOffset.y), GetRoundedValue(cameraOffset.z));
-                    model.transform.position += vectorOffset;
+                    InteractiveObject.transform.position += vectorOffset;
                     cameraOffset -= vectorOffset;
                     //model.transform.position += new Vector3(GetRoundedValue(cameraNow.x - cameraPrev.x), GetRoundedValue(cameraNow.y - cameraPrev.y), GetRoundedValue(cameraNow.z - cameraPrev.z));
                     break;
@@ -244,13 +306,13 @@ public class TransformMenu : Singleton<TransformMenu> {
 
             switch (SelectedAxis) {
                 case "x":
-                    model.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.right));
+                    InteractiveObject.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.right), GameManager.Instance.Gizmo.transform);
                     break;
                 case "y":
-                    model.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.up));
+                    InteractiveObject.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.up), GameManager.Instance.Gizmo.transform);
                     break;
                 case "z":
-                    model.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.forward));
+                    InteractiveObject.transform.Translate(TransformConvertor.ROSToUnity(wheelValue * Vector3.forward), GameManager.Instance.Gizmo.transform);
                     break;
             }
         }
@@ -274,67 +336,22 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     private void UpdateRotate(float wheelValue) {
-        /*if (model == null)
-            return;
-        if (wheelValue != 0) {
-            ConfirmBtn.SetInteractivity(true);
-            ResetBtn.SetInteractivity(true);
-        }
-        if (handHolding) {
-            
-        } else {
-            
-            switch (Coordinates.GetSelectedAxis()) {
-                case "x":
-                    //offsetRotation = Quaternion.Euler(wheelValue, offsetRotation.eulerAngles.y, offsetRotation.eulerAngles.z);
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(new Vector3(wheelValue, 0, 0)), Space.Self);
-                    break;
-                case "y":
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(new Vector3(0, wheelValue, 0)), Space.Self);
-
-                    //offsetRotation = Quaternion.Euler(offsetRotation.eulerAngles.x, wheelValue, offsetRotation.eulerAngles.z);
-                    break;
-                case "z":
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(new Vector3(0, 0, wheelValue)), Space.Self);
-
-                    //offsetRotation = Quaternion.Euler(offsetRotation.eulerAngles.x, offsetRotation.eulerAngles.y, wheelValue);
-                    break;
-            }
-
-        }
-        Quaternion delta = Quaternion.identity;
-        if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
-            delta = model.transform.localRotation * Quaternion.Inverse(((ActionPoint3D) InteractiveObject).GetRotation());
-            
-        } else if (InteractiveObject.GetType() == typeof(DummyBox)) {
-            delta = model.transform.localRotation;
-        }
-       
-        Quaternion newrotation = Quaternion.Inverse(GameManager.Instance.Scene.transform.rotation * Quaternion.Inverse(model.transform.rotation));
-        Debug.LogError(newrotation.eulerAngles);
-        Coordinates.X.SetValueDegrees(TransformConvertor.UnityToROS(newrotation.eulerAngles).x);
-        Coordinates.X.SetDeltaDegrees(TransformConvertor.UnityToROS(delta.eulerAngles).x);
-
-        float nmbr = 360 + TransformConvertor.UnityToROS(newrotation.eulerAngles).y;
-        Coordinates.Y.SetValueDegrees(nmbr == 360 ? 0 : nmbr);
-        nmbr = 360 + TransformConvertor.UnityToROS(delta.eulerAngles).y;
-        Coordinates.Y.SetDeltaDegrees(nmbr == 360 ? 0 : nmbr);
-        Coordinates.Z.SetValueDegrees(TransformConvertor.UnityToROS(newrotation.eulerAngles).z);
-        Coordinates.Z.SetDeltaDegrees(TransformConvertor.UnityToROS(delta.eulerAngles).z);*/
-
+        
         if (HandHolding) {
 
         } else {
 
             switch (SelectedAxis) {
                 case "x":
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.right));
+                    Debug.LogError(InteractiveObject.transform.rotation);
+                    GameManager.Instance.Gizmo.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.right));
+                    Debug.LogError(InteractiveObject.transform.rotation);
                     break;
                 case "y":
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.up));
+                    GameManager.Instance.Gizmo.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.up));
                     break;
                 case "z":
-                    model.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.forward));
+                    GameManager.Instance.Gizmo.transform.Rotate(TransformConvertor.ROSToUnity(wheelValue * Vector3.forward));
                     break;
             }
 
@@ -523,12 +540,15 @@ public class TransformMenu : Singleton<TransformMenu> {
             robot = false;
             SwitchToTablet();
         }
-
+        originalParent = InteractiveObject.transform.parent;
+        GameManager.Instance.Gizmo.transform.SetParent(interactiveObject.transform);
+        GameManager.Instance.Gizmo.transform.localPosition = Vector3.zero;
+        GameManager.Instance.Gizmo.transform.localRotation = Quaternion.identity;
         if (interactiveObject is ActionPoint3D actionPoint) {
+            actionPoint.FixRotation = false;
             model = actionPoint.GetModelCopy();
             connectionToModel = CreateConnection(actionPoint.transform, model.transform);
-            Debug.LogError(actionPoint.GetRotation());
-            model.transform.localRotation = actionPoint.GetRotation();
+            GameManager.Instance.Gizmo.transform.localRotation = actionPoint.GetRotation();
             //origRotation = TransformConvertor.UnityToROS(((ActionPoint3D) interactiveObject).GetRotation());
         } else if (interactiveObject is DummyBox dummyBox) {
             model = dummyBox.GetModelCopy();
@@ -553,10 +573,17 @@ public class TransformMenu : Singleton<TransformMenu> {
             Hide();
             return;
         }
+        model.transform.SetParent(originalParent);
+        GameManager.Instance.ModelGizmo.transform.SetParent(model.transform);
+        GameManager.Instance.ModelGizmo.SetActive(true);
+        GameManager.Instance.ModelGizmo.transform.localRotation = Quaternion.identity;
+        GameManager.Instance.ModelGizmo.transform.localScale = Vector3.one;
+        GameManager.Instance.ModelGizmo.transform.localPosition = Vector3.zero;
+        if (interactiveObject is ActionPoint3D ap) {
+            GameManager.Instance.ModelGizmo.transform.localRotation = ap.GetRotation();
+        }
+        interactiveObject.transform.SetParent(model.transform);
         
-        GameManager.Instance.Gizmo.transform.SetParent(model.transform);
-        GameManager.Instance.Gizmo.transform.localPosition = Vector3.zero;
-        GameManager.Instance.Gizmo.transform.localRotation = Quaternion.identity;
         GameManager.Instance.Gizmo.SetActive(true);
         Sight.Instance.GizmoArrowsColliders.Clear();
         foreach (MeshCollider c in GameManager.Instance.Gizmo.transform.GetComponentsInChildren<MeshCollider>()) {
@@ -622,19 +649,25 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     public async void Hide() {
-        if (InteractiveObject != null)
+        if (InteractiveObject != null) {
+            
+            InteractiveObject.transform.SetParent(originalParent);
             await SubmitPosition();
+            if (InteractiveObject is ActionPoint3D actionPoint)
+                actionPoint.FixRotation = true;
+        }
         for (int i = 0; i < 4; ++i) {
             if (dummyPoints[i] != null) {
                 Destroy(dummyPoints[i]);
             }
         }
         if (manuallySelected)
-            SelectorMenu.Instance.SetSelectedObject(InteractiveObject, true);
-        
+            SelectorMenu.Instance.SetSelectedObject(InteractiveObject, true);            
         InteractiveObject = null;
         GameManager.Instance.Gizmo.SetActive(false);
+        GameManager.Instance.ModelGizmo.SetActive(false);
         GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
+        GameManager.Instance.ModelGizmo.transform.SetParent(GameManager.Instance.Scene.transform);
         Destroy(model);
         model = null;
         enabled = false;
@@ -710,89 +743,25 @@ public class TransformMenu : Singleton<TransformMenu> {
             try {
                 if (!robot) {
                     //await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition + model.transform.localPosition)));
-                    await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(InteractiveObject.transform.parent.InverseTransformPoint(model.transform.position))));
+                    await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(model.transform.parent.InverseTransformPoint(InteractiveObject.transform.position))));
                 } else {
                     await WebsocketManager.Instance.UpdateActionPointUsingRobot(InteractiveObject.GetId(), robotId, endEffector.EEId);
                 }
-                Debug.LogError(model.transform.localRotation);
-                actionPoint.SetRotation(model.transform.localRotation);
-                ResetPosition();
+                actionPoint.SetRotation(GameManager.Instance.Gizmo.transform.localRotation);
+                //ResetPosition();
             } catch (RequestFailedException e) {
                 Notifications.Instance.ShowNotification("Failed to update action point position", e.Message);
             }
         } else if (InteractiveObject.GetType() == typeof(DummyBox)) {
             //InteractiveObject.transform.localRotation = TransformConvertor.ROSToUnity(origRotation * interRotation * offsetRotation);
             //InteractiveObject.transform.Translate(TransformConvertor.ROSToUnity(interPosition + offsetPosition));
-            InteractiveObject.transform.position = model.transform.position;
-            InteractiveObject.transform.rotation = model.transform.rotation;
+            
             InteractiveObject.transform.hasChanged = true;
-            ResetPosition();
+            //ResetPosition();
         }
 
     }
 
-    /*
-    public async void SubmitPosition() {
-        if (DummyAimBox) {
-            Dots[currentArrowIndex].color = Color.green;
-            PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + (Tester ? "/BlueBox" : "/Tester") + "/PointAimed/" + currentArrowIndex, true);
-            if (dummyPoints[currentArrowIndex] != null) {
-                GameManager.Instance.Gizmo.transform.SetParent(GameManager.Instance.Scene.transform);
-                Destroy(dummyPoints[currentArrowIndex]);
-            }
-            model.transform.SetParent(GameManager.Instance.Scene.transform, true);
-            dummyPoints[currentArrowIndex] = model;
-            model = GetPointModel();
-
-            GameManager.Instance.Gizmo.transform.SetParent(model.transform);
-            GameManager.Instance.Gizmo.transform.localPosition = Vector3.zero;
-            bool done = true;
-            foreach (GameObject p in dummyPoints) {
-                if (p == null) {
-                    done = false;
-                    break;
-                }
-            }
-            if (done) {
-                if (Tester) {
-                    DummyAimBoxTester dummyAimBox = FindObjectOfType<DummyAimBoxTester>();
-                    if (dummyAimBox != null)
-                        dummyAimBox.AimFinished();
-                } else {
-                    DummyAimBox dummyAimBox = FindObjectOfType<DummyAimBox>();
-                    if (dummyAimBox != null)
-                        dummyAimBox.AimFinished();
-                }
-            }
-        } else if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
-            try {
-
-                //Vector3 position = interPosition + offsetPosition;
-                //model.transform.localPosition = TransformConvertor.ROSToUnity(origRotation) * position;
-                if (RobotTabletBtn.CurrentState == "tablet" || RobotTabletBtn.CurrentState == "pivot")
-                    await WebsocketManager.Instance.UpdateActionPointPosition(InteractiveObject.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(InteractiveObject.transform.localPosition + model.transform.localPosition)));
-                else if (RobotTabletBtn.CurrentState == "robot") {
-                    await WebsocketManager.Instance.UpdateActionPointUsingRobot(InteractiveObject.GetId(), robotId, endEffector.GetId());
-                } 
-               ((ActionPoint3D) InteractiveObject).SetRotation(model.transform.localRotation);
-                //origRotation = TransformConvertor.UnityToROS(model.transform.localRotation);
-                ResetPosition();
-            } catch (RequestFailedException e) {
-                Notifications.Instance.ShowNotification("Failed to update action point position", e.Message);
-            }
-        } else if (InteractiveObject.GetType() == typeof(DummyBox)) {
-            //InteractiveObject.transform.localRotation = TransformConvertor.ROSToUnity(origRotation * interRotation * offsetRotation);
-            //InteractiveObject.transform.Translate(TransformConvertor.ROSToUnity(interPosition + offsetPosition));
-            InteractiveObject.transform.position = model.transform.position;
-            InteractiveObject.transform.rotation = model.transform.rotation;
-            InteractiveObject.transform.hasChanged = true;
-            ResetPosition();
-        }
-        if (RotateTranslateBtn.CurrentState == "translate")
-            UpdateTranslate(0);
-        else
-            UpdateRotate(0);
-    }*/
 
     public void ResetPosition() {
         ResetPosition(default, default);
@@ -828,75 +797,20 @@ public class TransformMenu : Singleton<TransformMenu> {
                 ConfirmBtn.SetInteractivity(false, "Position / orientation not changed");
                 ResetBtn.SetInteractivity(false, "Position / orientation not changed");
             }
-            
 
-            model.transform.localPosition = Vector3.zero;
-            model.transform.localRotation = Quaternion.identity;
+            InteractiveObject.transform.position = model.transform.position;
+            InteractiveObject.transform.rotation = model.transform.rotation;
             ResetTransformWheel();
             if (InteractiveObject != null && model != null) {
                 if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
-                    model.transform.localRotation = ((ActionPoint3D) InteractiveObject).GetRotation();
+                    InteractiveObject.transform.localRotation = ((ActionPoint3D) InteractiveObject).GetRotation();
                 } /*else if (InteractiveObject.GetType() == typeof(DummyBox)) {
                     model.transform.localRotation = Quaternion.identity;
                 }*/
             }
         }
-
-
-        /*
-         
-        prevValue = 0;
-        offsetPosition = Vector3.zero;
-        interPosition = Vector3.zero;
-        if (model != null)
-            model.transform.localPosition = offsetPosition;
-        //offsetRotation = Quaternion.identity;
-        //interRotation = Quaternion.identity;
-        if (InteractiveObject != null && model != null) {
-            if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
-                model.transform.localRotation = ((ActionPoint3D) InteractiveObject).GetRotation();
-            } else if (InteractiveObject.GetType() == typeof(DummyBox)) {
-                model.transform.localRotation = Quaternion.identity;
-            }
-        }
-        ResetTransformWheel();
-        if (RotateTranslateBtn.CurrentState == "translate")
-            UpdateTranslate(0);
-        else
-            UpdateRotate(0);*/
-
-        //if (InteractiveObject.GetType() == typeof(ActionPoint3D)) {
-        //    origRotation = TransformConvertor.UnityToROS(((ActionPoint3D) InteractiveObject).GetRotation());
-        //}
+        
     }
-    /*if (RobotTabletBtn.CurrentState == "robot" && endEffector != null) {
-            IO.Swagger.Model.Position position = endEffector.Position;
-            if (prevValue != wheelValue) {
-                switch (Coordinates.GetSelectedAxis()) {
-                    case "x":
-                        position.X += (decimal) wheelValue;
-                        break;
-                    case "y":
-                        position.Y += (decimal) wheelValue;
-                        break;
-                    case "z":
-                        position.Z += (decimal) wheelValue;
-                        break;
-                }
-
-                //Vector3 p = TransformConvertor.ROSToUnity(interPosition + offsetPosition);
-                //model.transform.localPosition = ((ActionPoint3D) InteractiveObject).GetRotation() * p;
-                try {
-                    await WebsocketManager.Instance.MoveToPose(robotId, endEffector.EEId, (decimal) 0.3, position, endEffector.Orientation, false);
-
-                    prevValue = wheelValue;
-                } catch (RequestFailedException ex) {
-                    prevValue = float.MinValue;
-                }
-            }          
-            
-            return;
-        }*/
 
     public void RobotStepUp() {
             RobotStep(GetPositionValue(1));
@@ -955,50 +869,5 @@ public class TransformMenu : Singleton<TransformMenu> {
 
             }
         }
-
-    /*public void RobotStepUp() {
-        if (RotateTranslateBtn.CurrentState == "translate") 
-            RobotStep(GetPositionValue(1));
-        else
-            RobotStep(GetRotationValue(0.01745329252f)); // pi/180 - rotation in radians
-        
-    }
-
-
-    public void RobotStepDown() {
-        if (RotateTranslateBtn.CurrentState == "translate") 
-            RobotStep(GetPositionValue(-1));
-        else
-            RobotStep(GetRotationValue(-0.01745329252f)); // pi/180
-    }
-
-    public async void RobotStep(float step) {
-
-        StepuUpButton.interactable = false;
-        StepDownButton.interactable = false;
-        IO.Swagger.Model.StepRobotEefRequestArgs.AxisEnum axis = IO.Swagger.Model.StepRobotEefRequestArgs.AxisEnum.X;
-        switch (Coordinates.GetSelectedAxis()) {
-            case "x":
-                axis = IO.Swagger.Model.StepRobotEefRequestArgs.AxisEnum.X;
-                break;
-            case "y":
-                axis = IO.Swagger.Model.StepRobotEefRequestArgs.AxisEnum.Y;
-                break;
-            case "z":
-                axis = IO.Swagger.Model.StepRobotEefRequestArgs.AxisEnum.Z;
-                break;
-        }
-        try {
-            await WebsocketManager.Instance.StepRobotEef(axis, endEffector.GetId(), false, robotId, 1,
-            (decimal) step, RotateTranslateBtn.CurrentState == "translate" ? IO.Swagger.Model.StepRobotEefRequestArgs.WhatEnum.Position : IO.Swagger.Model.StepRobotEefRequestArgs.WhatEnum.Orientation,
-            IO.Swagger.Model.StepRobotEefRequestArgs.ModeEnum.World);
-        } catch (RequestFailedException ex) {
-            Notifications.Instance.ShowNotification("Failed to move robot", ex.Message);
-            StepuUpButton.interactable = true;
-            StepDownButton.interactable = true;
-        }
-
-
-    }*/
 
 }

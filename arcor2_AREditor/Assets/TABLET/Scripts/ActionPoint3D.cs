@@ -23,9 +23,11 @@ public class ActionPoint3D : Base.ActionPoint {
     [SerializeField]
     private OutlineOnClick outlineOnClick;
 
+    public bool FixRotation;
+
 
     private void Awake() {
-        
+        FixRotation = true;
     }
 
 
@@ -62,6 +64,8 @@ public class ActionPoint3D : Base.ActionPoint {
     }
 
     private void LateUpdate() {
+        if (!FixRotation)
+            return;
         // Fix of AP rotations - works on both PC and tablet
         transform.rotation = Base.SceneManager.Instance.SceneOrigin.transform.rotation;
         if (Parent != null)
