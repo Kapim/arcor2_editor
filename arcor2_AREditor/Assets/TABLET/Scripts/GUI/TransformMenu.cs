@@ -7,6 +7,7 @@ using TrilleonAutomation;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Animations;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class TransformMenu : Singleton<TransformMenu> {
@@ -523,13 +524,15 @@ public class TransformMenu : Singleton<TransformMenu> {
             SwitchToTablet();
         }
 
-        if (interactiveObject.GetType() == typeof(ActionPoint3D)) {
-            model = ((ActionPoint3D) interactiveObject).GetModelCopy();
-            connectionToModel = CreateConnection(interactiveObject.transform, model.transform);
+        if (interactiveObject is ActionPoint3D actionPoint) {
+            model = actionPoint.GetModelCopy();
+            connectionToModel = CreateConnection(actionPoint.transform, model.transform);
+            Debug.LogError(actionPoint.GetRotation());
+            model.transform.localRotation = actionPoint.GetRotation();
             //origRotation = TransformConvertor.UnityToROS(((ActionPoint3D) interactiveObject).GetRotation());
-        } else if (interactiveObject.GetType() == typeof(DummyBox)) {
-            model = ((DummyBox) interactiveObject).GetModelCopy();
-            connectionToModel = CreateConnection(interactiveObject.transform, model.transform);
+        } else if (interactiveObject is DummyBox dummyBox) {
+            model = dummyBox.GetModelCopy();
+            connectionToModel = CreateConnection(dummyBox.transform, model.transform);
             //origRotation = interactiveObject.transform.localRotation;
         } else if (DummyAimBox) {
             model = GetPointModel();
@@ -618,9 +621,9 @@ public class TransformMenu : Singleton<TransformMenu> {
         SelectorMenu.Instance.Active = true;
     }
 
-    public void Hide() {
+    public async void Hide() {
         if (InteractiveObject != null)
-            SubmitPosition();
+            await SubmitPosition();
         for (int i = 0; i < 4; ++i) {
             if (dummyPoints[i] != null) {
                 Destroy(dummyPoints[i]);
@@ -669,7 +672,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         TransformWheel.SetInteractive(SelectedAxis != "all");
         TransformWheel.InitList(0);
     }
-    public async void SubmitPosition() {
+    public async Task SubmitPosition() {
         if (DummyAimBox) {
             Dots[currentArrowIndex].color = Color.green;
             PlayerPrefsHelper.SaveBool(Base.ProjectManager.Instance.ProjectMeta.Id + (Tester ? "/BlueBox" : "/Tester") + "/PointAimed/" + currentArrowIndex, true);
@@ -711,10 +714,9 @@ public class TransformMenu : Singleton<TransformMenu> {
                 } else {
                     await WebsocketManager.Instance.UpdateActionPointUsingRobot(InteractiveObject.GetId(), robotId, endEffector.EEId);
                 }
-                if (model != null) {
-                    actionPoint.SetRotation(model.transform.localRotation);
-                    ResetPosition();
-                }
+                Debug.LogError(model.transform.localRotation);
+                actionPoint.SetRotation(model.transform.localRotation);
+                ResetPosition();
             } catch (RequestFailedException e) {
                 Notifications.Instance.ShowNotification("Failed to update action point position", e.Message);
             }
