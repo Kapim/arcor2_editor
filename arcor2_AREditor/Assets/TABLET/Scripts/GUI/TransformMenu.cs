@@ -221,11 +221,10 @@ public class TransformMenu : Singleton<TransformMenu> {
     private async void UpdateTranslate(float wheelValue) {
         if (model == null)
             return;
-
-        /*if (wheelValue != 0) {
-            ConfirmBtn.SetInteractivity(true);
+        
+        if (wheelValue != 0) {
             ResetBtn.SetInteractivity(true);
-        }*/
+        }
         if (HandHolding) {
             /*Vector3 cameraNow = TransformConvertor.UnityToROS(InteractiveObject.transform.InverseTransformPoint(Camera.main.transform.position));
             offsetPosition.x = GetRoundedValue(cameraNow.x - cameraOrig.x);
@@ -336,7 +335,9 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     private void UpdateRotate(float wheelValue) {
-        
+        if (wheelValue != 0) {
+            ResetBtn.SetInteractivity(true);
+        }
         if (HandHolding) {
 
         } else {
