@@ -253,15 +253,14 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         if (selectedObject is null)
             return;
 
-        if (selectedObject.GetType() == typeof(PuckInput) ||
-            selectedObject.GetType() == typeof(PuckOutput)) {
-            selectedObject.StartManipulation();
-            return;
-        }
-
+        
         //SelectorMenu.Instance.Active = false;
         gameObject.SetActive(false);
-        TransformMenu.Instance.Show(selectedObject, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
+
+        InteractiveObject obj = selectedObject;
+        if (selectedObject is Action3D action)
+            obj = action.ActionPoint;
+        TransformMenu.Instance.Show(obj, selectedObject.GetType() == typeof(DummyAimBox) || selectedObject.GetType() == typeof(DummyAimBoxTester), selectedObject.GetType() == typeof(DummyAimBoxTester));
 
     }
 
