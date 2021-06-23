@@ -134,8 +134,8 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             if (selectedObject != null) {
                 if (selectedObject is ConnectionLine connectionLine) {
                     if (ProjectManager.Instance.LogicItems.TryGetValue(connectionLine.LogicItemId, out LogicItem logicItem)) {
-                        logicItem.Input.Action.ActionPoint.SetApCollapsed(false);
-                        logicItem.Output.Action.ActionPoint.SetApCollapsed(false);
+                        logicItem.Input.Action.ActionPoint?.SetApCollapsed(false);
+                        logicItem.Output.Action.ActionPoint?.SetApCollapsed(false);
                         ProjectManager.Instance.PrevAction = logicItem.Output.Action.GetId();
                         ProjectManager.Instance.NextAction = logicItem.Input.Action.GetId();
                         connectionLine.Remove();

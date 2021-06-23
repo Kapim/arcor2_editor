@@ -714,15 +714,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        if (CurrentMode == Mode.AddAction) {
+        //if (CurrentMode == Mode.AddAction) {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
                 RightButtonsMenu.Instance.MoveClick();
-        } else {
+        //} else {
            // RestoreSelector();
-            AddActionButton.GetComponent<Image>().enabled = false;
-        }
+        //    AddActionButton.GetComponent<Image>().enabled = false;
+        //}
         APToRemoveOnCancel = null;
     }
     public async void ActionPickClick() {
@@ -753,15 +753,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/pick", name, robot.GetActionMetadata("pick").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        if (CurrentMode == Mode.AddAction) {
+        //if (CurrentMode == Mode.AddAction) {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
                 RightButtonsMenu.Instance.MoveClick();
-        } else {
+        /*} else {
             //RestoreSelector();
             AddActionButton.GetComponent<Image>().enabled = false;
-        }
+        }*/
         APToRemoveOnCancel = null;
 
 
@@ -793,15 +793,15 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
-        if (CurrentMode == Mode.AddAction) {
+        //if (CurrentMode == Mode.AddAction) {
             SelectorMenu.Instance.Active = true;
             RightButtonsMenu.Instance.SetActionMode();
             if (APToRemoveOnCancel != null)
                 RightButtonsMenu.Instance.MoveClick();
-        } else {
+        /*} else {
             //RestoreSelector();
             AddActionButton.GetComponent<Image>().enabled = false;
-        }
+        }*/
         APToRemoveOnCancel = null;
 
     }
