@@ -207,7 +207,8 @@ public class LeftMenu : Base.Singleton<LeftMenu> {
     public void StartAddActionMode() {
 
         if (!AddActionModeBtn.GetComponent<Image>().enabled) { //other menu/dialog opened
-             //close all other opened menus/dialogs and takes care of red background of buttons
+                                                               //close all other opened menus/dialogs and takes care of red background of buttons
+            SetActiveSubmenu(LeftMenuSelection.None, true, true);
         }
         if (AddActionModeBtn.GetComponent<Image>().enabled) {
             //AddActionModeBtn.GetComponent<Image>().enabled = false;

@@ -62,14 +62,11 @@ public class SelectorItem : MonoBehaviour
     public void CollapseBtnCb() {
         Collapsed = !Collapsed;
         ActionPoint3D actionPoint = (ActionPoint3D) InteractiveObject;
+        actionPoint.SetApCollapsed(Collapsed);
         if (Collapsed) {
             CollapsableButtonIcon.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
-            actionPoint.ActionsCollapsed = true;
-            actionPoint.UpdatePositionsOfPucks();
         } else {
             CollapsableButtonIcon.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
-            actionPoint.ActionsCollapsed = false;
-            actionPoint.UpdatePositionsOfPucks();
         }
     }
 

@@ -75,7 +75,6 @@ namespace Base {
             SetParent(parent);
             Data = apData;
             //ActionsCollapsed = PlayerPrefsHelper.LoadBool("/AP/" + Data.Id + "/actionsCollapsed", false);
-            ActionsCollapsed = true;
             transform.localPosition = GetScenePosition();
             SetSize(size);
             ActivateForGizmo((ControlBoxManager.Instance.UseGizmoMove && ProjectManager.Instance.AllowEdit && !MenuManager.Instance.IsAnyMenuOpened) ? "GizmoRuntime" : "Default");
@@ -85,11 +84,15 @@ namespace Base {
                 Data.Orientations = new List<NamedOrientation>();
             if (Data.RobotJoints == null)
                 Data.RobotJoints = new List<ProjectRobotJoints>();
+
+            bool collapsed = PlayerPrefsHelper.LoadBool($"{ProjectManager.Instance.ProjectMeta.Id}/AP/{GetId()}/collapsed", true);
+            SetApCollapsed(collapsed);
         }
 
         public void SetApCollapsed(bool collapsed) {
             ActionsCollapsed = collapsed;
             UpdatePositionsOfPucks();
+            PlayerPrefsHelper.SaveBool($"{ProjectManager.Instance.ProjectMeta.Id}/AP/{GetId()}/collapsed", collapsed);
         }
 
         public void SetParent(IActionPointParent parent) {
