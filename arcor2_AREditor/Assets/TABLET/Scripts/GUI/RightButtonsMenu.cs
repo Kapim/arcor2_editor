@@ -13,7 +13,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public ButtonWithTooltip SelectBtn, CollapseBtn, MenuTriggerBtn, AddActionBtn, RemoveBtn, MoveBtn, ExecuteBtn, ConnectionBtn;
     public Sprite CollapseIcon, UncollapseIcon;
 
-    public Image RobotHandBtn;
+    public Image RobotHandIcon;
 
     private InteractiveObject selectedObject;
     private ButtonInteractiveObject selectedButton;
@@ -26,7 +26,19 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     private void Awake() {
         SelectorMenu.Instance.OnObjectSelectedChangedEvent += OnObjectSelectedChangedEvent;
         Sight.Instance.OnObjectSelectedChangedEvent += OnButtonObjectSelectedChangedEvent;
+        SceneManager.Instance.OnSceneStateEvent += OnSceneStateEvent;
         Connecting = false;
+    }
+
+    private void OnSceneStateEvent(object sender, SceneStateEventArgs args) {
+        if (args.Event.State == SceneStateData.StateEnum.Started) {
+            if (SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotActionObject ||
+                SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotEE) {
+                RobotHandIcon.color = Color.white;
+            }
+        } else {
+            RobotHandIcon.color = new Color(1, 1, 1, 0.4f);
+        }
     }
 
     private void OnButtonObjectSelectedChangedEvent(object sender, ButtonInteractiveObjectEventArgs args) {
@@ -73,10 +85,11 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                 selectedObject.GetType() == typeof(ActionPoint3D) ||
                 selectedObject.GetType() == typeof(ConnectionLine) ||
                 selectedObject is RobotEE || selectedObject is RobotActionObject);
-            if (selectedObject is RobotEE)
-                RobotHandBtn.color = Color.white;
-            else
-                RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
+            if (SceneManager.Instance.SceneStarted && (selectedObject is RobotEE || selectedObject is RobotActionObject)) {
+                RobotHandIcon.color = Color.white;
+            } else {
+                RobotHandIcon.color = new Color(1, 1, 1, 0.4f);
+            }
         } else {
             CollapseBtn.SetInteractivity(false, "Žádný vybraný objekt");
             SelectBtn.SetInteractivity(false, "Žádný vybraný objekt");
@@ -84,7 +97,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             MoveBtn.SetInteractivity(false, "Žádný vybraný objekt");
             ExecuteBtn.SetInteractivity(false, "Žádný vybraný objekt");
             AddActionBtn.SetInteractivity(true);
-            RobotHandBtn.color = new Color(1, 1, 1, 0.4f);
+            RobotHandIcon.color = new Color(1, 1, 1, 0.4f);
         }
 
     }
@@ -153,7 +166,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
 
         } else {
-            string name = ProjectManager.Instance.GetFreeAPName("ap");
+            string name = ProjectManager.Instance.GetFreeAPName("ab");
             AREditorResources.Instance.LeftMenuProject.ApToAddActionName = name;
             AREditorResources.Instance.LeftMenuProject.ActionCb = SelectAP;
             if (selectedObject != null) {
@@ -295,8 +308,8 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
         SelectorMenu.Instance.Active = false;
         //gameObject.SetActive(false);
-        AREditorResources.Instance.LeftMenuProject.ConfirmationDialog.Open("Remove object",
-                         "Are you sure you want to remove " + selectedObject.GetName() + "?",
+        AREditorResources.Instance.LeftMenuProject.ConfirmationDialog.Open("Odstranit objekt",
+                         "Jste si jistí že chce odstranit " + selectedObject.GetName() + "?",
                          () => {
                              selectedObject.Remove();
                              SetRemoveMode();
@@ -306,7 +319,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                          () => {
                              SetRemoveMode();
                              SelectorMenu.Instance.Active = true;
-                         });
+                         }, "Potvrdit", "Zrušit");
     }
 
     public async void RunClick() {
@@ -347,7 +360,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
             if (Connecting) {
                 if (action.Input.AnyConnection()) {
-                    Notifications.Instance.ShowNotification("Failed to create connection", "There is already existing connection to this action");
+                    Notifications.Instance.ShowNotification("Nepodařilo se vytvořit propoj", "Propoj k této akci již existuje");
                     ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
                     Connecting = false;
                     return;
@@ -356,7 +369,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                 try {
                     await WebsocketManager.Instance.AddLogicItem(from.GetId(), action.GetId(), from.GetProjectLogicIf(), false);                
                 } catch (RequestFailedException ex) {
-                    Notifications.Instance.ShowNotification("Failed to create connection", ex.Message);
+                    Notifications.Instance.ShowNotification("Nepodařilo se vytvořit propoj", ex.Message);
                     return;
                 } finally {
                     ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
@@ -364,7 +377,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                 }
             } else {
                 if (action.Output.AnyConnection()) {
-                    Notifications.Instance.ShowNotification("Failed to create connection", "There is already existing connection from this action");
+                    Notifications.Instance.ShowNotification("Nepodařilo se vytvořit propoj", "Propoj k této akci již existuje");
                     return;
                 }
                 Connecting = true;
@@ -393,6 +406,8 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     }
 
     public async void RobotHandTeachingRelease() {
+        if (!SceneManager.Instance.SceneStarted)
+            return;
         await SceneManager.Instance.SelectRobotAndEE();
 
         await WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: false);

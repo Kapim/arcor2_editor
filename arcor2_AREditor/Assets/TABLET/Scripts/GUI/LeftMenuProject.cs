@@ -93,10 +93,16 @@ public class LeftMenuProject : LeftMenu
         GameManager.Instance.OnActionExecutionCanceled += OnActionExecutionEvent;
         GameManager.Instance.OnActionExecutionFinished += OnActionExecutionEvent;
 
+        
 
         CurrentMode = Mode.AddAction;
         RightButtonsMenu.Instance.SetActionMode();
         SetActiveSubmenu(LeftMenuSelection.None);
+    }
+
+
+    private void OnEmptyClick(object sender, EventArgs e) {
+        DeactivateAllSubmenus();
     }
 
 
@@ -159,9 +165,7 @@ public class LeftMenuProject : LeftMenu
             RightButtonsMenu.Instance.gameObject.SetActive(true);
             SelectorMenu.Instance.gameObject.SetActive(false);
             RightButtonsMenu.Instance.SetActionMode();
-            if (currentMode == Mode.Normal)
-
-                CurrentMode = Mode.AddAction;
+            CurrentMode = Mode.AddAction;
             SelectorMenuButton.GetComponent<Image>().enabled = false;
         //}
 
@@ -417,7 +421,12 @@ public class LeftMenuProject : LeftMenu
 
     public override void DeactivateAllSubmenus(bool unlock = true) {
         base.DeactivateAllSubmenus(unlock);
-
+        if (ActionPicker.activeSelf) {
+            CloseActionPicker();
+        }
+        if (MeshPicker.activeSelf) {
+            CloseMeshPicker();
+        }
         AddActionButton.GetComponent<Image>().enabled = false;
         AddActionButton2.GetComponent<Image>().enabled = false;
         //ActionPointAimingMenuButton.GetComponent<Image>().enabled = false;
@@ -811,7 +820,7 @@ public class LeftMenuProject : LeftMenu
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
-        string name = ProjectManager.Instance.GetFreeActionName("MoveTo");
+        string name = ProjectManager.Instance.GetFreeActionName("Presunout");
         NamedOrientation o = actionPoint.GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pose", type: "pose", value: "\"" + o.Id + "\""),
@@ -851,7 +860,7 @@ public class LeftMenuProject : LeftMenu
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
-        string name = ProjectManager.Instance.GetFreeActionName("Pick");
+        string name = ProjectManager.Instance.GetFreeActionName("Zvednout");
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
@@ -891,7 +900,7 @@ public class LeftMenuProject : LeftMenu
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
             robotId = r.GetId();
         }
-        string name = ProjectManager.Instance.GetFreeActionName("Release");
+        string name = ProjectManager.Instance.GetFreeActionName("Polozit");
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "place_pose", type: "pose", value: "\"" + o.Id + "\""),

@@ -346,13 +346,11 @@ public class ActionObject3D : ActionObject {
             ActionObjectName.gameObject.SetActive(true);
         }
         outlineOnClick.Highlight();
-        DisplayOffscreenIndicator(true);
     }
 
     public override void OnHoverEnd() {
         ActionObjectName.gameObject.SetActive(false);
         outlineOnClick.UnHighlight();
-        DisplayOffscreenIndicator(false);
     }
 
     public override void UpdateColor() {

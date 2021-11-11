@@ -35,11 +35,9 @@ public class RecalibrateUsingServer : InteractiveObject {
 
 
     public override void OnHoverStart() {
-        DisplayOffscreenIndicator(true);
     }
 
     public override void OnHoverEnd() {
-        DisplayOffscreenIndicator(false);
     }
 
     public override string GetName() {

@@ -21,6 +21,7 @@ namespace Base {
         public AREditorEventArgs.GizmoAxisEventHandler SelectedGizmoAxis;
         private ButtonInteractiveObject buttonInteractiveObject;
         public event AREditorEventArgs.ButtonInteractiveObjectEventHandler OnObjectSelectedChangedEvent;
+        public event EventHandler OnEmptyClick;
 
 
         private void Awake() {
@@ -38,6 +39,11 @@ namespace Base {
                     break;
             }
         }
+
+        public void EmptyClick() {
+            OnEmptyClick?.Invoke(this, EventArgs.Empty);
+        }
+
         private void Update() {
             if (SelectorMenu.Instance.Active) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));

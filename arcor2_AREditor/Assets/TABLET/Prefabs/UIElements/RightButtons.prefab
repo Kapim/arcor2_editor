@@ -605,7 +605,8 @@ MonoBehaviour:
   ConnectionBtn: {fileID: 3924355655632952941}
   CollapseIcon: {fileID: 21300000, guid: 8b2176d310b519549a1915df62830193, type: 3}
   UncollapseIcon: {fileID: 21300000, guid: 567fc8e52b595a84d938dd2824741e89, type: 3}
-  RobotHandBtn: {fileID: 8220337686663114905}
+  RobotHandIcon: {fileID: 2415682263488643444}
+  RobotHandBtn: {fileID: 7528623008459480582}
   ActionPicker: {fileID: 1079025514483319792}
   Connecting: 0
 --- !u!1 &8983898657453594793

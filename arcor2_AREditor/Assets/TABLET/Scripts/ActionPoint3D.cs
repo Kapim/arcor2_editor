@@ -153,14 +153,12 @@ public class ActionPoint3D : Base.ActionPoint {
         
         HighlightAP(true);
         ActionPointName.gameObject.SetActive(true);
-        DisplayOffscreenIndicator(true);
     }
 
     public override void OnHoverEnd() {
         HighlightAP(false);
         ActionPointName.gameObject.SetActive(false);
         Lock.SetActive(false);
-        DisplayOffscreenIndicator(false);
     }
 
 
