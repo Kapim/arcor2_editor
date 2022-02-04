@@ -22,7 +22,6 @@ public abstract class InteractiveObject : Clickable {
     public SelectorItem SelectorItem;
     public List<Collider> Colliders = new List<Collider>();
 
-    protected Target offscreenIndicator;
 
     /// <summary>
     /// Indicates that object is on blacklist and should not be listed in aim menu and object visibility should be 0
@@ -31,14 +30,8 @@ public abstract class InteractiveObject : Clickable {
 
     protected virtual void Start() {
         LockingEventsCache.Instance.OnObjectLockingEvent += OnObjectLockingEvent;
-        offscreenIndicator = gameObject.GetComponent<Target>();
-        DisplayOffscreenIndicator(false);
     }
 
-    public virtual void DisplayOffscreenIndicator(bool active) {
-        if (offscreenIndicator)
-            offscreenIndicator.enabled = active;
-    }
 
     // ONDESTROY CANNOT BE USED BECAUSE OF ITS DELAYED CALL - it causes mess when directly creating project from scene
     public virtual void DestroyObject() {
@@ -69,7 +62,15 @@ public abstract class InteractiveObject : Clickable {
     public virtual float GetDistance(Vector3 origin) {
         float minDist = float.MaxValue;
         foreach (Collider collider in Colliders) {
-            Vector3 point = collider.ClosestPointOnBounds(origin);
+            Vector3 point;
+            if (collider is MeshCollider meshCollider) {
+                if (meshCollider.convex)
+                    point = meshCollider.ClosestPoint(origin);
+                else
+                    point = meshCollider.ClosestPointOnBounds(origin);
+            } else {
+                point = collider.ClosestPoint(origin);
+            }
            
             minDist = Math.Min(Vector3.Distance(origin, point), minDist);
 
@@ -201,9 +202,6 @@ public abstract class InteractiveObject : Clickable {
             UpdateColor();
     }
 
-    public virtual void EnableOffscreenIndicator(bool enable) {
-        offscreenIndicator.enabled = enable;
-    }
 
     public abstract void EnableVisual(bool enable);
 }

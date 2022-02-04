@@ -10,7 +10,6 @@ public class ConnectionLine : InteractiveObject {
 
     public OnClickCollider OnClickCollider;
     public OutlineOnClick OutlineOnClick;
-    public MeshCollider MeshCollider;
     public RectTransform[] Target = new RectTransform[2];
     public GameObject Cone;
 

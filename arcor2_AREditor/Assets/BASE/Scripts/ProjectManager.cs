@@ -652,14 +652,14 @@ namespace Base {
         public string GetFreeAPName(string apDefaultName) {
             int i = 2;
             bool hasFreeName;
-            string freeName = apDefaultName + "_ap";
+            string freeName = apDefaultName;
             do {
                 hasFreeName = true;
                 if (ActionPointsContainsName(freeName)) {
                     hasFreeName = false;
                 }
                 if (!hasFreeName)
-                    freeName = apDefaultName + "_ap_" + i++.ToString();
+                    freeName = apDefaultName + i++.ToString();
             } while (!hasFreeName);
 
             return freeName;

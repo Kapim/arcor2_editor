@@ -40,12 +40,10 @@ public class APOrientation : InteractiveObject, ISubItem {
         
 
         HighlightOrientation(true);
-        DisplayOffscreenIndicator(true);
     }
 
     public override void OnHoverEnd() {
         HighlightOrientation(false);
-        DisplayOffscreenIndicator(false);
     }
 
     public void HighlightOrientation(bool highlight) {

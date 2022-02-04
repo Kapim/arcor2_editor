@@ -21,6 +21,7 @@ namespace Base {
         public AREditorEventArgs.GizmoAxisEventHandler SelectedGizmoAxis;
         private ButtonInteractiveObject buttonInteractiveObject;
         public event AREditorEventArgs.ButtonInteractiveObjectEventHandler OnObjectSelectedChangedEvent;
+        public event EventHandler OnEmptyClick;
 
 
         private void Awake() {
@@ -38,6 +39,11 @@ namespace Base {
                     break;
             }
         }
+
+        public void EmptyClick() {
+            OnEmptyClick?.Invoke(this, EventArgs.Empty);
+        }
+
         private void Update() {
             if (SelectorMenu.Instance.Active) {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
@@ -72,7 +78,15 @@ namespace Base {
                                 Vector3 dir = ray.direction;
 
                                 Vector3 point = ray.origin + dir * Vector3.Distance(ray.origin, h.point);
-                                float dist = Vector3.Distance(point, h.collider.ClosestPointOnBounds(point));
+                                
+                                float dist;
+                                if (h.collider is MeshCollider meshCollider) {
+                                    if (meshCollider.convex)
+                                        dist = Vector3.Distance(point, meshCollider.ClosestPoint(point));
+                                    else
+                                        dist = Vector3.Distance(point, meshCollider.ClosestPointOnBounds(point));
+                                } else
+                                    dist = Vector3.Distance(point, h.collider.ClosestPointOnBounds(point));
                                 Debug.DrawLine(point, h.point);
                                 Debug.DrawRay(ray.origin, ray.direction);
                                 if (dist < minDist) {
@@ -103,7 +117,7 @@ namespace Base {
                                 foreach (Collider c in item.InteractiveObject.Colliders) {
 
                                     if (c == hitinfo.collider) {
-                                        dist = 0;
+                                        dist = -1;
                                         h = true;
                                     }
 

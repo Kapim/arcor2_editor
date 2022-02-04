@@ -66,6 +66,7 @@ public abstract class LeftMenu : MonoBehaviour {
         MainMenu.Instance.AddListener(() => OnGameStateChanged(this, null));
     }
 
+
     private void OnObjectLockingEvent(object sender, ObjectLockingEventArgs args) {
         UpdateBuildAndSaveBtns();
     }
@@ -607,6 +608,8 @@ public abstract class LeftMenu : MonoBehaviour {
 
         MainSettingsMenu.Instance.Hide();
         ActionObjectMenu.Instance.Hide();
+
+        
 
         FavoritesButtons.SetActive(false);
         HomeButtons.SetActive(false);

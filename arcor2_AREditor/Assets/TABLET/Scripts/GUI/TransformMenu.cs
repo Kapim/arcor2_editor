@@ -476,7 +476,6 @@ public class TransformMenu : Singleton<TransformMenu> {
             //target.SetTarget(Color.yellow, false, true, false);
             //target.enabled = true;
 
-            actionPoint.EnableOffscreenIndicator(false);
 
         } else if (interactiveObject is ActionObject3D actionObject) {
            // model = actionObject.GetModelCopy();
@@ -491,7 +490,6 @@ public class TransformMenu : Singleton<TransformMenu> {
             //target.SetTarget(Color.yellow, false, true, false);
            // target.enabled = true;
 
-            actionObject.EnableOffscreenIndicator(false);
 
         } else if (interactiveObject is RobotActionObject robot) {
            // model = robot.GetModelCopy();
@@ -506,7 +504,6 @@ public class TransformMenu : Singleton<TransformMenu> {
             target.SetTarget(Color.yellow, false, true, false);
             target.enabled = true;;*/
 
-            robot.EnableOffscreenIndicator(false);
         } else if (interactiveObject is StartEndAction action) {
             //model = action.GetModelCopy();
             RotateBtn.SetInteractivity(false);
@@ -520,8 +517,6 @@ public class TransformMenu : Singleton<TransformMenu> {
             target.SetTarget(Color.yellow, false, true, false);
             target.enabled = true;
                   */
-
-action.EnableOffscreenIndicator(false);
         }
         
         /*if (model == null) {
@@ -581,7 +576,6 @@ action.EnableOffscreenIndicator(false);
             }
         }
 
-        InteractiveObject.EnableOffscreenIndicator(true);
         InteractiveObject.EnableVisual(true);
 
 
