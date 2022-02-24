@@ -208,14 +208,26 @@ public class ActionPoint3D : Base.ActionPoint {
     }
 
     public async override void Remove() {
+        RemoveAsync();
+    }
+
+    public override async Task RemoveAsync() {
+        Debug.LogError($"request to remove ap: {GetName()}");
         try {
             List<Base.Action> actions = Actions.Values.ToList();
             for (int i = Actions.Count - 1; i >= 0; --i) {
                 if (actions[i] is Action3D action3D)
                     await action3D.RemoveAsync();
             }
-            await WebsocketManager.Instance.RemoveActionPoint(GetId(), false);
+            foreach (Base.ActionPoint ap in ProjectManager.Instance.ActionPoints.Values) {
+                if (ap.Parent != null && ap.Parent.GetId() == GetId()) {
+                    await ap.RemoveAsync();
+                }
+            }
+            Debug.LogError($"going to remove ap: {GetName()}");
+            await WebsocketManager.Instance.RemoveActionPoint(GetId(), false) ;
         } catch (RequestFailedException ex) {
+            Debug.LogError("remove fucked up");
             Notifications.Instance.ShowNotification("Failed to remove AP " + GetName(), ex.Message);
         }
     }

@@ -40,6 +40,8 @@ namespace Base {
             }
         }
 
+        public abstract Task RemoveAsync();
+
         public virtual void ActionPointBaseUpdate(IO.Swagger.Model.BareActionPoint apData) {
             Data.Name = apData.Name;
             Data.Position = apData.Position;
@@ -322,7 +324,7 @@ namespace Base {
             RemoveActions();
             RemoveConnectionToParent();
             RemoveOrientations();
-
+            
             // Remove this ActionPoint reference from parent ActionObject list
             if (removeFromList) // to allow remove all AP in foreach
                 ProjectManager.Instance.ActionPoints.Remove(this.Data.Id);

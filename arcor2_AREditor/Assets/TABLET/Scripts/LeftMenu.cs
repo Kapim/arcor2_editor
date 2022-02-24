@@ -166,7 +166,8 @@ public abstract class LeftMenu : MonoBehaviour {
                 obj.GetType() == typeof(CreateAnchor) || obj.GetType() == typeof(RecalibrateUsingServer), $"{CALIBRATION_BTN_LABEL}\n(selected object is not calibration cube)");
             if (obj is Action3D action) {
                 OpenMenuButton.SetDescription("Upravit parametry akce");
-                OpenMenuButton.SetInteractivity(action.GetActionType() == "DobotM1/move", "Upravit parametry akce\n(akce nemá parametry)");
+                //OpenMenuButton.SetInteractivity(action.GetActionType() == "DobotM1/move", "Upravit parametry akce\n(akce nemá parametry)");
+                OpenMenuButton.SetInteractivity(true);
             } else if (obj is ActionObject3D actionObject) {
                 OpenMenuButton.SetDescription("Přesně zaměřit objekt");
                 OpenMenuButton.SetInteractivity(actionObject.GetObjectTypeName() == "Tester" || actionObject.GetObjectTypeName() == "BlueBox", $"{OPEN_MENU_BTN_LABEL}\n(vybraný objekt nemůže být zaměřen)");

@@ -70,7 +70,7 @@ namespace Base {
                         directHit = true;
                         //Debug.DrawRay(ray.origin, ray.direction);
                     } else {
-                        RaycastHit[] hits = Physics.BoxCastAll(ray.origin, new Vector3(0.03f, 0.03f, 0.0001f), ray.direction, Camera.main.transform.rotation);
+                        RaycastHit[] hits = Physics.BoxCastAll(ray.origin, new Vector3(0.01f, 0.01f, 0.0001f), ray.direction, Camera.main.transform.rotation);
                         if (hits.Length > 0) {
 
                             float minDist = float.MaxValue;

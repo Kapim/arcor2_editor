@@ -39,6 +39,8 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     private int historyIndex;
 
+    private Vector3 cameraPrev = new Vector3(), cameraOffset = new Vector3();
+
 
     public CanvasGroup CanvasGroup;
 
@@ -76,8 +78,9 @@ public class TransformMenu : Singleton<TransformMenu> {
     private void OnObjectSelectedChangedEvent(object sender, InteractiveObjectEventArgs args) {
         if (args.InteractiveObject == null)
             SetPivotBtn.SetInteractivity(false, "Není vybraný žádný objekt");
-        else
+        else {
             SetPivotBtn.SetInteractivity(true);
+        }
     }
 
     private void TransformWheelMovementStart(object sender, EventArgs e) {
@@ -245,11 +248,12 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     private void UpdateTranslate(float wheelValue) {
+
         if (InteractiveObject == null)
             return;
-
         if (handHolding) {
             InteractiveObject.transform.position = Camera.main.transform.TransformPoint(origPosition);
+            
         } else {
             
             switch (selectedAxis) {
@@ -403,6 +407,8 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public void HoldPressed() {
         RedoBtn.SetInteractivity(false);
+        cameraPrev = Camera.main.transform.position;
+        cameraOffset = Vector3.zero;
         if (RobotTabletBtn.CurrentState == TwoStatesToggleNew.States.Right) {
             origPosition = Camera.main.transform.InverseTransformPoint(InteractiveObject.transform.position);
             handHolding = true;

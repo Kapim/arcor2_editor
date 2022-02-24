@@ -32,8 +32,9 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
     private void OnSceneStateEvent(object sender, SceneStateEventArgs args) {
         if (args.Event.State == SceneStateData.StateEnum.Started) {
-            if (SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotActionObject ||
-                SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotEE) {
+            if (SelectorMenu.Instance.lastSelectedItem != null &&
+                (SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotActionObject ||
+                SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotEE)) {
                 RobotHandIcon.color = Color.white;
             }
         } else {
@@ -327,16 +328,17 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             return;
 
         if (selectedObject.GetType() == typeof(StartAction)) {
-            GameManager.Instance.SaveProject();
-            GameManager.Instance.ShowLoadingScreen("Spouštím program", true);
+            GameManager.Instance.ShowLoadingScreen("Spouštím program...", true);
             try {
+                await WebsocketManager.Instance.SaveProjectSync(false);
                 await Base.WebsocketManager.Instance.TemporaryPackage();
-                //MenuManager.Instance.MainMenu.Close();
-            } catch (RequestFailedException ex) {
+            }
+            catch (RequestFailedException ex) {
                 Base.Notifications.Instance.ShowNotification("Nepodařilo se spustit program", "");
                 Debug.LogError(ex);
                 GameManager.Instance.HideLoadingScreen(true);
             }
+            
         } else if (selectedObject.GetType() == typeof(Action3D)) {
             try {
                 await WebsocketManager.Instance.ExecuteAction(selectedObject.GetId(), false);

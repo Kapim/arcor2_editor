@@ -64,6 +64,11 @@ public class Gizmo : MonoBehaviour {
                 YAxisOutline.UnHighlight();
                 XAxisOutline.UnHighlight();
                 break;
+            case Axis.NONE:
+                ZAxisOutline.UnHighlight();
+                YAxisOutline.UnHighlight();
+                XAxisOutline.UnHighlight();
+                break;
         }
         
     }

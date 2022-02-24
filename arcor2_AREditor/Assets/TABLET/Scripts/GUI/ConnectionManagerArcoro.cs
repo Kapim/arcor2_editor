@@ -59,8 +59,6 @@ public class ConnectionManagerArcoro : Base.Singleton<ConnectionManagerArcoro> {
 
     public void DestroyConnection(ConnectionLine connection) {
         Connections.Remove(connection);
-        if (connection.Cone != null && connection.Cone.gameObject != null)
-            Destroy(connection.Cone.gameObject);
         Destroy(connection.gameObject);
     }
 

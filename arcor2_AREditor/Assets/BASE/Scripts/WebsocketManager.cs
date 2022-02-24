@@ -1076,6 +1076,15 @@ namespace Base {
             SendDataToServer(new IO.Swagger.Model.SaveProjectRequest(id, "SaveProject", dryRun).ToJson(), id, false);
         }
 
+        public async Task SaveProjectSync(bool dryRun) {
+            int r_id = Interlocked.Increment(ref requestID);
+            IO.Swagger.Model.SaveProjectRequest request = new IO.Swagger.Model.SaveProjectRequest(id: r_id, request: "SaveProject", dryRun: dryRun);
+            SendDataToServer(request.ToJson(), r_id, true);
+            IO.Swagger.Model.SaveProjectResponse response = await WaitForResult<IO.Swagger.Model.SaveProjectResponse>(r_id, 30000);
+            if (response == null || !response.Result)
+                throw new RequestFailedException(response == null ? "Request timed out" : response.Messages[0]);
+        }
+
         /// <summary>
         /// Asks server to open project. Throws RequestFailedException when request failed
         /// </summary>
