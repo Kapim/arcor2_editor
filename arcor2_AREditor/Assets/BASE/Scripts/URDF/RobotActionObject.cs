@@ -268,9 +268,9 @@ namespace Base {
             SetDefaultJoints();
 
             Target target = GetComponent<Target>();
-            if (target != null) {
+            /*if (target != null) {
                 target.ChangeTarget(RobotModel.RobotModelGameObject);
-            }
+            }*/
 
             // Show or hide the robot based on global settings of displaying ActionObjects.
             // Needs to be called additionally, because when global setting is called, robot model is not loaded and only its placeholder is active.

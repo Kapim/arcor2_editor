@@ -106,7 +106,8 @@ public class ActionParametersMenu : Singleton<ActionParametersMenu>
             new ActionParameter(name: "pose", type: "pose", value: "\"" + o.Id + "\""),
             new ActionParameter(name: "move_type", type: "string_enum", value: "\"JOINTS\""),
             new ActionParameter(name: "velocity", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue())),
-            new ActionParameter(name: "acceleration", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue()))
+            new ActionParameter(name: "acceleration", type: "double", value: JsonConvert.SerializeObject((float) TransformWheel.GetValue())),
+            new ActionParameter(name: "safe", type: "boolean", value: "true")
         };
 
         Debug.Assert(ProjectManager.Instance.AllowEdit);

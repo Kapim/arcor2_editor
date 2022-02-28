@@ -62,91 +62,100 @@ namespace Base {
                 //if (SelectorMenu.Instance.CanvasGroup.alpha > 0 && SelectorMenu.Instance.gameObject.activeSelf) {
 
 
-                    RaycastHit hitinfo = new RaycastHit();
-                    bool anyHit = false, directHit = false;
-                    if (Physics.Raycast(ray, out RaycastHit hit)) {
-                        hitinfo = hit;
-                        anyHit = true;
-                        directHit = true;
-                        //Debug.DrawRay(ray.origin, ray.direction);
-                    } else {
-                        RaycastHit[] hits = Physics.BoxCastAll(ray.origin, new Vector3(0.01f, 0.01f, 0.0001f), ray.direction, Camera.main.transform.rotation);
-                        if (hits.Length > 0) {
+                RaycastHit hitinfo = new RaycastHit();
+                bool anyHit = false, directHit = false;
+                RaycastHit[] direct_hits = Physics.RaycastAll(ray);
+                if (direct_hits.Length > 0) {
+                    foreach (RaycastHit hit in direct_hits) {
+                        if (hit.collider.transform.parent.parent.gameObject.GetComponent(typeof(Action3D)) != null || hit.collider.transform.parent.parent.gameObject.GetComponent(typeof(ActionPoint3D)) != null) {
+                            hitinfo = hit;
+                            anyHit = true;
+                            directHit = true;
+                            break;
+                        }
+                    }
+                    
+                    //Debug.DrawRay(ray.origin, ray.direction);
+                }
 
-                            float minDist = float.MaxValue;
-                            foreach (RaycastHit h in hits) {
-                                Vector3 dir = ray.direction;
+                if (!directHit) {
+                    RaycastHit[] hits = Physics.BoxCastAll(ray.origin, new Vector3(0.01f, 0.01f, 0.0001f), ray.direction, Camera.main.transform.rotation);
+                    if (hits.Length > 0) {
 
-                                Vector3 point = ray.origin + dir * Vector3.Distance(ray.origin, h.point);
+                        float minDist = float.MaxValue;
+                        foreach (RaycastHit h in hits) {
+                            Vector3 dir = ray.direction;
+
+                            Vector3 point = ray.origin + dir * Vector3.Distance(ray.origin, h.point);
                                 
-                                float dist;
-                                if (h.collider is MeshCollider meshCollider) {
-                                    if (meshCollider.convex)
-                                        dist = Vector3.Distance(point, meshCollider.ClosestPoint(point));
-                                    else
-                                        dist = Vector3.Distance(point, meshCollider.ClosestPointOnBounds(point));
-                                } else
-                                    dist = Vector3.Distance(point, h.collider.ClosestPointOnBounds(point));
-                                Debug.DrawLine(point, h.point);
-                                Debug.DrawRay(ray.origin, ray.direction);
-                                if (dist < minDist) {
-                                    hitinfo = h;
-                                    anyHit = true;
-                                    minDist = dist;
-                                }
+                            float dist;
+                            if (h.collider is MeshCollider meshCollider) {
+                                if (meshCollider.convex)
+                                    dist = Vector3.Distance(point, meshCollider.ClosestPoint(point));
+                                else
+                                    dist = Vector3.Distance(point, meshCollider.ClosestPointOnBounds(point));
+                            } else
+                                dist = Vector3.Distance(point, h.collider.ClosestPointOnBounds(point));
+                            Debug.DrawLine(point, h.point);
+                            Debug.DrawRay(ray.origin, ray.direction);
+                            if (dist < minDist) {
+                                hitinfo = h;
+                                anyHit = true;
+                                minDist = dist;
                             }
                         }
                     }
-                    if (anyHit) {
-                        Vector3 lhs = hitinfo.point - ray.origin;
+                }
+                if (anyHit) {
+                    Vector3 lhs = hitinfo.point - ray.origin;
 
-                        float dotP = Vector3.Dot(lhs, ray.direction.normalized);
-                        Vector3 point = ray.origin + ray.direction.normalized * dotP;
-                        List<Tuple<float, InteractiveObject>> items = new List<Tuple<float, InteractiveObject>>();
-                        bool h = false;
-                        foreach (SelectorItem item in SelectorMenu.Instance.SelectorItems.Values) {
-                            if (!item.InteractiveObject.Enabled)
+                    float dotP = Vector3.Dot(lhs, ray.direction.normalized);
+                    Vector3 point = ray.origin + ray.direction.normalized * dotP;
+                    List<Tuple<float, InteractiveObject>> items = new List<Tuple<float, InteractiveObject>>();
+                    bool h = false;
+                    foreach (SelectorItem item in SelectorMenu.Instance.SelectorItems.Values) {
+                        if (!item.InteractiveObject.Enabled)
+                            continue;
+                        try {
+                            if (item.InteractiveObject == null) {
                                 continue;
-                            try {
-                                if (item.InteractiveObject == null) {
-                                    continue;
 
-                                }
-                                float dist = item.InteractiveObject.GetDistance(hitinfo.point);
-
-                                foreach (Collider c in item.InteractiveObject.Colliders) {
-
-                                    if (c == hitinfo.collider) {
-                                        dist = -1;
-                                        h = true;
-                                    }
-
-                                }
-
-
-                                if (item.InteractiveObject is ActionObjectNoPose || dist > 0.2) { // add objects max 20cm away from point of impact 
-
-                                    Debug.DrawLine(ray.origin, hitinfo.point);
-                                    continue;
-                                }
-
-                                items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
-                            } catch (MissingReferenceException ex) {
-                                Debug.LogError(ex);
-                                Debug.LogError($"{item.InteractiveObject.GetName()}: {hitinfo.collider.name}");
                             }
+                            float dist = item.InteractiveObject.GetDistance(hitinfo.point);
+
+                            foreach (Collider c in item.InteractiveObject.Colliders) {
+
+                                if (c == hitinfo.collider) {
+                                    dist = -1;
+                                    h = true;
+                                }
+
+                            }
+
+
+                            if (item.InteractiveObject is ActionObjectNoPose || dist > 0.2) { // add objects max 20cm away from point of impact 
+
+                                Debug.DrawLine(ray.origin, hitinfo.point);
+                                continue;
+                            }
+
+                            items.Add(new Tuple<float, InteractiveObject>(dist, item.InteractiveObject));
+                        } catch (MissingReferenceException ex) {
+                            Debug.LogError(ex);
+                            Debug.LogError($"{item.InteractiveObject.GetName()}: {hitinfo.collider.name}");
                         }
-                        if (h) {
-                            items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-                            /* if (items.Count > 10)
-                                 items.RemoveRange(10, items.Count - 10);*/
-                            SelectorMenu.Instance.UpdateAimMenu(items);
-                        } else {
-                            SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
-                        }
+                    }
+                    if (h) {
+                        items.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                        /* if (items.Count > 10)
+                                items.RemoveRange(10, items.Count - 10);*/
+                        SelectorMenu.Instance.UpdateAimMenu(items);
                     } else {
                         SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
                     }
+                } else {
+                    SelectorMenu.Instance.UpdateAimMenu(new List<Tuple<float, InteractiveObject>>());
+                }
                 //}
             } else {
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));

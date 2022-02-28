@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     private InteractiveObject selectedObject;
     private ButtonInteractiveObject selectedButton;
 
-    public GameObject ActionPicker;
+    public ActionPickerMenu3D ActionPicker;
 
     public bool Connecting;
     private RobotEE robotEE;
@@ -156,7 +157,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
             ActionPicker.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.2f;
             ActionPicker.GetComponent<FaceCamera>().Update();
-            ActionPicker.SetActive(true);
+            ActionPicker.Show();
             if (selectedObject is Action3D action) {
                 action.ActionPoint.SetApCollapsed(false);
             } else if (selectedObject is ActionPoint3D actionPoint) {
@@ -201,7 +202,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         //SelectorMenu.Instance.SetSelectedObject(actionPoint, true);
         AREditorResources.Instance.LeftMenuProject.APToRemoveOnCancel = actionPoint;
         ActionPicker.transform.position = actionPoint.transform.position - Camera.main.transform.forward * 0.05f;
-        ActionPicker.SetActive(true);
+        ActionPicker.Show();
     }
 
     public void SetMenuTriggerMode() {

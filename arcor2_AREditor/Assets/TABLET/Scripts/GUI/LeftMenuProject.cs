@@ -799,9 +799,18 @@ public class LeftMenuProject : LeftMenu
     public async void ActionMoveToClick() {
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
-            ActionMoveToClick(actionPoint);
+            ActionMoveToClick(actionPoint, true);
         } else if (selectedObject is Action3D action) {
-            ActionMoveToClick((ActionPoint3D) action.ActionPoint);
+            ActionMoveToClick((ActionPoint3D) action.ActionPoint, true);
+        }
+    }
+
+    public async void ActionMoveToClickMagician() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionMoveToClick(actionPoint, false);
+        } else if (selectedObject is Action3D action) {
+            ActionMoveToClick((ActionPoint3D) action.ActionPoint, false);
         }
     }
 
@@ -815,19 +824,38 @@ public class LeftMenuProject : LeftMenu
         MeshPicker.SetActive(true);
     }
 
-    public void ActionMoveToClick(ActionPoint3D actionPoint) {
-        string robotId = "";
+    private string GetRobotId(bool m1) {
+       
         foreach (IRobot r in SceneManager.Instance.GetRobots()) {
-            robotId = r.GetId();
+            Debug.LogError(r.GetName());
+            if (m1) {
+                if (r.GetName().Contains("m1")) {
+                    return r.GetId();
+                }
+            } else {
+                if (r.GetName().Contains("magic")) {
+                    return r.GetId();
+                }
+            }
+
         }
+        throw new RequestFailedException("Nenašel sem robota.. jakto?");
+    }
+
+    public void ActionMoveToClick(ActionPoint3D actionPoint, bool m1) {
+        string robotId = GetRobotId(m1);
+        
         string name = ProjectManager.Instance.GetFreeActionName("Presunout");
         NamedOrientation o = actionPoint.GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pose", type: "pose", value: "\"" + o.Id + "\""),
             new ActionParameter(name: "move_type", type: "string_enum", value: "\"JOINTS\""),
             new ActionParameter(name: "velocity", type: "double", value: "30.0"),
-            new ActionParameter(name: "acceleration", type: "double", value: "50.0")
+            new ActionParameter(name: "acceleration", type: "double", value: "50.0"),
+            new ActionParameter(name: "safe", type: "boolean", value: "true")
         };
+        if (m1)
+            parameters.RemoveAt(4);
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
         //ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/move", name, robot.GetActionMetadata("move").GetFlows(name));
@@ -847,25 +875,38 @@ public class LeftMenuProject : LeftMenu
     public async void ActionPickClick() {
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
-            ActionPickClick(actionPoint);
+            ActionPickClick(actionPoint, true);
         } else if (selectedObject is Action3D action) {
-            ActionPickClick((ActionPoint3D) action.ActionPoint);
+            ActionPickClick((ActionPoint3D) action.ActionPoint, true);
+        }
+    }
+
+    public async void ActionPickClickMagician() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionPickClick(actionPoint, false);
+        } else if (selectedObject is Action3D action) {
+            ActionPickClick((ActionPoint3D) action.ActionPoint, false);
         }
     }
 
 
-    public void ActionPickClick(ActionPoint3D actionPoint) {
+    public void ActionPickClick(ActionPoint3D actionPoint, bool m1) {
 
-        string robotId = "";
-        foreach (IRobot r in SceneManager.Instance.GetRobots()) {
-            robotId = r.GetId();
-        }
+        string robotId = GetRobotId(m1);
         string name = ProjectManager.Instance.GetFreeActionName("Zvednout");
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
-            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0")
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
+            new ActionParameter(name: "velocity", type: "double", value: "50.0"),
+            new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
+            new ActionParameter(name: "safe_place", type: "boolean", value: "false")
         };
+        if (m1) {
+            parameters.RemoveAt(3);
+            parameters.RemoveAt(4);
+        }
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
         //ProjectManager.Instance.ActionToSelect = name;
@@ -889,27 +930,94 @@ public class LeftMenuProject : LeftMenu
     public async void ActionReleaseClick() {
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
-            ActionReleaseClick(actionPoint);
+            ActionReleaseClick(actionPoint, true);
         } else if (selectedObject is Action3D action) {
-            ActionReleaseClick((ActionPoint3D) action.ActionPoint);
+            ActionReleaseClick((ActionPoint3D) action.ActionPoint, true);
         }
     }
 
-    public void ActionReleaseClick(ActionPoint3D actionPoint) {
-        string robotId = "";
-        foreach (IRobot r in SceneManager.Instance.GetRobots()) {
-            robotId = r.GetId();
+    public async void ActionReleaseClickMagician() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionReleaseClick(actionPoint, false);
+        } else if (selectedObject is Action3D action) {
+            ActionReleaseClick((ActionPoint3D) action.ActionPoint, false);
         }
+    }
+
+    public void ActionReleaseClick(ActionPoint3D actionPoint, bool m1) {
+        string robotId = GetRobotId(m1);
         string name = ProjectManager.Instance.GetFreeActionName("Polozit");
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "place_pose", type: "pose", value: "\"" + o.Id + "\""),
-            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0")
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
+            new ActionParameter(name: "velocity", type: "double", value: "50.0"),
+            new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
+            new ActionParameter(name: "safe_place", type: "boolean", value: "false")
         };
+        if (m1) {
+            parameters.RemoveAt(3);
+            parameters.RemoveAt(4);
+        }
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
 
         //ProjectManager.Instance.ActionToSelect = name;
         WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
+        //RestoreSelector();
+        ActionPicker.SetActive(false);
+        //if (CurrentMode == Mode.AddAction) {
+        SelectorMenu.Instance.Active = true;
+        RightButtonsMenu.Instance.SetActionMode();
+        if (APToRemoveOnCancel != null)
+            RightButtonsMenu.Instance.MoveClick();
+        /*} else {
+            //RestoreSelector();
+            AddActionButton.GetComponent<Image>().enabled = false;
+        }*/
+        APToRemoveOnCancel = null;
+
+    }
+
+
+    public async void ActionConveyorLeftClick() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionConveyorClick(actionPoint, true);
+        } else if (selectedObject is Action3D action) {
+            ActionConveyorClick((ActionPoint3D) action.ActionPoint, true);
+        }
+    }
+
+    public async void ActionConveyorRightClick() {
+        InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
+        if (selectedObject is ActionPoint3D actionPoint) {
+            ActionConveyorClick(actionPoint, false);
+        } else if (selectedObject is Action3D action) {
+            ActionConveyorClick((ActionPoint3D) action.ActionPoint, false);
+        }
+    }
+    // TODO!!
+    public void ActionConveyorClick(ActionPoint3D actionPoint, bool left) {
+        string objId = "";
+        foreach (ActionObject obj in SceneManager.Instance.ActionObjects.Values) {
+            if (obj.GetName().Contains("onvey")) {
+                objId = obj.GetId();
+                break;
+            }
+        }
+        string name = ProjectManager.Instance.GetFreeActionName("P");
+        //NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
+        List<ActionParameter> parameters = new List<ActionParameter> {
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
+            new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
+            new ActionParameter(name: "safe_place", type: "boolean", value: "false"),
+            new ActionParameter(name: "velocity", type: "double", value: "50.0")
+        };
+        //IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
+
+        //ProjectManager.Instance.ActionToSelect = name;
+        //WebsocketManager.Instance.AddAction(actionPoint.GetId(), parameters, robotId + "/place", name, robot.GetActionMetadata("place").GetFlows(name));
         //RestoreSelector();
         ActionPicker.SetActive(false);
         //if (CurrentMode == Mode.AddAction) {
