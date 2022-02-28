@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: VUTFIT
-  productName: AREditor
+  productName: AREditor_exp2022
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
@@ -126,7 +126,7 @@ PlayerSettings:
     16:10: 1
     16:9: 0
     Others: 0
-  bundleVersion: 0.16.2
+  bundleVersion: exp2022
   preloadedAssets:
   - {fileID: 11400000, guid: 20a9bcdf4f5308b4cbe95702f502a097, type: 2}
   metroInputSource: 0
@@ -171,7 +171,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.VUTFIT.arcor2_AREditor
+    Android: com.VUTFIT.arcor2_AREditor_exp2022
     Standalone: com.VUTFIT.AREditor
     iPhone: com.VUTFIT.arcor2AREditor
   buildNumber:
@@ -253,7 +253,7 @@ PlayerSettings:
   clonedFromGUID: c0afd0d1d80e3634a9dac47e8a0426ea
   templatePackageId: com.unity.template.3d@2.3.3
   templateDefaultScene: Assets/Scenes/SampleScene.unity
-  AndroidTargetArchitectures: 2
+  AndroidTargetArchitectures: 1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: '{inproject}: '
@@ -805,7 +805,7 @@ PlayerSettings:
     29: UNITY_POST_PROCESSING_STACK_V2
   platformArchitecture: {}
   scriptingBackend:
-    Android: 1
+    Android: 0
     Standalone: 0
   il2cppCompilerConfiguration:
     Android: 1
