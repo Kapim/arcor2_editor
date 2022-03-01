@@ -1790,6 +1790,7 @@ namespace Base {
                     ProjectManager.Instance.SelectAPNameWhenCreated = name;
                 else
                     ProjectManager.Instance.SelectAPNameWhenCreated = "";
+                ProjectManager.Instance.OpenTransformMenu = true;
                 ProjectManager.Instance.MoveApToRobot = moveToRobotPosition;
                 await WebsocketManager.Instance.AddActionPoint(name, "", position);
             } catch (RequestFailedException e) {

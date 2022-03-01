@@ -124,6 +124,7 @@ namespace Base {
 
 
         public List<string> LastAddedAPs;
+        internal bool OpenTransformMenu;
 
         public string SelectAPNameWhenCreated {
             get;

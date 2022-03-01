@@ -359,7 +359,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     }
 
     public async void ConnectionClick() {
-        if (selectedObject != null && selectedObject is Action3D action) {
+        if (selectedObject != null && selectedObject is Base.Action action) {
 
             if (Connecting) {
                 if (action.Input.AnyConnection()) {
@@ -405,6 +405,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public async void RobotHandTeachingPush() {
         await SceneManager.Instance.SelectRobotAndEE();
         robotEE = SceneManager.Instance.SelectedEndEffector;
+        await robotEE.Robot.WriteLock(false);
         _ = WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: true);
     }
 
@@ -414,8 +415,10 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         await SceneManager.Instance.SelectRobotAndEE();
 
         await WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: false);
+        await robotEE.Robot.WriteUnlock();
         IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(robotEE.transform.position)));
-        await WebsocketManager.Instance.MoveToPose(SceneManager.Instance.SelectedRobot.GetId(), SceneManager.Instance.SelectedEndEffector.GetId(), 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)));
+
+        await WebsocketManager.Instance.MoveToPose(SceneManager.Instance.SelectedRobot.GetId(), "default", 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)));
     }
 
     public void AddConnectionPush() {

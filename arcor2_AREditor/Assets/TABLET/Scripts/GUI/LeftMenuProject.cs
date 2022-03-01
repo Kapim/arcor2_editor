@@ -148,10 +148,9 @@ public class LeftMenuProject : LeftMenu
 
     public void StartAddActionMode() {
 
-        if (!ActionModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
                                                                //close all other opened menus/dialogs and takes care of red background of buttons
             SetActiveSubmenu(LeftMenuSelection.None, true, true);
-        }
+        
         //if (ActionModeButton.GetComponent<Image>().enabled) {
             //AddActionModeBtn.GetComponent<Image>().enabled = false;
             //RestoreSelector();
@@ -173,10 +172,8 @@ public class LeftMenuProject : LeftMenu
 
     public void StartRemoveMode() {
 
-        if (!RemoveModeButton.GetComponent<Image>().enabled) { //other menu/dialog opened
             SetActiveSubmenu(LeftMenuSelection.None, true, true); //close all other opened menus/dialogs and takes care of red background of buttons
-        }
-
+        
         /*if (RemoveModeButton.GetComponent<Image>().enabled) {
             //RemoveModeBtn.GetComponent<Image>().enabled = false;
             //RestoreSelector();
@@ -800,9 +797,20 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionMoveToClick(actionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(actionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         } else if (selectedObject is Action3D action) {
             ActionMoveToClick((ActionPoint3D) action.ActionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(action.ActionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         }
+        
     }
 
     public async void ActionMoveToClickMagician() {
@@ -854,7 +862,7 @@ public class LeftMenuProject : LeftMenu
             new ActionParameter(name: "acceleration", type: "double", value: "50.0"),
             new ActionParameter(name: "safe", type: "boolean", value: "true")
         };
-        if (m1)
+        if (!m1)
             parameters.RemoveAt(4);
         IActionProvider robot = SceneManager.Instance.GetActionObject(robotId);
         //ProjectManager.Instance.ActionToSelect = name;
@@ -876,9 +884,21 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionPickClick(actionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(actionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         } else if (selectedObject is Action3D action) {
             ActionPickClick((ActionPoint3D) action.ActionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(action.ActionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         }
+        
+
     }
 
     public async void ActionPickClickMagician() {
@@ -901,9 +921,9 @@ public class LeftMenuProject : LeftMenu
             new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
             new ActionParameter(name: "velocity", type: "double", value: "50.0"),
             new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
-            new ActionParameter(name: "safe_place", type: "boolean", value: "false")
+            new ActionParameter(name: "safe_pick", type: "boolean", value: "false")
         };
-        if (m1) {
+        if (!m1) {
             parameters.RemoveAt(3);
             parameters.RemoveAt(4);
         }
@@ -931,9 +951,20 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionReleaseClick(actionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(actionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         } else if (selectedObject is Action3D action) {
             ActionReleaseClick((ActionPoint3D) action.ActionPoint, true);
+            if (ProjectManager.Instance.OpenTransformMenu) {
+                RightButtonsMenu.Instance.gameObject.SetActive(false);
+                _ = TransformMenu.Instance.Show(action.ActionPoint);
+                ProjectManager.Instance.OpenTransformMenu = false;
+            }
         }
+        
     }
 
     public async void ActionReleaseClickMagician() {
@@ -956,7 +987,7 @@ public class LeftMenuProject : LeftMenu
             new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
             new ActionParameter(name: "safe_place", type: "boolean", value: "false")
         };
-        if (m1) {
+        if (!m1) {
             parameters.RemoveAt(3);
             parameters.RemoveAt(4);
         }
