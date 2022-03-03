@@ -25,8 +25,8 @@ namespace Base {
             // TODO - find better way
             Canvas.enabled = false;
             Canvas.enabled = true;
-            NotificationManager.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.2f;
-            NotificationManager.transform.LookAt(Camera.main.transform.position + Camera.main.transform.forward * 0.3f);
+            NotificationManager.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.3f;
+            NotificationManager.transform.LookAt(Camera.main.transform.position + Camera.main.transform.forward * 0.4f);
             NotificationManager.title = title;
             NotificationManager.description = text;
             NotificationManager.UpdateUI();

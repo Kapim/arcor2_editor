@@ -343,8 +343,12 @@ namespace Base {
                   "default", "default");*/
                 try {
                     await ap.WriteLock(true);
-                    if (!ap.AnyOrientation())
-                        await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)), "default");
+                    if (!ap.AnyOrientation()) {
+                        await WebsocketManager.Instance.AddActionPointOrientation(ap.GetId(), DataHelper.QuaternionToOrientation(new Quaternion(0, 0, 1, 0)), "default");
+                        //if (SceneManager.Instance.SelectedRobot == null)
+                        //    await SceneManager.Instance.SelectRobotAndEE();
+                        //await WebsocketManager.Instance.AddActionPointOrientationUsingRobot(ap.GetId(), SceneManager.Instance.SelectedRobot.GetId(), "default", "default");
+                    }
                     
                     if (MoveApToRobot != null) {
                         await WebsocketManager.Instance.UpdateActionPointUsingRobot(ap.GetId(), MoveApToRobot.Robot.GetId(), MoveApToRobot.EEId);
@@ -1241,12 +1245,15 @@ namespace Base {
             updateProject = true;
         }
 
+
+
         /// <summary>
         /// Adds action to the project
         /// </summary>
         /// <param name="projectAction">Action description</param>
         /// <param name="parentId">UUID of action point to which the action should be added</param>
         public async void ActionAdded(IO.Swagger.Model.Action projectAction, string parentId) {
+            GameManager.Instance.ShowLoadingScreen("Přidávám akci");
             ActionPoint actionPoint = GetActionPoint(parentId);
             try {
                 Base.Action action = SpawnAction(projectAction, actionPoint);
@@ -1263,9 +1270,9 @@ namespace Base {
                 }
                 if (!string.IsNullOrEmpty(PrevAction) && !string.IsNullOrEmpty(NextAction)) {
                     int timeout = 0;
-                    while (!await action.WriteLock(false) && timeout < 20) {
+                    while (!await action.WriteLock(false)  && timeout < 20) { // TODO: zamknout prev akci?
                         //wait
-                        Thread.Sleep(50);
+                        await Task.Delay(TimeSpan.FromMilliseconds(1));
                         ++timeout;
                     }
                     Debug.Log(timeout);
@@ -1286,7 +1293,7 @@ namespace Base {
                             int timeout = 0;
                             while (!await action.WriteLock(false) && timeout < 20) {
                                 //wait
-                                Thread.Sleep(50);
+                                await Task.Delay(TimeSpan.FromSeconds(1));
                                 ++timeout;
                             }
                             Debug.Log(timeout);
@@ -1298,10 +1305,18 @@ namespace Base {
                         }
                     }
                 }
+                if (OpenTransformMenu) {
+                    RightButtonsMenu.Instance.gameObject.SetActive(false);
+                    _ = TransformMenu.Instance.Show(actionPoint);
+                    OpenTransformMenu = false;
+                }
             } catch (RequestFailedException ex) {
                 Debug.LogError(ex);
-            }            
+            } finally {
+                GameManager.Instance.HideLoadingScreen();
+            }       
         }
+
 
         /// <summary>
         /// Removes actino from project

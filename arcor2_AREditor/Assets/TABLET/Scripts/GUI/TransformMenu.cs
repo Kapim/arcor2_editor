@@ -48,6 +48,11 @@ public class TransformMenu : Singleton<TransformMenu> {
 
     public ToggleGroupIconButtons BottomButtons;
 
+    public ActionObjectAimingMenu ActionObjectAimingMenu;
+
+    [SerializeField]
+    public List<GameObject> HideWhenAiming;
+
 
     private Gizmo gizmo;
     //private bool IsPositionChanged => model != null && (model.transform.localPosition != Vector3.zero || model.transform.localRotation != Quaternion.identity);
@@ -333,7 +338,16 @@ public class TransformMenu : Singleton<TransformMenu> {
         };
     }
 
-    public void SwitchToTranslate() {
+    public async void SwitchToTranslate() {
+        foreach (GameObject obj in HideWhenAiming) {
+            obj.SetActive(true);
+        }
+        //if (ActionObjectAimingMenu.AimingInProgress)
+        await ActionObjectAimingMenu.CancelAiming();
+
+        await ActionObjectAimingMenu.Hide();
+        
+        ActionObjectAimingMenu.spheres.Clear();
         TransformWheel.Units = Units;
         ResetTransformWheel();
         Units.gameObject.SetActive(true);
@@ -342,10 +356,24 @@ public class TransformMenu : Singleton<TransformMenu> {
         SetRotationAxis(Gizmo.Axis.NONE);
         CurrentState = State.Translate;
         HandBtn.SetInteractivity(true);
+        if (gizmo != null)
+            gizmo.gameObject.SetActive(true);
         BottomButtons.SelectButton(BottomButtons.Buttons[0], false);
     }
 
-    public void SwitchToRotate() {
+    public async void SwitchToRotate() {
+        foreach (GameObject obj in HideWhenAiming) {
+            obj.SetActive(true);
+        }
+        //if (ActionObjectAimingMenu.AimingInProgress)
+        await ActionObjectAimingMenu.CancelAiming();
+        await ActionObjectAimingMenu.Hide();
+        foreach (AimingPointSphere sphere in ActionObjectAimingMenu.spheres) {
+            if (sphere != null) {
+                Destroy(sphere.gameObject);
+            }
+        }
+        ActionObjectAimingMenu.spheres.Clear();
         TransformWheel.Units = UnitsDegrees;
         ResetTransformWheel();
         Units.gameObject.SetActive(false);
@@ -353,10 +381,13 @@ public class TransformMenu : Singleton<TransformMenu> {
         RobotTabletBtn.SetInteractivity(false);
         SetRotationAxis(selectedAxis);
         HandBtn.SetInteractivity(false);
+        if (gizmo != null)
+            gizmo.gameObject.SetActive(true);
         CurrentState = State.Rotate;
     }
 
-    public void SwitchToScale() {
+    public async void SwitchToScale() {
+        /*
         TransformWheel.Units = Units;
         ResetTransformWheel();
         Units.gameObject.SetActive(true);
@@ -364,7 +395,14 @@ public class TransformMenu : Singleton<TransformMenu> {
         RobotTabletBtn.SetInteractivity(false);
         SetRotationAxis(Gizmo.Axis.NONE);
 
-        HandBtn.SetInteractivity(false, "Not available for scaling");
+        HandBtn.SetInteractivity(false, "Not available for scaling");*/
+        foreach (GameObject obj in HideWhenAiming) {
+            obj.SetActive(false);
+        }
+        if (gizmo != null)
+            gizmo.gameObject.SetActive(false);
+        await ActionObjectAimingMenu.ShowSync((ActionObject) InteractiveObject);
+        ActionObjectAimingMenu.StartObjectFocusing();
         CurrentState = State.Scale;
     }
 
@@ -409,26 +447,41 @@ public class TransformMenu : Singleton<TransformMenu> {
         RedoBtn.SetInteractivity(false);
         cameraPrev = Camera.main.transform.position;
         cameraOffset = Vector3.zero;
-        if (RobotTabletBtn.CurrentState == TwoStatesToggleNew.States.Right) {
-            origPosition = Camera.main.transform.InverseTransformPoint(InteractiveObject.transform.position);
-            handHolding = true;
-        } else {
+        if (CurrentState == State.Scale) {
             string armId = null;
             if (SceneManager.Instance.SelectedRobot.MultiArm())
                 armId = SceneManager.Instance.SelectedArmId;
             _ = WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: true, armId);
+        } else {
+            if (RobotTabletBtn.CurrentState == TwoStatesToggleNew.States.Right) {
+                origPosition = Camera.main.transform.InverseTransformPoint(InteractiveObject.transform.position);
+                handHolding = true;
+            } else {
+                string armId = null;
+                if (SceneManager.Instance.SelectedRobot.MultiArm())
+                    armId = SceneManager.Instance.SelectedArmId;
+                _ = WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: true, armId);
+            }
         }
+        
         Debug.LogError("Hold pressed");
     }
 
     public void HoldReleased() {
-        if (RobotTabletBtn.CurrentState == TwoStatesToggleNew.States.Right) {
-            handHolding = false;
-        } else {
+        if (CurrentState == State.Scale) {
             string armId = null;
             if (SceneManager.Instance.SelectedRobot.MultiArm())
                 armId = SceneManager.Instance.SelectedArmId;
             _ = WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: false, armId);
+        } else {
+            if (RobotTabletBtn.CurrentState == TwoStatesToggleNew.States.Right) {
+                handHolding = false;
+            } else {
+                string armId = null;
+                if (SceneManager.Instance.SelectedRobot.MultiArm())
+                    armId = SceneManager.Instance.SelectedArmId;
+                _ = WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: false, armId);
+            }
         }
         Debug.LogError("Hold released");
         SubmitPosition(true);
@@ -469,7 +522,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         if (interactiveObject is ActionPoint3D actionPoint) {
             //model = actionPoint.GetModelCopy();
             RotateBtn.SetInteractivity(true);
-            ScaleBtn.SetInteractivity(false, "Action point size could not be changed");
+            ScaleBtn.SetInteractivity(false, "Nelze zaměřovat akční body");
             RobotTabletBtn.SetInteractivity(true);
             //izmoTransform.transform.localRotation = actionPoint.GetRotation();
             //gizmo.transform.localRotation = actionPoint.GetRotation();
@@ -486,7 +539,7 @@ public class TransformMenu : Singleton<TransformMenu> {
         } else if (interactiveObject is ActionObject3D actionObject) {
            // model = actionObject.GetModelCopy();
             RotateBtn.SetInteractivity(true);
-            ScaleBtn.SetInteractivity(interactiveObject is CollisionObject, "Only collision objects size could be changed");
+            ScaleBtn.SetInteractivity(true);
             RobotTabletBtn.SetInteractivity(true);
             //model.transform.SetParent(GizmoTransform);
             //model.transform.rotation = interactiveObject.transform.rotation;
@@ -500,8 +553,8 @@ public class TransformMenu : Singleton<TransformMenu> {
         } else if (interactiveObject is RobotActionObject robot) {
            // model = robot.GetModelCopy();
             RotateBtn.SetInteractivity(true);
-            ScaleBtn.SetInteractivity(false, "Robot size could not be changed");
-            RobotTabletBtn.SetInteractivity(false, "Robot position could not be set using robot");
+            ScaleBtn.SetInteractivity(false, "Robot nemůže být zaměřen.");
+            RobotTabletBtn.SetInteractivity(false, "Robota nelze transformovat robotem.");
             /*model.transform.SetParent(GizmoTransform);
             model.transform.rotation = interactiveObject.transform.rotation;
             model.transform.position = interactiveObject.transform.position;
@@ -513,8 +566,8 @@ public class TransformMenu : Singleton<TransformMenu> {
         } else if (interactiveObject is StartEndAction action) {
             //model = action.GetModelCopy();
             RotateBtn.SetInteractivity(false);
-            ScaleBtn.SetInteractivity(false, "Robot size could not be changed");
-            RobotTabletBtn.SetInteractivity(false, "START / STOP position could not be set using robot");
+            ScaleBtn.SetInteractivity(false, "Akce nelze zaměřovat.");
+            RobotTabletBtn.SetInteractivity(false, "START / STOP pozice nemůž být nastavena robotem");
             /*model.transform.SetParent(GizmoTransform);
             model.transform.rotation = interactiveObject.transform.rotation;
             model.transform.position = interactiveObject.transform.position;

@@ -152,10 +152,10 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             selectedButton.OnClick(Clickable.Click.MOUSE_LEFT_BUTTON);
     }
 
-    public void AddAction() {
+    public async void AddAction() {
         if (selectedObject != null && (selectedObject is Action3D || selectedObject is ActionPoint3D)) {
 
-            ActionPicker.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.2f;
+            ActionPicker.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.3f;
             ActionPicker.GetComponent<FaceCamera>().Update();
             ActionPicker.Show();
             if (selectedObject is Action3D action) {
@@ -183,6 +183,9 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                     }
                 } else if (selectedObject is RobotEE robotEE) {
                     GameManager.Instance.AddActionPointExperiment(name, false, robotEE);
+                } else if (selectedObject is RobotActionObject robot) {
+                    RobotEE ee = (await robot.GetAllEE())[0];
+                    GameManager.Instance.AddActionPointExperiment(name, false, ee);
                 } else {
                     GameManager.Instance.AddActionPointExperiment(name, false);
                 }
@@ -332,6 +335,10 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             GameManager.Instance.ShowLoadingScreen("Spouštím program...", true);
             try {
                 await WebsocketManager.Instance.SaveProjectSync(false);
+            } catch (RequestFailedException) {
+                //pass, already saved probably
+            }
+            try {                
                 await Base.WebsocketManager.Instance.TemporaryPackage();
             }
             catch (RequestFailedException ex) {
@@ -343,7 +350,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         } else if (selectedObject.GetType() == typeof(Action3D)) {
             try {
                 await WebsocketManager.Instance.ExecuteAction(selectedObject.GetId(), false);
-            } catch (RequestFailedException ex) {
+            } catch (RequestFailedException) {
                 Notifications.Instance.ShowNotification("Nepodařilo se vykonat akci", "");
                 return;
             }
@@ -354,7 +361,13 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             }
             NamedOrientation o = ((ActionPoint3D) selectedObject).GetFirstOrientation();
             IRobot robot = SceneManager.Instance.GetRobot(robotId);
-            await WebsocketManager.Instance.MoveToActionPointOrientation(robot.GetId(), (await robot.GetEndEffectorIds())[0], 0.5m, o.Id, false);
+            try {
+                await WebsocketManager.Instance.MoveToActionPointOrientation(robot.GetId(), (await robot.GetEndEffectorIds())[0], 0.5m, o.Id, false);
+            } catch (RequestFailedException) {
+                Notifications.Instance.ShowNotification("Nepodařilo se přesunout robota", "Nedosažitelné místo");
+                return;
+            }
+
         }
     }
 
@@ -362,13 +375,20 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         if (selectedObject != null && selectedObject is Base.Action action) {
 
             if (Connecting) {
+                Base.Action from = ConnectionManagerArcoro.Instance.GetActionConnectedToPointer();
+                if (action.GetId() == from.GetId()) {
+                    Notifications.Instance.ShowNotification("Nepodařilo se vytvořit propoj", "Tlačítko je potřeba držet a přetáhnout zaměřovač na navazující akci");
+                    ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
+                    Connecting = false;
+                    return;
+                }
                 if (action.Input.AnyConnection()) {
                     Notifications.Instance.ShowNotification("Nepodařilo se vytvořit propoj", "Propoj k této akci již existuje");
                     ConnectionManagerArcoro.Instance.DestroyConnectionToMouse();
                     Connecting = false;
                     return;
                 }
-                Base.Action from = ConnectionManagerArcoro.Instance.GetActionConnectedToPointer();
+                
                 try {
                     await WebsocketManager.Instance.AddLogicItem(from.GetId(), action.GetId(), from.GetProjectLogicIf(), false);                
                 } catch (RequestFailedException ex) {
@@ -418,7 +438,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
         await robotEE.Robot.WriteUnlock();
         IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(robotEE.transform.position)));
 
-        await WebsocketManager.Instance.MoveToPose(SceneManager.Instance.SelectedRobot.GetId(), "default", 1, position, DataHelper.QuaternionToOrientation(Quaternion.Euler(180, 0, 0)));
+        await WebsocketManager.Instance.MoveToPose(SceneManager.Instance.SelectedRobot.GetId(), "default", 1, position, DataHelper.QuaternionToOrientation(new Quaternion(0, 0, 1, 0)));
     }
 
     public void AddConnectionPush() {

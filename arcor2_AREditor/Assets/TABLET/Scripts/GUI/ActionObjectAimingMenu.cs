@@ -31,10 +31,11 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
     public bool AimingInProgress;
 
     public GameObject Sphere;
-
-    private List<AimingPointSphere> spheres = new List<AimingPointSphere>();
+    [SerializeField]
+    public List<AimingPointSphere> spheres = new List<AimingPointSphere>();
 
     private void Update() {
+        
         if (!AimingInProgress || !automaticPointSelection)
             return;
         float maxDist = float.MaxValue;
@@ -81,7 +82,11 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
         
     }
 
-    public async void Show(ActionObject actionObject) {
+    public async Task ShowSync(ActionObject actionObject) {
+        foreach (AimingPointSphere obj in spheres) {
+            Destroy(obj.gameObject);
+        }
+        spheres.Clear();
         if (actionObject.IsRobot()) {
             if (!await actionObject.WriteLock(false))
                 return;
@@ -92,10 +97,15 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
         currentObject = actionObject;
         await UpdateMenu();
         EditorHelper.EnableCanvasGroup(CanvasGroup, true);
+        SetAutomaticPointSelection(true);
         RobotInfoMenu.Instance.Show();
     }
 
-    public async void Hide(bool unlock = true) {
+    public void Show(ActionObject actionObject) {
+        _ = ShowSync(actionObject);
+    }
+
+    public async Task Hide(bool unlock = true) {
         if (CanvasGroup.alpha == 0)
             return;
         HideModelOnEE();
@@ -167,8 +177,8 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
                 foreach (IO.Swagger.Model.Pose point in currentObject.ActionObjectMetadata.ObjectModel.Mesh.FocusPoints) {
                     AimingPointSphere sphere = Instantiate(Sphere, currentObject.transform).GetComponent<AimingPointSphere>();
                     sphere.transform.localScale = new Vector3(0.02f, 0.02f, 0.02f);
-                    sphere.transform.localPosition = DataHelper.PositionToVector3(point.Position);
-                    sphere.transform.localRotation = DataHelper.OrientationToQuaternion(point.Orientation);
+                    sphere.transform.localPosition = TransformConvertor.ROSToUnity(DataHelper.PositionToVector3(point.Position));
+                    sphere.transform.localRotation = TransformConvertor.ROSToUnity(DataHelper.OrientationToQuaternion(point.Orientation));
                     sphere.Init(idx, $"Aiming point #{idx}");
                     spheres.Add(sphere);
                     ++idx;
@@ -259,16 +269,17 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
 
     }
 
-    public async void CancelAiming() {
+    public async Task CancelAiming() {
         try {
-            await WebsocketManager.Instance.CancelObjectAiming();
             AimingInProgress = false;
+            await WebsocketManager.Instance.CancelObjectAiming();
+            
             if (currentFocusPoint >= 0 && currentFocusPoint < spheres.Count)
                 spheres[currentFocusPoint].UnHighlight();
             UpdateCurrentPointLabel();
             await UpdateMenu();
         } catch (RequestFailedException ex) {
-            Notifications.Instance.ShowNotification("Failed to cancel aiming", ex.Message);
+            //Notifications.Instance.ShowNotification("Failed to cancel aiming", ex.Message);
         }
     }
 

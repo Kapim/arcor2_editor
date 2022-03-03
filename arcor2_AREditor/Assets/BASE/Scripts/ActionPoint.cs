@@ -69,7 +69,7 @@ namespace Base {
             ActionsCollapsed = PlayerPrefsHelper.LoadBool($"{ProjectManager.Instance.ProjectMeta.Id}/AP/{Data.Id}/collapsed", false);
             SetApCollapsed(ActionsCollapsed);
             transform.localPosition = GetScenePosition();
-            SetSize(size);
+            SetSize(0.07f);
             if (Data.Actions == null)
                 Data.Actions = new List<IO.Swagger.Model.Action>();
             if (Data.Orientations == null)

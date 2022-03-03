@@ -607,6 +607,7 @@ namespace Base {
         }
 
         public async Task<RobotEE> GetEE(string ee_id, string arm_id) {
+            
             if (!ResourcesLoaded) {
                 await LoadResources();
             }

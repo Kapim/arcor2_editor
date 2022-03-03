@@ -797,18 +797,10 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionMoveToClick(actionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(actionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
+            
         } else if (selectedObject is Action3D action) {
             ActionMoveToClick((ActionPoint3D) action.ActionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(action.ActionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
+            
         }
         
     }
@@ -884,18 +876,10 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionPickClick(actionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(actionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
+            
         } else if (selectedObject is Action3D action) {
             ActionPickClick((ActionPoint3D) action.ActionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(action.ActionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
+            
         }
         
 
@@ -918,8 +902,8 @@ public class LeftMenuProject : LeftMenu
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "pick_pose", type: "pose", value: "\"" + o.Id + "\""),
-            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
             new ActionParameter(name: "velocity", type: "double", value: "50.0"),
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.05"),
             new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
             new ActionParameter(name: "safe_pick", type: "boolean", value: "false")
         };
@@ -951,18 +935,8 @@ public class LeftMenuProject : LeftMenu
         InteractiveObject selectedObject = SelectorMenu.Instance.GetSelectedObject();
         if (selectedObject is ActionPoint3D actionPoint) {
             ActionReleaseClick(actionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(actionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
         } else if (selectedObject is Action3D action) {
             ActionReleaseClick((ActionPoint3D) action.ActionPoint, true);
-            if (ProjectManager.Instance.OpenTransformMenu) {
-                RightButtonsMenu.Instance.gameObject.SetActive(false);
-                _ = TransformMenu.Instance.Show(action.ActionPoint);
-                ProjectManager.Instance.OpenTransformMenu = false;
-            }
         }
         
     }
@@ -982,8 +956,8 @@ public class LeftMenuProject : LeftMenu
         NamedOrientation o = ((ActionPoint3D) actionPoint).GetFirstOrientation();
         List<ActionParameter> parameters = new List<ActionParameter> {
             new ActionParameter(name: "place_pose", type: "pose", value: "\"" + o.Id + "\""),
-            new ActionParameter(name: "vertical_offset", type: "double", value: "0.0"),
             new ActionParameter(name: "velocity", type: "double", value: "50.0"),
+            new ActionParameter(name: "vertical_offset", type: "double", value: "0.05"),
             new ActionParameter(name: "safe_approach", type: "boolean", value: "true"),
             new ActionParameter(name: "safe_place", type: "boolean", value: "false")
         };

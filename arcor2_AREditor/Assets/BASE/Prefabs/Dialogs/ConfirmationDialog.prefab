@@ -60,6 +60,8 @@ GameObject:
   - component: {fileID: 8882941825038401981}
   - component: {fileID: 146934453992931109}
   - component: {fileID: 3724553390893787553}
+  - component: {fileID: 4323354806702423160}
+  - component: {fileID: 6809582106324176703}
   m_Layer: 5
   m_Name: Cancel
   m_TagString: Untagged
@@ -245,7 +247,66 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tooltip: {fileID: 146934453992931109}
   Button: {fileID: 0}
+  Button2: {fileID: 0}
   TooltipContent: {fileID: 0}
+--- !u!61 &4323354806702423160
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295890121561217131}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -3.419632, y: -1.3676586}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 241.74002, y: 76.22102}
+  m_EdgeRadius: 0
+--- !u!114 &6809582106324176703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295890121561217131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3798ecd177bd3cd45bcbc41b2e6c9fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  SelectorItem: {fileID: 0}
+  Colliders:
+  - {fileID: 0}
+  Name: Move to
+  Callback:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Border: {fileID: 0}
 --- !u!1 &7295890121865125984
 GameObject:
   m_ObjectHideFlags: 0
@@ -1855,6 +1916,8 @@ GameObject:
   - component: {fileID: 6945759684190067718}
   - component: {fileID: 8269161529493555808}
   - component: {fileID: 8247246364356184140}
+  - component: {fileID: 663102726851942347}
+  - component: {fileID: 3957253061714468109}
   m_Layer: 5
   m_Name: Confirm
   m_TagString: Untagged
@@ -2040,7 +2103,66 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tooltip: {fileID: 8269161529493555808}
   Button: {fileID: 0}
+  Button2: {fileID: 0}
   TooltipContent: {fileID: 0}
+--- !u!61 &663102726851942347
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295890122679534876}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.000038146973, y: 1.0257511}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 244.44539, y: 71.434204}
+  m_EdgeRadius: 0
+--- !u!114 &3957253061714468109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295890122679534876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3798ecd177bd3cd45bcbc41b2e6c9fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  SelectorItem: {fileID: 0}
+  Colliders:
+  - {fileID: 0}
+  Name: Move to
+  Callback:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Border: {fileID: 0}
 --- !u!1 &7295890122736034395
 GameObject:
   m_ObjectHideFlags: 0
