@@ -110,6 +110,10 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
         if (selectedObject != null && objId != selectedObject.GetId()) // selected object was updated in the meantime
             return;
+        if (selectedObject.GetName() == "obrobek_ab_1" || selectedObject.GetName() == "obrobek_ab_2" || selectedObject.GetName() == "obrobek_ab_3" || selectedObject.GetName() == "obrobek_ab_4") {
+            move.Success = false;
+            move.Message = "pozice se váže k pozici objektu obrobek";
+        }
         MoveBtn.SetInteractivity(move.Success, $"Manipulovat s objektem\n({move.Message})");
         RemoveBtn.SetInteractivity(remove.Success, $"Odstranit objekt\n({remove.Message})");
         if (selectedObject is Action3D action) {

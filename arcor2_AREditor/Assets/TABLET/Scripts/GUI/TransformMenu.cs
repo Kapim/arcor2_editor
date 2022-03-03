@@ -491,6 +491,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     public async Task<bool> Show(InteractiveObject interactiveObject) {
         initDone = false;
         InteractiveObject = interactiveObject;
+        Debug.LogError(DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(interactiveObject.transform.localPosition)));
         if (! await interactiveObject.WriteLock(true))
             return false;
         

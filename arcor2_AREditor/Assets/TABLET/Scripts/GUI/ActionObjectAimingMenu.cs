@@ -365,7 +365,8 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
             //GetComponent<SimpleSideMenu>().handleToggleStateOnPressed = true;
             //GetComponent<SimpleSideMenu>().overlayCloseOnPressed = true;
             currentFocusPoint = -1;            
-            
+
+
             await WebsocketManager.Instance.ObjectAimingDone();
             FocusObjectDoneButton.SetInteractivity(false, "No aiming in progress");
             NextButton.SetInteractivity(false, "No aiming in progress");
@@ -373,6 +374,26 @@ public class ActionObjectAimingMenu : Base.Singleton<ActionObjectAimingMenu>
             SavePositionButton.SetInteractivity(false, "No aiming in progress");
             StartObjectFocusingButton.SetInteractivity(true);
             AimingInProgress = false;
+            try {
+                Base.ActionPoint ap1 = ProjectManager.Instance.GetactionpointByName("obrobek_ab_1");
+                Base.ActionPoint ap2 = ProjectManager.Instance.GetactionpointByName("obrobek_ab_2");
+                Base.ActionPoint ap3 = ProjectManager.Instance.GetactionpointByName("obrobek_ab_3");
+                Base.ActionPoint ap4 = ProjectManager.Instance.GetactionpointByName("obrobek_ab_4");
+               // _ = WebsocketManager.Instance.UpdateActionPointPosition(ap1.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(spheres[0].transform.position))));
+             //   _ = WebsocketManager.Instance.UpdateActionPointPosition(ap2.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(spheres[1].transform.position))));
+             //   _ = WebsocketManager.Instance.UpdateActionPointPosition(ap3.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(spheres[2].transform.position))));
+             //   _ = WebsocketManager.Instance.UpdateActionPointPosition(ap4.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(spheres[3].transform.position))));
+            } catch (KeyNotFoundException) {
+                if (SceneManager.Instance.TryGetActionObjectByName("workpiece", out ActionObject obj)) {
+                    
+                    _ = WebsocketManager.Instance.AddActionPoint("obrobek_ab_1", obj.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(spheres[0].transform.localPosition)));
+                    _ = WebsocketManager.Instance.AddActionPoint("obrobek_ab_2", obj.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(spheres[1].transform.localPosition)));
+                    _ = WebsocketManager.Instance.AddActionPoint("obrobek_ab_3", obj.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(spheres[2].transform.localPosition)));
+                    _ = WebsocketManager.Instance.AddActionPoint("obrobek_ab_4", obj.GetId(), DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(spheres[3].transform.localPosition)));
+                }
+            }
+            
+            
         } catch (Base.RequestFailedException ex) {
             Base.NotificationsModernUI.Instance.ShowNotification("Failed to focus object", ex.Message);
         }
