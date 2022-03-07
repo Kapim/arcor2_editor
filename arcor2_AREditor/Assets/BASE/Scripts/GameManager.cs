@@ -1779,7 +1779,7 @@ namespace Base {
             }
         }
 
-        public async void AddActionPointExperiment(string defaultName = "ap", bool openTransformMenu = true, RobotEE moveToRobotPosition = null) {
+        public async void AddActionPointExperiment(string defaultName = "ap", bool openTransformMenu = true, RobotEE moveToRobotPosition = null, InteractiveObject parent = null) {
             string name = ProjectManager.Instance.GetFreeAPName(defaultName);
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
             Vector3 point = TransformConvertor.UnityToROS(Scene.transform.InverseTransformPoint(ray.GetPoint(0.25f)));
@@ -1792,7 +1792,13 @@ namespace Base {
                     ProjectManager.Instance.SelectAPNameWhenCreated = "";
                 ProjectManager.Instance.OpenTransformMenu = true;
                 ProjectManager.Instance.MoveApToRobot = moveToRobotPosition;
-                await WebsocketManager.Instance.AddActionPoint(name, "", position);
+                string parentId = "";
+                if (parent != null) {
+                    parentId = parent.GetId();
+                    point = TransformConvertor.UnityToROS(parent.transform.InverseTransformPoint(ray.GetPoint(0.25f)));
+                    position = DataHelper.Vector3ToPosition(point);
+                }
+                await WebsocketManager.Instance.AddActionPoint(name, parent == null ? "" : parent.GetId(), position);
             } catch (RequestFailedException e) {
                 Notifications.Instance.ShowNotification("Failed to add action point", e.Message);
                 ProjectManager.Instance.SelectAPNameWhenCreated = "";

@@ -51,9 +51,9 @@ namespace Base {
         }
 
         protected virtual void Update() {
-            if (ActionObjectMetadata != null && ActionObjectMetadata.HasPose && gameObject.transform.hasChanged) {
+           /* if (ActionObjectMetadata != null && ActionObjectMetadata.HasPose && gameObject.transform.hasChanged) {
                 transform.hasChanged = false;
-            }
+            }*/
         }
 
         public virtual void ActionObjectUpdate(IO.Swagger.Model.SceneObject actionObjectSwagger) {

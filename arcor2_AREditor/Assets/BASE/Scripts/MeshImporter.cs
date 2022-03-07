@@ -64,6 +64,10 @@ public class MeshImporter : Singleton<MeshImporter> {
             // Supports: FBX, OBJ, GLTF2, STL, PLY, 3MF
             AssetLoaderOptions assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
             AssetLoader.LoadModelFromFile(path, null, delegate (AssetLoaderContext assetLoaderContext) {
+                if (Path.GetExtension(path).ToLower() == ".fbx")
+                {
+                    assetLoaderContext.RootGameObject.transform.Rotate(0f, -90f, 0f);
+                }
                 OnMeshImported?.Invoke(this, new ImportedMeshEventArgs(assetLoaderContext.RootGameObject, aoId));
             }, null, assetLoaderOptions: assetLoaderOptions, onError: OnModelLoadError);
         }

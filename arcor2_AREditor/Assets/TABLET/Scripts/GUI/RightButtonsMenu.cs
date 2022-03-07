@@ -32,7 +32,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     }
 
     private void OnSceneStateEvent(object sender, SceneStateEventArgs args) {
-        if (args.Event.State == SceneStateData.StateEnum.Started) {
+        /*if (args.Event.State == SceneStateData.StateEnum.Started) {
             if (SelectorMenu.Instance.lastSelectedItem != null &&
                 (SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotActionObject ||
                 SelectorMenu.Instance.lastSelectedItem.InteractiveObject is RobotEE)) {
@@ -40,7 +40,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             }
         } else {
             RobotHandIcon.color = new Color(1, 1, 1, 0.4f);
-        }
+        }*/
     }
 
     private void OnButtonObjectSelectedChangedEvent(object sender, ButtonInteractiveObjectEventArgs args) {
@@ -82,16 +82,13 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
             Task<RequestResult> tRemove = Task.Run(() => selectedObject.Removable());
             UpdateMoveAndRemoveBtns(selectedObject.GetId(), tMove, tRemove);
             
-            ExecuteBtn.SetInteractivity(selectedObject.GetType() == typeof(StartAction) || selectedObject.GetType() == typeof(Action3D) || selectedObject.GetType() == typeof(ActionPoint3D));
-            AddActionBtn.SetInteractivity(selectedObject.GetType() == typeof(Action3D) ||
-                selectedObject.GetType() == typeof(ActionPoint3D) ||
-                selectedObject.GetType() == typeof(ConnectionLine) ||
+            ExecuteBtn.SetInteractivity(selectedObject is StartAction || selectedObject is Action3D || selectedObject is ActionPoint3D);
+            AddActionBtn.SetInteractivity(selectedObject is Action3D ||
+                selectedObject is ActionPoint3D ||
+                selectedObject is ConnectionLine ||
+                selectedObject is ActionObject3D ||
                 selectedObject is RobotEE || selectedObject is RobotActionObject);
-            if (SceneManager.Instance.SceneStarted && (selectedObject is RobotEE || selectedObject is RobotActionObject)) {
-                RobotHandIcon.color = Color.white;
-            } else {
-                RobotHandIcon.color = new Color(1, 1, 1, 0.4f);
-            }
+            
         } else {
             CollapseBtn.SetInteractivity(false, "Žádný vybraný objekt");
             SelectBtn.SetInteractivity(false, "Žádný vybraný objekt");
@@ -110,10 +107,13 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
         if (selectedObject != null && objId != selectedObject.GetId()) // selected object was updated in the meantime
             return;
-        if (selectedObject.GetName() == "obrobek_ab_1" || selectedObject.GetName() == "obrobek_ab_2" || selectedObject.GetName() == "obrobek_ab_3" || selectedObject.GetName() == "obrobek_ab_4") {
+       
+
+        if (selectedObject != null && (selectedObject.GetName() == "obrobek_ab_1" || selectedObject.GetName() == "obrobek_ab_2" || selectedObject.GetName() == "obrobek_ab_3" || selectedObject.GetName() == "obrobek_ab_4")) {
             move.Success = false;
             move.Message = "pozice se váže k pozici objektu obrobek";
         }
+       
         MoveBtn.SetInteractivity(move.Success, $"Manipulovat s objektem\n({move.Message})");
         RemoveBtn.SetInteractivity(remove.Success, $"Odstranit objekt\n({remove.Message})");
         if (selectedObject is Action3D action) {
@@ -190,6 +190,8 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
                 } else if (selectedObject is RobotActionObject robot) {
                     RobotEE ee = (await robot.GetAllEE())[0];
                     GameManager.Instance.AddActionPointExperiment(name, false, ee);
+                } else if (selectedObject is ActionObject) {
+                    GameManager.Instance.AddActionPointExperiment(name, false, null, selectedObject);
                 } else {
                     GameManager.Instance.AddActionPointExperiment(name, false);
                 }
@@ -215,7 +217,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetMenuTriggerMode() {
         MenuTriggerBtn.gameObject.SetActive(true);
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+        //CollapseBtn.gameObject.SetActive(true);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(false);
         RemoveBtn.gameObject.SetActive(false);
@@ -225,7 +227,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
 
     public void SetSelectorMode() {
         SelectBtn.gameObject.SetActive(true);
-        CollapseBtn.gameObject.SetActive(true);
+        //CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(false);
@@ -237,7 +239,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetActionMode() {
         SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+       // CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(true);
         MoveBtn.gameObject.SetActive(false);
@@ -249,7 +251,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetMoveMode() {
         SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+        //CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(true);
@@ -261,7 +263,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetRemoveMode() {
         SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+       // CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(false);
@@ -273,7 +275,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetRunMode() {
         SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+      //  CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(false);
@@ -286,7 +288,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public void SetConnectionsMode() {
         SelectorMenu.Instance.DeselectObject();
         SelectBtn.gameObject.SetActive(false);
-        CollapseBtn.gameObject.SetActive(true);
+      //  CollapseBtn.gameObject.SetActive(true);
         MenuTriggerBtn.gameObject.SetActive(false);
         AddActionBtn.gameObject.SetActive(false);
         MoveBtn.gameObject.SetActive(false);
@@ -436,8 +438,7 @@ public class RightButtonsMenu : Singleton<RightButtonsMenu> {
     public async void RobotHandTeachingRelease() {
         if (!SceneManager.Instance.SceneStarted)
             return;
-        await SceneManager.Instance.SelectRobotAndEE();
-
+        
         await WebsocketManager.Instance.HandTeachingMode(robotId: SceneManager.Instance.SelectedRobot.GetId(), enable: false);
         await robotEE.Robot.WriteUnlock();
         IO.Swagger.Model.Position position = DataHelper.Vector3ToPosition(TransformConvertor.UnityToROS(GameManager.Instance.Scene.transform.InverseTransformPoint(robotEE.transform.position)));

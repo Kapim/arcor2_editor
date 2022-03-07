@@ -67,6 +67,8 @@ namespace Base {
                 RaycastHit[] direct_hits = Physics.RaycastAll(ray);
                 if (direct_hits.Length > 0) {
                     foreach (RaycastHit hit in direct_hits) {
+                        if (hit.collider.transform.parent == null || hit.collider.transform.parent.parent == null)
+                            continue;
                         if (hit.collider.transform.parent.parent.gameObject.GetComponent(typeof(Action3D)) != null ||
                             hit.collider.transform.parent.parent.gameObject.GetComponent(typeof(EndAction)) != null ||
                             hit.collider.transform.parent.parent.gameObject.GetComponent(typeof(StartAction)) != null ||

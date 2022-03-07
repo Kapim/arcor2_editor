@@ -156,7 +156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -350, y: 300}
+  m_AnchoredPosition: {x: -403, y: 300}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &4123610595538744578
@@ -606,8 +606,7 @@ MonoBehaviour:
   CollapseIcon: {fileID: 21300000, guid: 8b2176d310b519549a1915df62830193, type: 3}
   UncollapseIcon: {fileID: 21300000, guid: 567fc8e52b595a84d938dd2824741e89, type: 3}
   RobotHandIcon: {fileID: 2415682263488643444}
-  RobotHandBtn: {fileID: 7528623008459480582}
-  ActionPicker: {fileID: 1079025514483319792}
+  ActionPicker: {fileID: 0}
   Connecting: 0
 --- !u!1 &8983898657453594793
 GameObject:
@@ -646,7 +645,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -350, y: -25}
+  m_AnchoredPosition: {x: -63, y: 299}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &4782857385865732998
@@ -1287,7 +1286,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -1568,7 +1567,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -1844,7 +1843,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -1921,6 +1920,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Collapse
+      objectReference: {fileID: 0}
+    - target: {fileID: 1171430893015759436, guid: a37f66d2914458b4c85e50f9fa33cf93,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3750091178015956156, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -2405,7 +2409,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -2681,7 +2685,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
@@ -2957,7 +2961,7 @@ PrefabInstance:
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -350
+      value: -403
       objectReference: {fileID: 0}
     - target: {fileID: 7710050843114423662, guid: a37f66d2914458b4c85e50f9fa33cf93,
         type: 3}

@@ -87,13 +87,13 @@ MonoBehaviour:
   ActionObjectName: {fileID: 826771530686706174}
   Visual: {fileID: 1446646014438923905}
   Model: {fileID: 0}
+  outlineOnClick: {fileID: 1852372384386817337}
   CubePrefab: {fileID: 4648989740229487369, guid: eaf2d11af5d22ad4ab541babe0c35235,
     type: 3}
   CylinderPrefab: {fileID: 6167678633110614832, guid: 4e8c689fdd91a6c46b4b75cac9a152b8,
     type: 3}
   SpherePrefab: {fileID: 1882225777272338896, guid: 86f57e8e80a38894c9cdf8cb5ffc41ee,
     type: 3}
-  outlineOnClick: {fileID: 1852372384386817337}
 --- !u!114 &3050534694925757164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4117692875275004882}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12fabd961d2f703418575fef10475b7b, type: 3}
   m_Name: 

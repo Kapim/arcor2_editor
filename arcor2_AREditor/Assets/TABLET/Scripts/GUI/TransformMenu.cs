@@ -609,7 +609,7 @@ public class TransformMenu : Singleton<TransformMenu> {
     }
 
     private void NormalizeGizmoScale() {
-        gizmo.transform.localScale = new Vector3(0.1f / InteractiveObject.transform.localScale.x, 0.1f / InteractiveObject.transform.localScale.y, 0.1f / InteractiveObject.transform.localScale.z);
+        gizmo.transform.localScale = new Vector3(0.05f / InteractiveObject.transform.localScale.x, 0.05f / InteractiveObject.transform.localScale.y, 0.05f / InteractiveObject.transform.localScale.z);
     }
 
     private void UpdateSceneStateRelatedStuff() {
@@ -854,14 +854,16 @@ public class TransformMenu : Singleton<TransformMenu> {
         } 
     }
 
-    public void SetPivot() {
+    public async void SetPivot() {
         
         InteractiveObject interactiveObject = SelectorMenu.Instance.GetSelectedObject();
         if (interactiveObject is Action3D action)
             interactiveObject = action.ActionPoint;
         if (interactiveObject != null) {
             InteractiveObject.transform.position = interactiveObject.transform.position;
-            SubmitPosition();
+            await SubmitPosition();
+            GizmoTransform.transform.position = interactiveObject.transform.position;
+            GizmoTransform.transform.rotation = interactiveObject.transform.rotation;
         }
 
     }

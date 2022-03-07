@@ -343,6 +343,7 @@ public class LeftMenuProject : LeftMenu
                 } else {
                     AddActionButton.SetInteractivity(false, $"{ADD_ACTION_LABEL}\n(selected object is not action point)");
                     AddActionButton2.SetInteractivity(false, $"{ADD_ACTION_LABEL}\n(selected object is not action point)");
+                    AddActionButton2.SetInteractivity(false, $"{ADD_ACTION_LABEL}\n(selected object is not action point)");
                 }
                // ActionPointAimingMenuButton.SetInteractivity(obj is ActionPoint3D || obj is APOrientation, $"{ACTION_POINT_AIMING_LABEL}\n(selected object is not action point or orientation)");
                 if (obj is IActionPointParent) {
