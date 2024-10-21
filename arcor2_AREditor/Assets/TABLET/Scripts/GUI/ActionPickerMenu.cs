@@ -41,10 +41,21 @@ public class ActionPickerMenu : RightMenu<ActionPickerMenu> {
     private void OnActionAddedToScene(object sender, ActionEventArgs args) {
         if (args.Action.GetName() == addedActionName) {
             SelectorMenu.Instance.SetSelectedObject(args.Action, true);
-            AREditorResources.Instance.LeftMenuProject.RenameClick(true, () => {
-                AREditorResources.Instance.LeftMenuProject.SetActiveSubmenu(LeftMenuSelection.Utility);
-                AREditorResources.Instance.LeftMenuProject.OpenMenuButtonClick();
-            }, true);
+            string success_message = "Action " + addedActionName + " sucessfully added.";
+            if (args.Action.Parameters.Count > 0) {
+                AREditorResources.Instance.LeftMenuProject.RenameClick(true, () => {
+                    AREditorResources.Instance.LeftMenuProject.SetActiveSubmenu(LeftMenuSelection.Utility);
+                    // opens the action parameters menu
+                    AREditorResources.Instance.LeftMenuProject.OpenMenuButtonClick();
+                    Notifications.Instance.ShowToastMessage(success_message);
+                }, true);
+            } else {
+                AREditorResources.Instance.LeftMenuProject.RenameClick(true, () => {
+                    AREditorResources.Instance.LeftMenuProject.SetActiveSubmenu(LeftMenuSelection.Utility);
+                    Notifications.Instance.ShowToastMessage(success_message);
+                }, true);
+            }
+            
             addedActionName = null;
         }
     }
